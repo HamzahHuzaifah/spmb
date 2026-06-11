@@ -1,0 +1,70 @@
+<div class="form-card" style="text-align: center; padding: 50px 30px;">
+    <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <h2>Pendaftaran Berhasil Disimpan!</h2>
+    
+    <% if(typeof noRef !== 'undefined' && noRef) { %>
+    <div style="background-color: #e8f5e9; padding: 20px; border-radius: var(--radius-sm); border: 2px solid #4caf50; margin-bottom: 25px; text-align: center;">
+        <h3 style="color: #2e7d32; margin-bottom: 5px; font-size: 16px;">Nomor Pendaftaran Anda:</h3>
+        <div style="font-size: 26px; font-weight: bold; color: #1b5e20; letter-spacing: 1px;"><%= noRef %></div>
+        <p style="margin-top: 10px; font-size: 14px; color: #388e3c; margin-bottom: 0;">Harap simpan nomor pendaftaran ini untuk keperluan selanjutnya.</p>
+    </div>
+    <% } %>
+
+    <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 16px;">
+        Terima kasih telah mendaftar di SPMB JIC Tahun Ajaran 2026/2027. Data Anda telah kami terima dan akan segera diproses oleh panitia.
+    </p>
+    
+    <div style="background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); border: 1px dashed var(--primary); margin-bottom: 30px; display: inline-block; text-align: left;">
+        <h4 style="color: var(--primary); margin-bottom: 10px;">Langkah Selanjutnya:</h4>
+        <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+            <li>Siapkan dokumen fisik untuk daftar ulang yang diantaranya:</li>
+            <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+                <li> FC Akta Kelahiran</li>
+                <li> FC Kartu Keluarga</li>
+                <li> FC KTP Walisantri</li>
+            </ul>
+            <li>Khusus Pendaftar Beasiswa siapkan tambahan dokumen fisik sesuai dengan jenis beasiswa yang dipilih:</li>
+            <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+                <li> Beasiswa Dhuafa: SKTM</li>
+                <li> Beasiswa Yatim/Piatu: Surat Keterangan/Akta Kematian dan SKTM</li>
+                <li> Beasiswa Pegawai/Komunitas JIC: Kartu Pegawai/PJLP/Komunitas JIC atau surat keterangan dari kantor atau komunitas</li>
+            </ul>
+            <li>Tunggu pesan konfirmasi dari panitia via WhatsApp.</li>
+            <li>Silakan datang ke kantor JIC untuk verifikasi dokumen atau pembayaran administrasi jika di perlukan.</li>
+        </ul>
+    </div>
+    
+    <div style="background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); border: 1px dashed var(--primary); margin-bottom: 30px; display: inline-block; text-align: left;">
+        <h4 style="color: var(--primary); margin-bottom: 10px;">Ketentuan Umum Pendaftaran:</h4>
+        <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+            <li>Pembayaran Formulir dibayarkan setelah mengisi tautan pendaftaran, lalu Calon Santri Baru dapat mengikuti Tahap Observasi.</li>
+            <li>Setelah mengikuti Observasi dan menerima Hasil Observasi maka Calon Santri Baru wajib melakukan pembayaran pertama sebesar 50% dari total biaya. Maksimal 7 hari setelah hasil observasi diberikan</li>
+            <li>Skema pembayaran dapat dilakukan secara bertahap dengan ketentuan pembayaran yaitu paling minimal 3 bulan yaitu Juli-September:</li>
+            <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+                <li> Pembayaran ke-1: 50%</li>
+                <li> Pembayaran ke-2: 30%</li>
+                <li> Pembayaran ke-3: 20%</li>
+            </ul>
+            <li>Pembayaran ditransfer ke Bank Syariah Indonesia (BSI - Kode Bank 451) dengan No. Rekening 810 000 1118 an. PAUDQu Jakarta Islamic Centre</li>
+            <li>Untuk seragam, foto dan buku akan dijadwalkan pemberiannya dan pengambilan buku paket dan atk harus sudah membayarkan 50% dari jumlah biaya pendaftaran, dan untuk seragam bisa dibagikan apabila sudah masuk 80% dari jumlah biaya pendaftaran.</li>
+        </ul>
+    </div>
+
+     <div style="background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); border: 1px dashed var(--primary); margin-bottom: 30px; display: inline-block; text-align: left;">
+        <h4 style="color: var(--primary); margin-bottom: 10px;">Ketentuan Khusus:</h4>
+        <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+            <li>Dana yang sudah masuk tidak dapat diambil kembali kecuali hal-hal sebagai berikut:</li>
+            <ul style="color: var(--text-main); margin-left: 20px; line-height: 1.6;">
+                <li> Calon santri meninggal dunia maka seluruh dana yang sudah dibayarkan dikembalikan.</li>
+                <li> Orang tua pindah tugas ke daerah, maka dana yang telah dibayarkan dipotong sebesar 50% dari total biaya pendidikan dengan melampirkan surat tugas perusahaan/instansi terkait</li>
+                <li> Siswa mengundurkan diri dengan alasan diterima di sekolah lain maka dana yang sudah dibayarkan tidak dapat dikembalikan.</li>
+            </ul>
+    </div>
+    
+    <div>
+        <a href="/daftar" class="btn-submit" style="display: inline-block; width: auto; background-color: var(--surface); color: var(--primary); border: 2px solid var(--primary);">Kembali ke Halaman Pendaftaran</a>
+    </div>
+</div>

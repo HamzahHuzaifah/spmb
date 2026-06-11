@@ -1,0 +1,88 @@
+<%- include('partials/header', { title: 'Tunggakan Daftar Ulang', activePage: 'tunggakan-daftar-ulang' }) %>
+
+<div class="filter-bar">
+    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" onkeyup="filterData()">
+    <select id="statusInput" class="form-control" style="width: 200px;" onchange="filterData()">
+        <option value="">Semua Status Bayar</option>
+        <option value="Lunas">Lunas</option>
+        <option value="Belum Lunas">Belum Lunas</option>
+    </select>
+    <button class="btn btn-primary" onclick="filterData()">Filter</button>
+    <button class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
+        <i class="fas fa-print"></i> Cetak Tabel
+    </button>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Daftar Tunggakan Santri Daftar Ulang</div>
+    </div>
+    
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Lengkap</th>
+                <th>Lanjut Ke</th>
+                <th>No Telepon</th>
+                <th>Total Tagihan</th>
+                <th>Total Bayar</th>
+                <th>Sisa Bayar</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(tunggakan && tunggakan.length > 0) { %>
+                <% tunggakan.forEach((item, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td style="font-weight: 600;"><%= item.nama %></td>
+                    <td><span class="badge badge-info"><%= item.satuanPendidikan %></span></td>
+                    <td><%= item.noTelepon %></td>
+                    <td>Rp <%= item.totalTagihan.toLocaleString('id-ID') %></td>
+                    <td>Rp <%= item.totalBayar.toLocaleString('id-ID') %></td>
+                    <td style="color: var(--danger); font-weight: bold;">Rp <%= item.sisaBayar.toLocaleString('id-ID') %></td>
+                    <td>
+                        <span class="badge <%= item.status === 'Lunas' ? 'badge-success' : 'badge-danger' %>">
+                            <%= item.status %>
+                        </span>
+                    </td>
+                </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="8" style="text-align: center;">Tidak ada data tunggakan</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var statusInput = document.getElementById("statusInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[1]; // Nama is index 1
+        var tdStatus = tr[i].getElementsByTagName("td")[7]; // Status is index 7
+        if (tdNama && tdStatus) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtStatus = tdStatus.textContent || tdStatus.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            // For status, exactly matches the selected, or empty means all
+            var matchStatus = statusInput === "" || txtStatus.toLowerCase().trim() === statusInput;
+            
+            if (matchNama && matchStatus) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+</script>
+
+<%- include('partials/footer') %>

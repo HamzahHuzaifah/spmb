@@ -1,0 +1,223 @@
+<div class="form-card">
+    <h2 style="color: #d35400;">Form Pendaftaran Santri Baru (Jalur Beasiswa)</h2>
+    <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan pilih jenis beasiswa dan lengkapi data diri calon
+        santri beserta orang tua dengan benar.</p>
+
+    <div
+        style="background-color: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+        <h3 style="margin-bottom: 15px; color: var(--text-main);">Selamat Datang di Jalur Beasiswa!</h3>
+        <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Assalamualaikum warahmatullahi
+            wabarakatuh,<br><br>Madrasah Jakarta Islamic Centre menyediakan berbagai opsi beasiswa untuk membantu
+            meringankan biaya pendidikan bagi santri yang berhak. Silahkan Anda mengisi formulir pendaftaran berikut
+            untuk memulai pendaftaran di jalur beasiswa yang sesuai.</p>
+
+        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text-main);">SYARAT & KETENTUAN PENDAFTARAN
+            BEASISWA</h4>
+        <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Harap membaca ketentuan berikut dengan
+            seksama sebelum mengisi aplikasi pendaftaran Anda.</p>
+
+        <div
+            style="max-height: 200px; overflow-y: auto; background: var(--bg-main); padding: 15px; border-radius: 4px; font-size: 13px; line-height: 1.6; border: 1px solid var(--border);">
+            <p><strong>[ KETENTUAN BEASISWA ]</strong><br>
+                1. Calon santri yang mendaftar melalui jalur beasiswa wajib melampirkan dokumen pendukung asli saat
+                proses verifikasi (seperti SKTM, Akta Kematian untuk Yatim, dll).<br>
+                2. Pihak Panitia SPMB berhak melakukan survei atau membatalkan status beasiswa apabila data yang
+                diberikan terbukti tidak valid.<br>
+                3. Ketentuan biaya dan potongan diatur lebih lanjut dalam kebijakan sekolah.</p>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+            <label class="radio-label" style="font-weight: 500; color: var(--primary);">
+                <input type="checkbox" name="setujuSK" required> Saya telah membaca dan menyetujui seluruh Syarat &
+                Ketentuan pendaftaran di atas.
+            </label>
+        </div>
+    </div>
+
+    <form action="/daftar/beasiswa" method="POST">
+
+        <!-- Pilihan Jalur Beasiswa -->
+        <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            Jalur Pendaftaran Beasiswa</h3>
+        <div class="form-group" style="margin-bottom: 30px;">
+            <div class="radio-group" style="flex-direction: column; gap: 15px;">
+                <label class="radio-label">
+                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Dhuafa" required>
+                    <div>
+                        <strong>Beasiswa Dhuafa</strong>
+                        <div class="form-help">Potongan biaya khusus bagi kaum dhuafa (wajib melampirkan SKTM).</div>
+                    </div>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Yatim/Piatu">
+                    <div>
+                        <strong>Beasiswa Yatim/Piatu</strong>
+                        <div class="form-help">Potongan biaya khusus anak yatim/piatu (wajib melampirkan Surat
+                            Keterangan/Akta Kematian dan SKTM).</div>
+                    </div>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Pegawai/Komunitas JIC">
+                    <div>
+                        <strong>Beasiswa Pegawai/Komunitas JIC</strong>
+                        <div class="form-help">Potongan biaya khusus bagi Keluarga Pegawai/PJLP/Komunitas JIC (wajib melampirkan KTP & KK orang tua serta Kartu Pegawai/PJLP/Komunitas JIC atau surat keterangan dari kantor atau komunitas)</div>
+                    </div>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Satu Keluarga">
+                    <div>
+                        <strong>Beasiswa Satu Keluarga</strong>
+                        <div class="form-help">Potongan biaya khusus jika mendaftarkan atau menyekolahkan 2 anak kandung
+                            atau lebih dalam satu keluarga. (wajib melampirkan KTP & KK orang tua)</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Data Santri -->
+        <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            A. Data Calon Santri</h3>
+
+        <div class="form-group">
+            <label class="required">Nama Lengkap Santri</label>
+            <input type="text" name="namaSantri" class="form-input" placeholder="Masukkan nama lengkap" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nama Panggilan</label>
+            <input type="text" name="namaPanggilan" class="form-input" placeholder="Masukkan nama panggilan">
+        </div>
+
+        <div class="form-group">
+            <label class="required">Jenis Kelamin</label>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="jenisKelamin" value="Laki-laki" required> Laki-laki
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="jenisKelamin" value="Perempuan"> Perempuan
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Tingkat Pendidikan yang Didaftar</label>
+            <select name="pendidikan" class="form-input" required>
+                <option value="">-- Pilih Satuan Pendidikan --</option>
+                <option value="PAUDQu A">PAUDQu A</option>
+                <option value="PAUDQu B">PAUDQu B</option>
+                <option value="TPQ A">TPQ A</option>
+                <option value="TPQ B">TPQ B</option>
+                <option value="MDT 1">MDT 1</option>
+                <option value="MDT 2">MDT 2</option>
+                <option value="MDT 3">MDT 3</option>
+                <option value="MDT 4">MDT 4</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 15px;">
+            <div style="flex: 1;">
+                <label class="required">Tempat Lahir</label>
+                <input type="text" name="tempatLahir" class="form-input" placeholder="Kota tempat lahir" required>
+            </div>
+            <div style="flex: 1;">
+                <label class="required">Tanggal Lahir</label>
+                <input type="date" name="tanggalLahir" class="form-input" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Agama</label>
+            <select name="agama" class="form-input" required>
+                <option value="">-- Pilih Agama --</option>
+                <option value="Islam" selected>Islam</option>
+                <option value="Kristen">Kristen</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Konghucu">Konghucu</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Status dalam Keluarga</label>
+            <select name="statusKeluarga" class="form-input" required>
+                <option value="">-- Pilih Status --</option>
+                <option value="Anak Kandung">Anak Kandung</option>
+                <option value="Anak Tiri">Anak Tiri</option>
+                <option value="Anak Angkat">Anak Angkat</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Anak ke (berdasarkan Kartu Keluarga)</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span>Anak ke</span>
+                <input type="number" name="anakKe" class="form-input" style="width: 70px;" required>
+                <span>dari</span>
+                <input type="number" name="dariBersaudara" class="form-input" style="width: 70px;" required>
+                <span>Bersaudara</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Asal Sekolah</label>
+            <input type="text" name="asalSekolah" class="form-input"
+                placeholder="Nama asal sekolah (contoh: BimBa / TK ...). Kosongkan jika belum pernah.">
+        </div>
+
+        <h3
+            style="margin-top: 35px; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            B. Data Orang Tua / Wali</h3>
+
+        <div class="form-group">
+            <label class="required">Email Pendaftar (Orang Tua/Wali)</label>
+            <input type="email" name="email" class="form-input" placeholder="contoh@email.com" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Nama Ayah</label>
+            <input type="text" name="namaAyah" class="form-input" placeholder="Nama lengkap ayah" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Pekerjaan Ayah</label>
+            <input type="text" name="pekerjaanAyah" class="form-input" placeholder="Pekerjaan ayah saat ini" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">No. Telepon/WhatsApp Ayah</label>
+            <input type="tel" name="teleponAyah" class="form-input" placeholder="08xxxxxxxxxx" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Nama Ibu</label>
+            <input type="text" name="namaIbu" class="form-input" placeholder="Nama lengkap ibu" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Pekerjaan Ibu</label>
+            <input type="text" name="pekerjaanIbu" class="form-input" placeholder="Pekerjaan ibu saat ini" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">No. Telepon/WhatsApp Ibu</label>
+            <input type="tel" name="teleponIbu" class="form-input" placeholder="08xxxxxxxxxx" required>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Alamat Lengkap</label>
+            <textarea name="alamat" class="form-input" placeholder="Alamat domisili saat ini" required></textarea>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <button type="submit" class="btn-submit" style="background-color: #d35400;">Kirim Pendaftaran
+                Beasiswa</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/daftar" style="color: var(--primary); text-decoration: underline; font-size: 14px;">Ingin
+                mendaftar jalur reguler? Klik di sini.</a>
+        </div>
+    </form>
+</div>

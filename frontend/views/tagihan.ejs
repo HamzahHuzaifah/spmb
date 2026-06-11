@@ -1,0 +1,198 @@
+<%- include('partials/header', { title: 'Tagihan Santri Baru', activePage: 'tagihan' }) %>
+
+<div class="filter-bar">
+    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" onkeyup="filterData()">
+    <select id="satuanInput" class="form-control" style="width: 200px;" onchange="filterData()">
+        <option value="">Semua Pendidikan</option>
+        <option value="PAUDQu">PAUDQu</option>
+        <option value="TPQ">TPQ</option>
+        <option value="MDT">MDT</option>
+    </select>
+    <button class="btn btn-primary" onclick="filterData()">Filter</button>
+    <button class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
+        <i class="fas fa-print"></i> Cetak Tabel
+    </button>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Daftar Tagihan Berdasarkan Jalur</div>
+    </div>
+    
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Nama Santri</th>
+                <th>Jalur Pendaftaran</th>
+                <th>Satuan Pendidikan</th>
+                <th>Formulir</th>
+                <th>Uang Pangkal</th>
+                <th>Perlengkapan</th>
+                <th>Seragam</th>
+                <th>SPP (Juli)</th>
+                <th>Total Tagihan</th>
+                <th>Terbayar</th>
+                <th>Sisa Tagihan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(tagihan && tagihan.length > 0) { %>
+                <% tagihan.forEach(item => { %>
+                <tr>
+                    <td style="font-weight: 600;"><%= item.nama %></td>
+                    <td>
+                        <span class="badge <%= item.jalur === 'Regular' ? 'badge-info' : 'badge-warning' %>">
+                            <%= item.jalur %>
+                        </span>
+                    </td>
+                    <td><%= item.satuanPendidikan %></td>
+                    <td>Rp <%= (item.formulir || 0).toLocaleString('id-ID') %></td>
+                    <td>Rp <%= item.uangPangkal.toLocaleString('id-ID') %></td>
+                    <td>Rp <%= item.perlengkapan.toLocaleString('id-ID') %></td>
+                    <td>Rp <%= item.seragam.toLocaleString('id-ID') %></td>
+                    <td>Rp <%= item.spp.toLocaleString('id-ID') %></td>
+                    <td style="font-weight: bold; color: var(--primary);">Rp <%= item.totalTagihan.toLocaleString('id-ID') %></td>
+                    <% 
+                        let t = tunggakan.find(x => x.nama === item.nama);
+                        let totalBayar = t ? t.totalBayar : 0;
+                        let sisaBayar = t ? t.sisaBayar : item.totalTagihan;
+                    %>
+                    <td style="font-weight: bold; color: var(--success);">Rp <%= totalBayar.toLocaleString('id-ID') %></td>
+                    <td style="font-weight: bold; color: var(--danger);">Rp <%= sisaBayar.toLocaleString('id-ID') %></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" data-tagihan="<%= JSON.stringify(item) %>" onclick="openTagihanModal(this)">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="12" style="text-align: center;">Tidak ada data tagihan</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Edit Tagihan -->
+<style>
+/* Enhanced Modal Styles */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); overflow-y: auto; padding-top: 50px; padding-bottom: 50px; backdrop-filter: blur(4px); }
+.modal-content { background-color: #ffffff; margin: 0 auto; padding: 35px 40px; border-radius: 12px; width: 90%; max-width: 650px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.close-modal { color: #999; float: right; font-size: 32px; font-weight: 300; cursor: pointer; transition: color 0.3s; }
+.close-modal:hover { color: #333; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
+
+.modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+.form-group-modal label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; font-size: 14px; }
+.form-input { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
+.form-input:focus { border-color: #007bff; box-shadow: 0 0 5px rgba(0,123,255,0.3); outline: none; }
+.form-input[readonly] { background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6; cursor: not-allowed; }
+.modal-footer { margin-top: 35px; text-align: right; border-top: 2px solid #f0f0f0; padding-top: 20px; }
+.btn { padding: 10px 25px; font-weight: 600; border-radius: 6px; font-size: 15px; cursor: pointer; border: none; transition: background-color 0.3s; }
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover { background-color: #0056b3; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+</style>
+
+<div id="tagihanModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+        <h2 style="color: var(--primary); margin: 0;">Edit Data Tagihan</h2>
+        <span class="close-modal" onclick="closeTagihanModal()">&times;</span>
+    </div>
+    
+    <form id="editTagihanForm" method="POST" action="">
+        <div class="form-group-modal" style="margin-bottom: 20px;">
+            <label>Nama Santri</label>
+            <input type="text" id="m_nama" class="form-input" readonly>
+        </div>
+
+        <div class="modal-grid">
+            <div class="form-group-modal">
+                <label>Formulir (Rp)</label>
+                <input type="number" name="formulir" id="m_formulir" class="form-input" required>
+            </div>
+            <div class="form-group-modal">
+                <label>Uang Pangkal (Rp)</label>
+                <input type="number" name="uangPangkal" id="m_uangPangkal" class="form-input" required>
+            </div>
+            <div class="form-group-modal">
+                <label>Perlengkapan (Rp)</label>
+                <input type="number" name="perlengkapan" id="m_perlengkapan" class="form-input" required>
+            </div>
+            <div class="form-group-modal">
+                <label>Seragam (Rp)</label>
+                <input type="number" name="seragam" id="m_seragam" class="form-input" required>
+            </div>
+            <div class="form-group-modal">
+                <label>SPP (Juli) (Rp)</label>
+                <input type="number" name="spp" id="m_spp" class="form-input" required>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeTagihanModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-left: 10px;">Simpan Perubahan</button>
+        </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var satuanInput = document.getElementById("satuanInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[0];
+        var tdSatuan = tr[i].getElementsByTagName("td")[2];
+        if (tdNama && tdSatuan) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtSatuan = tdSatuan.textContent || tdSatuan.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            var matchSatuan = satuanInput === "" || txtSatuan.toLowerCase().indexOf(satuanInput) > -1;
+            
+            if (matchNama && matchSatuan) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+function openTagihanModal(btn) {
+    var data = JSON.parse(btn.getAttribute('data-tagihan'));
+    
+    // Ganti URL action form dengan endpoint edit sesuai ID tagihan (misal /tagihan/edit/:id)
+    document.getElementById('editTagihanForm').action = '/tagihan/edit/' + (data.id || '');
+    
+    document.getElementById('m_nama').value = data.nama || '';
+    document.getElementById('m_formulir').value = data.formulir || 0;
+    document.getElementById('m_uangPangkal').value = data.uangPangkal || 0;
+    document.getElementById('m_perlengkapan').value = data.perlengkapan || 0;
+    document.getElementById('m_seragam').value = data.seragam || 0;
+    document.getElementById('m_spp').value = data.spp || 0;
+    
+    document.getElementById('tagihanModal').style.display = 'block';
+}
+
+function closeTagihanModal() {
+    document.getElementById('tagihanModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    var modal = document.getElementById('tagihanModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+<%- include('partials/footer') %>

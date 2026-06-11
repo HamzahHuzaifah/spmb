@@ -1,0 +1,649 @@
+<%- include('partials/header', { title: 'Laporan Utama' , activePage: 'laporan' }) %>
+
+    <div class="filter-bar">
+        <select class="form-control" id="filterTahun">
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+        </select>
+        <select class="form-control" id="filterBulan">
+            <option value="">Semua Bulan</option>
+            <option value="Januari">Januari</option>
+            <option value="Februari">Februari</option>
+            <option value="Maret">Maret</option>
+            <option value="April">April</option>
+            <option value="Mei">Mei</option>
+            <option value="Juni">Juni</option>
+            <option value="Juli">Juli</option>
+            <option value="Agustus">Agustus</option>
+            <option value="September">September</option>
+            <option value="Oktober">Oktober</option>
+            <option value="November">November</option>
+            <option value="Desember">Desember</option>
+        </select>
+        <button class="btn btn-primary" onclick="filterData()">Filter</button>
+
+        <div style="margin-left: auto;">
+            <button class="btn btn-info" onclick="openPreviewLaporan()"
+                style="color: white; background-color: #0ea5e9; border: none; margin-right: 10px;">
+                <i class="fas fa-eye"></i> Preview Laporan
+            </button>
+            <button class="btn btn-secondary btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i> Cetak / PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-title">Laporan Keuangan SPMB JIC</div>
+        </div>
+
+        <table id="tabelLaporan">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>Bulan</th>
+                    <th>No Transaksi</th>
+                    <th>Uraian</th>
+                    <th>Pemasukan</th>
+                    <th>Pengeluaran</th>
+                    <th>Saldo Akhir</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% let saldo=0; if(laporan && laporan.length> 0) {
+                    laporan.forEach((item, index) => {
+                    saldo = saldo + item.pemasukan - item.pengeluaran;
+                    %>
+                    <tr>
+                        <td>
+                            <%= index + 1 %>
+                        </td>
+                        <td>
+                            <%= item.tanggal %>
+                        </td>
+                        <td>
+                            <%= item.bulan %>
+                                <%= item.tahun %>
+                        </td>
+                        <td>
+                            <%= item.noTransaksi %>
+                        </td>
+                        <td>
+                            <%= item.uraian %>
+                        </td>
+                        <td style="color: var(--success);">
+                            <%= item.pemasukan> 0 ? 'Rp ' + item.pemasukan.toLocaleString('id-ID') : '-' %>
+                        </td>
+                        <td style="color: var(--danger);">
+                            <%= item.pengeluaran> 0 ? 'Rp ' + item.pengeluaran.toLocaleString('id-ID') : '-' %>
+                        </td>
+                        <td style="font-weight: bold;">Rp <%= saldo.toLocaleString('id-ID') %>
+                        </td>
+                    </tr>
+                    <% }) } else { %>
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Tidak ada data laporan</td>
+                        </tr>
+                        <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Modal Preview Laporan -->
+    <div id="previewModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; overflow-y: auto; padding: 20px;">
+        <div
+            style="max-width: 21.59cm; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; position: relative;">
+            <!-- Modal Toolbar -->
+            <div style="text-align: right; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 10px;"
+                class="no-print">
+                <button onclick="toggleEditLaporan()" class="btn btn-warning" id="btnEditLaporan"
+                    style="background-color: #f59e0b; border:none; margin-right: 5px;"><i class="fas fa-edit"></i>
+                    Edit Data</button>
+                <button onclick="exportPreviewToWord()" class="btn btn-primary" id="btnWordLaporan"
+                    style="background-color: #2563eb; border:none; margin-right: 5px;"><i class="fas fa-file-word"></i>
+                    Export Word</button>
+                <button onclick="exportPreviewToPDF()" class="btn btn-danger" id="btnPdfLaporan"
+                    style="background-color: #dc2626; border:none; margin-right: 5px;"><i class="fas fa-file-pdf"></i>
+                    Export PDF</button>
+                <button onclick="printPreview()" class="btn btn-success" id="btnPrintLaporan"
+                    style="background-color: #059669; border:none; margin-right: 5px;"><i class="fas fa-print"></i>
+                    Cetak</button>
+                <button onclick="closePreviewLaporan()" class="btn btn-secondary"><i class="fas fa-times"></i>
+                    Tutup</button>
+            </div>
+
+            <div id="layoutControlsLaporan" class="no-print" style="display: none; margin-bottom: 20px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ccc; max-width: 500px; margin-left: auto; margin-right: auto; justify-content: center; gap: 10px;">
+                <strong style="display: flex; align-items: center; margin-right: 10px;">Geser Tata Letak Laporan:</strong>
+                <button type="button" onclick="moveLaporanLayout(0, -10)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-up"></i> Naik</button>
+                <button type="button" onclick="moveLaporanLayout(0, 10)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-down"></i> Turun</button>
+                <button type="button" onclick="moveLaporanLayout(-10, 0)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-left"></i> Kiri</button>
+                <button type="button" onclick="moveLaporanLayout(10, 0)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-right"></i> Kanan</button>
+            </div>
+
+            <!-- The F4 Preview Container -->
+            <div id="previewF4Wrapper"
+                style="width: 21.59cm; height: 33cm; margin: 0 auto; background-color: #ffffff; background-image: url('/images/Template%20Laporan%20dan%20Kwintasi.webp'); background-size: 100% 100%; background-repeat: no-repeat; position: relative; font-family: 'Arial', sans-serif; font-size: 10pt; color: #000; box-sizing: border-box;">
+                
+                <!-- 
+                ===================================================================================
+                PANDUAN MENGATUR JARAK MANUAL (SETTING PADDING)
+                Jika posisi judul terasa masih terlalu dekat atau jauh dari Kop Surat, 
+                Anda bisa mengubah angka "3.8cm" pada kode padding di bawah ini.
+                "3.8cm" adalah padding atas. Naikkan ke 4.0cm untuk lebih turun, atau kurangi ke 3.6cm untuk lebih naik.
+                ===================================================================================
+                -->
+                <div id="contentOverlayLaporan"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 4.8cm 1.5cm 1.5cm 1.5cm; box-sizing: border-box;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; font-size: 12pt; font-weight: bold; letter-spacing: 0.5px;">LAPORAN KAS
+                            KEUANGAN SPMB</h3>
+                        <h3 id="previewTahunJudul"
+                            style="margin: 0; font-size: 12pt; font-weight: bold; letter-spacing: 0.5px;">TAHUN
+                            PELAJARAN ...</h3>
+                        <h4 id="previewBulanJudul" style="margin: 15px 0 0 0; font-size: 11pt; font-weight: bold;">Bulan
+                            ...</h4>
+                    </div>
+
+                    <style>
+                        #previewTable th {
+                            background-color: #3a7b5e !important;
+                            color: white !important;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+
+                        #previewTable td {
+                            white-space: normal !important;
+                            word-wrap: break-word !important;
+                        }
+
+                        /* --- KODE PENANGKAL BOCORAN CSS TEMPLATE --- */
+
+                        /* 1. Mencegah efek "background gelap" pada baris tabel saat kursor diarahkan */
+                        #previewModal table tr:hover,
+                        #previewModal table td:hover,
+                        .footer-table tr:hover td,
+                        .footer-table td:hover {
+                            background-color: transparent !important;
+                        }
+
+                        /* 2. Menghilangkan "garis bawah" (border) dan background di text TTD */
+                        #previewModal [contenteditable] {
+                            outline: none !important;
+                            box-shadow: none !important;
+                            background: transparent !important;
+                            border: none !important; /* Ini yang menghilangkan garis bawaan template */
+                            text-decoration: none !important;
+                        }
+
+                        #previewModal [contenteditable]:hover,
+                        #previewModal [contenteditable]:focus {
+                            background: transparent !important;
+                            background-color: transparent !important;
+                            outline: none !important;
+                            border: none !important; /* Tangkal garis bawah tambahan saat di-hover */
+                            text-decoration: none !important;
+                            box-shadow: none !important;
+                        }
+
+                        #previewModal.editable-mode [contenteditable]:focus {
+                            outline: 2px dashed #007bff !important;
+                            background-color: #f8f9fa !important;
+                        }
+                    </style>
+
+                    <table
+                        style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #000; table-layout: fixed; word-wrap: break-word;"
+                        id="previewTable">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 5%;">NO</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 15%;">
+                                    TANGGAL</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 38%;">URAIAN
+                                </th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 14%;">DEBIT
+                                </th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 14%;">KREDIT
+                                </th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 14%;">SALDO
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewTbody">
+                            <!-- Content injected via JS -->
+                        </tbody>
+                    </table>
+
+                    <table class="footer-table" style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; table-layout: fixed; background-color: transparent !important;">
+                        <tr style="background-color: transparent !important;">
+                            <td style="width: 60%; background-color: transparent !important;"></td>
+                            <td style="width: 40%; text-align: center; vertical-align: bottom; background-color: transparent !important;">
+                                <div style="margin-bottom: 10px; background-color: transparent !important;">Jakarta, <span id="previewTanggalCetak" contenteditable="true" spellcheck="false" style="text-decoration: none !important; background: transparent !important; outline: none !important; border: none !important; box-shadow: none !important;">...</span></div>
+                                <div class="ttd-container" style="position: relative; text-align: center; height: 50px; background-color: transparent !important;">
+                                    <img src="/images/TTD Bendahara.webp" class="ttd-image" alt="TTD Bendahara" style="width: 120px; display: inline-block; position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + 0px), calc(-50% + 0px)); z-index: 1;">
+                                    <div class="ttd-controls no-print" style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); z-index: 2; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 5px; border: 1px solid #ccc; white-space: nowrap;">
+                                        <button type="button" onclick="deleteTtd(this)" style="background: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-trash"></i></button>
+                                        <button type="button" onclick="resizeTtd(this, 10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-plus"></i></button>
+                                        <button type="button" onclick="resizeTtd(this, -10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-minus"></i></button>
+                                        <button type="button" onclick="moveTtd(this, 0, -5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-up"></i></button>
+                                        <button type="button" onclick="moveTtd(this, 0, 5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-down"></i></button>
+                                        <button type="button" onclick="moveTtd(this, -5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-left"></i></button>
+                                        <button type="button" onclick="moveTtd(this, 5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-right"></i></button>
+                                    </div>
+                                </div>
+                                <p class="signature-name" style="position: relative; z-index: 2; margin: 0; font-weight: bold; text-decoration: none !important; background: transparent !important; outline: none !important; border: none !important; box-shadow: none !important;" contenteditable="true" spellcheck="false">Henny Maulida, S.Pd.</p>
+                                <p style="margin: 5px 0 0 0; background-color: transparent !important;">Bendahara SPMB</p>
+                            </td>
+                        </tr>
+                    </table>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rawLaporanData = <%- JSON.stringify(laporan || []) %>;
+        const rawTransaksi = <%- JSON.stringify(typeof transaksiTerbaru !== 'undefined' ? transaksiTerbaru : []) %>;
+
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        function getMonthIndex(name) {
+            return monthNames.indexOf(name);
+        }
+
+        function formatRupiah(num) {
+            if (!num) return '';
+            return 'Rp' + parseInt(num).toLocaleString('id-ID');
+        }
+
+        let currentTtdWidth = 120;
+        let currentTtdX = 0;
+        let currentTtdY = 0;
+
+        function resizeTtd(btn, changePx) {
+            currentTtdWidth += changePx;
+            if (currentTtdWidth < 50) currentTtdWidth = 50;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.width = currentTtdWidth + 'px';
+        }
+
+        function deleteTtd(btn) {
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.display = 'none';
+        }
+
+        function moveTtd(btn, dx, dy) {
+            currentTtdX += dx;
+            currentTtdY += dy;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.transform = `translate(calc(-50% + ${currentTtdX}px), calc(-50% + ${currentTtdY}px))`;
+        }
+
+        let isLaporanEditing = false;
+        let currentLaporanMarginTop = 4.8 * 37.8;
+        let currentLaporanMarginLeft = 1.5 * 37.8;
+
+        function moveLaporanLayout(xPx, yPx) {
+            currentLaporanMarginLeft += xPx;
+            currentLaporanMarginTop += yPx;
+            
+            const overlay = document.getElementById('contentOverlayLaporan');
+            overlay.style.paddingLeft = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingRight = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingTop = (currentLaporanMarginTop / 37.8).toFixed(2) + 'cm';
+        }
+
+        function toggleEditLaporan() {
+            const btnEdit = document.getElementById('btnEditLaporan');
+            const layoutControls = document.getElementById('layoutControlsLaporan');
+            const ttdControls = document.querySelectorAll('#previewModal .ttd-controls');
+            const modal = document.getElementById('previewModal');
+            
+            if (!isLaporanEditing) {
+                isLaporanEditing = true;
+                modal.classList.add('editable-mode');
+                ttdControls.forEach(el => el.style.display = "block");
+                layoutControls.style.display = "flex";
+                
+                btnEdit.innerHTML = '<i class="fas fa-check"></i> Selesai Edit';
+                btnEdit.classList.replace('btn-warning', 'btn-success');
+                btnEdit.style.backgroundColor = '#059669';
+                
+                // Enable editing manually in case they were disabled
+                document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
+            } else {
+                isLaporanEditing = false;
+                modal.classList.remove('editable-mode');
+                ttdControls.forEach(el => el.style.display = "none");
+                layoutControls.style.display = "none";
+                
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+                btnEdit.classList.replace('btn-success', 'btn-warning');
+                btnEdit.style.backgroundColor = '#f59e0b';
+                
+                // Disable editing for cleaner print
+                document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        function openPreviewLaporan() {
+            const filterTahun = document.getElementById("filterTahun").value;
+            const filterBulan = document.getElementById("filterBulan").value;
+
+            if (!filterBulan) {
+                alert("Silakan pilih Bulan terlebih dahulu untuk melihat preview laporan bulanan.");
+                return;
+            }
+
+            document.getElementById('previewTahunJudul').innerText = `TAHUN PELAJARAN ${filterTahun}/${parseInt(filterTahun) + 1}`;
+            document.getElementById('previewBulanJudul').innerText = `Bulan ${filterBulan}`;
+
+            let d = new Date();
+            document.getElementById('previewTanggalCetak').innerText = `${d.getDate()} ${filterBulan} ${filterTahun}`;
+
+            let selTahun = parseInt(filterTahun);
+            let selBulanIdx = getMonthIndex(filterBulan);
+
+            let saldoAwal = 0;
+            let currentData = [];
+
+            rawLaporanData.forEach(item => {
+                let itemTahun = parseInt(item.tahun);
+                let itemBulanIdx = getMonthIndex(item.bulan);
+
+                if (itemTahun < selTahun || (itemTahun === selTahun && itemBulanIdx < selBulanIdx)) {
+                    saldoAwal += (item.pemasukan || 0) - (item.pengeluaran || 0);
+                } else if (itemTahun === selTahun && itemBulanIdx === selBulanIdx) {
+                    currentData.push(item);
+                }
+            });
+
+            const tbody = document.getElementById('previewTbody');
+            tbody.innerHTML = '';
+
+            let no = 1;
+            let prevMonthName = selBulanIdx === 0 ? "Desember" : monthNames[selBulanIdx - 1];
+            let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
+
+            let totalDebit = saldoAwal;
+            let totalKredit = 0;
+            let runningSaldo = saldoAwal;
+
+            // Row 1: Saldo Awal
+            let trAwal = document.createElement('tr');
+            trAwal.innerHTML = `
+            <td style="border: 1px solid #000; padding: 6px; text-align: center;">${no++}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: center;">01/${(selBulanIdx + 1).toString().padStart(2, '0')}/${selTahun}</td>
+            <td style="border: 1px solid #000; padding: 6px;">Saldo Bulan ${prevMonthName} ${prevMonthYear}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(saldoAwal)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;"></td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(saldoAwal)}</td>
+        `;
+            tbody.appendChild(trAwal);
+
+            // Transactions
+            currentData.forEach(item => {
+                runningSaldo += (item.pemasukan || 0) - (item.pengeluaran || 0);
+                totalDebit += (item.pemasukan || 0);
+                totalKredit += (item.pengeluaran || 0);
+
+                // Format Uraian
+                let uraianText = item.uraian;
+
+                // Try cross reference to get namaSantri and satuanPendidikan
+                const trx = rawTransaksi.find(t => t.noTransaksi === item.noTransaksi);
+                if (trx) {
+                    if (item.pemasukan > 0) {
+                        if (uraianText.includes('Pendaftaran Baru') || uraianText.includes('Daftar Ulang') || uraianText.includes('Pembayaran')) {
+                            // Clean up existing 'Pembayaran Pendaftaran Baru [Nama]' to just the action.
+                            let actionType = "Pembayaran Pendaftaran Baru";
+                            if (uraianText.includes('Daftar Ulang')) actionType = "Pembayaran Daftar Ulang";
+                            else if (trx.kategoriDana && trx.kategoriDana !== '-') actionType = `Pembayaran ${trx.kategoriDana}`;
+
+                            let sat = trx.satuanPendidikan || 'SPMB';
+                            if (sat === 'MADRASAH') sat = 'MDT';
+                            uraianText = `Diterima ${actionType} ${sat} Tahun Pelajaran ${filterTahun}/${parseInt(filterTahun) + 1} dari ${trx.namaSantri}`;
+                        } else {
+                            uraianText = `Diterima ${uraianText} dari ${trx.namaSantri || trx.diterimaDari || 'Siswa'}`;
+                        }
+                    } else if (item.pengeluaran > 0) {
+                        uraianText = `Dikeluarkan untuk ${uraianText}`;
+                    }
+                } else {
+                    // Fallback basic text
+                    if (item.pemasukan > 0 && !uraianText.startsWith('Diterima')) uraianText = "Diterima " + uraianText;
+                    if (item.pengeluaran > 0 && !uraianText.startsWith('Dikeluarkan')) uraianText = "Dikeluarkan untuk " + uraianText;
+                }
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${no++}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.tanggal}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${uraianText}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${item.pemasukan ? formatRupiah(item.pemasukan) : ''}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${item.pengeluaran ? formatRupiah(item.pengeluaran) : ''}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(runningSaldo)}</td>
+            `;
+                tbody.appendChild(tr);
+            });
+
+            // Row Terakhir: Total
+            let trTotal = document.createElement('tr');
+            trTotal.innerHTML = `
+            <td colspan="3" style="border: 1px solid #000; padding: 6px; text-align: center; font-style: italic; font-weight: bold;">Total Saldo</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(totalDebit)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(totalKredit)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(runningSaldo)}</td>
+        `;
+            tbody.appendChild(trTotal);
+
+            document.getElementById('previewModal').style.display = 'flex';
+            document.getElementById('previewModal').classList.remove('editable-mode');
+            document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            
+            // Reset Edit Button State
+            const btnEdit = document.getElementById('btnEditLaporan');
+            if (btnEdit) {
+                isLaporanEditing = false;
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+                btnEdit.classList.remove('btn-success');
+                btnEdit.classList.add('btn-warning');
+                btnEdit.style.backgroundColor = '#f59e0b';
+                
+                const layoutControls = document.getElementById('layoutControlsLaporan');
+                if (layoutControls) layoutControls.style.display = 'none';
+                
+                const ttdControls = document.querySelectorAll('#previewModal .ttd-controls');
+                ttdControls.forEach(el => el.style.display = 'none');
+            }
+        }
+
+        function closePreviewLaporan() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function printPreview() {
+            const p = document.getElementById('previewF4Wrapper');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+            <html>
+            <head>
+                <title>Cetak Laporan</title>
+                <style>
+                    @page { size: 21.59cm 33cm; margin: 0; }
+                    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .wrapper { 
+                        width: 21.59cm; height: 33cm; 
+                        background-image: url('${window.location.origin}/images/Template%20Laporan%20dan%20Kwintasi.webp'); 
+                        background-size: 100% 100%; 
+                        position: relative;
+                        font-family: Arial, sans-serif;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="wrapper">
+                    ${p.innerHTML}
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    };
+                </` + `script>
+            </body>
+            </html>
+        `);
+            printWindow.document.close();
+        }
+
+        function exportPreviewToPDF() {
+            const element = document.getElementById('previewF4Wrapper');
+            const btn = document.querySelector('button[onclick="exportPreviewToPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+
+            const opt = {
+                margin: 0,
+                filename: 'Laporan_Keuangan_SPMB.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'cm', format: [21.59, 33], orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+            });
+        }
+
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportPreviewToWord() {
+            const btn = document.querySelector('button[onclick="exportPreviewToWord()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            btn.disabled = true;
+
+            try {
+                const bgDataUrl = await getBase64Image('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+
+                const clone = document.getElementById('previewF4Wrapper').cloneNode(true);
+                clone.querySelectorAll('[contenteditable]').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                    el.style.border = 'none';
+                });
+                const contentStr = clone.innerHTML;
+
+                const html = `
+            <html xmlns:v="urn:schemas-microsoft-com:vml"
+            xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:w="urn:schemas-microsoft-com:office:word"
+            xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+            xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+            <meta charset="utf-8">
+            <style>
+              @page WordSection1 {
+                size: 21.59cm 33.0cm;
+                margin: 0cm 0cm 0cm 0cm;
+                mso-header-margin: 0cm;
+                mso-footer-margin: 0cm;
+                mso-paper-source: 0;
+              }
+              div.WordSection1 { page: WordSection1; }
+              body { font-family: Arial, sans-serif; font-size: 10pt; margin: 0; padding: 0; }
+              table { border-collapse: collapse; }
+              td, th { vertical-align: top; }
+            </style>
+            <!--[if gte mso 9]>
+            <xml>
+             <w:WordDocument>
+              <w:View>Print</w:View>
+              <w:Zoom>100</w:Zoom>
+              <w:DoNotOptimizeForBrowser/>
+             </w:WordDocument>
+            </xml>
+            <![endif]-->
+            </head>
+            <body>
+            <div class="WordSection1">
+              <!--[if gte vml 1]>
+              <v:rect id="bgimg" style="position:absolute;left:0;top:0;width:21.59cm;height:33.0cm;z-index:-1" stroked="f">
+                <v:fill src="${bgDataUrl}" type="frame"/>
+              </v:rect>
+              <![endif]-->
+              ${contentStr}
+            </div>
+            </body>
+            </html>
+            `;
+
+                const blob = new Blob(['\\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Laporan_Keuangan_SPMB.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (e) {
+                console.error(e);
+                alert('Gagal mengexport ke Word.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function filterData() {
+            var filterTahun = document.getElementById("filterTahun").value.toLowerCase();
+            var filterBulan = document.getElementById("filterBulan").value.toLowerCase();
+            var table = document.getElementById("tabelLaporan");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdBulan = tr[i].getElementsByTagName("td")[2]; // Bulan dan Tahun is index 2
+                if (tdBulan) {
+                    var txtBulan = tdBulan.textContent || tdBulan.innerText;
+                    var txtLower = txtBulan.toLowerCase();
+
+                    var matchTahun = filterTahun === "" || txtLower.indexOf(filterTahun) > -1;
+                    var matchBulan = filterBulan === "" || txtLower.indexOf(filterBulan) > -1;
+
+                    if (matchTahun && matchBulan) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+
+    <%- include('partials/footer') %>

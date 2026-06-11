@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= typeof title !=='undefined' ? title + ' - ' : '' %>SPMB JIC
+    </title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style-public.css">
+</head>
+
+<body class="public-body">
+
+    <% if (bodyView !== 'landing') { %>
+    <div class="public-header">
+        <h1>Madrasah Jakarta Islamic Centre</h1>
+        <p>Sistem Penerimaan Murid Baru Tahun Ajaran 2026/2027</p>
+    </div>
+    <% } %>
+
+    <div class="public-container">
+        <%- include(bodyView) %>
+    </div>
+
+</body>
+
+</html>

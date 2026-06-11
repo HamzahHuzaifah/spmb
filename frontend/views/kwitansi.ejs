@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kwitansi Pembayaran SPMB JIC - <%= no_transaksi %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Ukuran kertas F4 (Folio) standar 21.59cm x 33cm */
+        @page {
+            size: 21.59cm 33cm;
+            margin: 0; /* Margin 0 agar gambar template full memenuhi kertas */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+            background-color: #e2e8f0;
+            font-size: 11pt;
+            line-height: 1.5;
+        }
+
+        /* Container yang mensimulasikan kertas F4 */
+        .page-wrapper {
+            width: 21.59cm;
+            height: 33cm;
+            margin: 40px auto;
+            background-color: #ffffff;
+            background-image: url('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* Konten kwitansi layer atas */
+        .content-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            /* Padding atas disesuaikan agar Kop Surat pada template tidak tertimpa teks */
+            padding: 6.5cm 2.5cm 2.5cm 2.5cm;
+        }
+
+        .kwitansi-title-wrapper {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .doc-title {
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .doc-number {
+            font-size: 11pt;
+            margin: 5px 0 0 0;
+        }
+
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .content-table td {
+            padding: 10px 5px;
+            vertical-align: top;
+            font-size: 12pt;
+        }
+
+        .label {
+            width: 200px;
+        }
+
+        .colon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .value {
+            border-bottom: 1px dotted #000;
+        }
+
+        .value-highlight {
+            font-weight: bold;
+        }
+
+        .terbilang-container {
+            width: 100%;
+            border: 1px solid #000;
+            padding: 15px 20px;
+            margin-bottom: 40px;
+            border-radius: 4px;
+            /* Latar transparan ringan jika ada corak di template, atau solid putih jika ingin menutupinya */
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+
+        .terbilang-value {
+            font-style: italic;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .amount-cell {
+            width: 60%;
+            vertical-align: top;
+        }
+
+        .amount-box {
+            border: 2px solid #000;
+            font-size: 16pt;
+            font-weight: bold;
+            padding: 12px 25px;
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+
+        .signature-cell {
+            width: 40%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .date-text {
+            margin-bottom: 80px;
+        }
+
+        .signature-name {
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 0;
+        }
+
+        .signature-role {
+            font-size: 10pt;
+            margin: 5px 0 0 0;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn-print {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 12pt;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-back {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #475569;
+            font-size: 11pt;
+            padding: 11px 25px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: white;
+            display: inline-block;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            .page-wrapper {
+                margin: 0;
+                box-shadow: none;
+                width: 21.59cm;
+                height: 33cm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Pastikan background tercetak */
+            .page-wrapper {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .terbilang-container, .amount-box {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Editable Mode Styles */
+        .editable-mode .editable-field {
+            border: 1px dashed #007bff;
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            cursor: text;
+            display: inline-block;
+            min-width: 50px;
+        }
+        .editable-mode .editable-field:focus {
+            outline: 2px solid #007bff;
+            background-color: #fff;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+
+    <div class="no-print action-buttons">
+        <button onclick="window.print()" class="btn-print" id="btnPrint">
+            <i class="fas fa-print"></i> Cetak Kwitansi
+        </button>
+        <button type="button" onclick="toggleEdit()" class="btn-print" id="btnEdit" style="background-color: #f59e0b; margin-left: 10px;">
+            <i class="fas fa-edit"></i> Edit Data
+        </button>
+        <button type="button" onclick="exportToPDF()" class="btn-print" id="btnPdf" style="background-color: #dc2626; margin-left: 10px;">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button type="button" onclick="exportToWord()" class="btn-print" id="btnWord" style="background-color: #2563eb; margin-left: 10px;">
+            <i class="fas fa-file-word"></i> Export Word
+        </button>
+        <a href="/input-transaksi" class="btn-back">Kembali</a>
+        
+        <div id="layoutControls" class="no-print" style="display: none; margin-top: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ccc; max-width: 500px; margin-left: auto; margin-right: auto; justify-content: center; gap: 10px;">
+            <strong style="display: flex; align-items: center; margin-right: 10px;">Geser Tata Letak Kwitansi:</strong>
+            <button type="button" onclick="moveLayout(0, -10)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-up"></i> Naik</button>
+            <button type="button" onclick="moveLayout(0, 10)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-down"></i> Turun</button>
+            <button type="button" onclick="moveLayout(-10, 0)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-left"></i> Kiri</button>
+            <button type="button" onclick="moveLayout(10, 0)" style="padding: 5px 10px; cursor: pointer;"><i class="fas fa-arrow-right"></i> Kanan</button>
+        </div>
+    </div>
+
+    <!-- Container F4 dengan gambar template di dalamnya -->
+    <div class="page-wrapper">
+
+        <!-- KONTEN KWITANSI OVERLAY (Diatas Template) -->
+        <% 
+    const defaultOrder = ['diterimaDari', 'namaSantri', 'satuanPendidikan', 'untukPembayaran', 'nominalRow', 'terbilangRow', 'dibayarkanKepada', 'kategoriDana', 'keteranganPengeluaran', 'rincianPengeluaran', 'untukBantuan'];
+    let currentOrder = [];
+    try {
+        if (typeof rowOrder !== 'undefined' && rowOrder) {
+            currentOrder = JSON.parse(rowOrder);
+        }
+    } catch(e) {}
+    if (!Array.isArray(currentOrder) || currentOrder.length === 0) currentOrder = defaultOrder;
+    const getOrder = (id) => {
+        let idx = currentOrder.indexOf(id);
+        return idx !== -1 ? idx : defaultOrder.indexOf(id);
+    };
+%>
+<div class="content-overlay" id="contentOverlay" style="padding-top: <%= layoutMarginTop %>; padding-left: <%= layoutMarginLeft %>; padding-right: <%= layoutMarginLeft %>;">
+            <div class="kwitansi-title-wrapper">
+                <h2 class="doc-title">
+                    <span class="editable-field" data-field="docTitle"><%= docTitle || (typeof is_pengeluaran !== 'undefined' && is_pengeluaran ? 'BUKTI PENGELUARAN KEUANGAN' : (is_pembayaran ? 'KWITANSI PEMBAYARAN' : 'BUKTI TANDA TERIMA')) %></span>
+                </h2>
+                <p class="doc-number">No: <%= no_transaksi %></p>
+            </div>
+
+            <table class="content-table" style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <tbody id="kwitansiTbody" style="display: flex; flex-direction: column; width: 100%;">
+                <% if (typeof is_pengeluaran !== 'undefined' && is_pengeluaran) { %>
+                    <tr data-row-id="dibayarkanKepada" style="display: flex; width: 100%; order: <%= getOrder('dibayarkanKepada') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Dibayarkan Kepada</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="value-highlight editable-field" data-field="dibayarkanKepada"><%= dibayarkanKepada || '.................................................................................' %></span></td>
+                    </tr>
+                    <tr data-row-id="kategoriDana" style="display: flex; width: 100%; order: <%= getOrder('kategoriDana') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Kategori Dana</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="value-highlight editable-field" data-field="kategoriDana"><%= kategoriDana || '-' %></span></td>
+                    </tr>
+                    <tr data-row-id="keteranganPengeluaran" style="display: flex; width: 100%; order: <%= getOrder('keteranganPengeluaran') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Keterangan Pengeluaran</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="editable-field" data-field="uraian_pembayaran"><%= uraian_pembayaran %></span></td>
+                    </tr>
+                    <% if (typeof rincianNames !== 'undefined' && rincianNames.length > 0) { %>
+                    <tr data-row-id="rincianPengeluaran" style="display: flex; width: 100%; order: <%= getOrder('rincianPengeluaran') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Rincian Pengeluaran</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td style="padding-top: 10px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <% for(let i=0; i<rincianNames.length; i++) { %>
+                                    <tr>
+                                        <td style="width: 5%; vertical-align: top;"><%= i+1 %>.</td>
+                                        <td style="width: 65%;"><span class="editable-field rincian-name"><%= rincianNames[i] %></span></td>
+                                        <td style="width: 30%; text-align: right;">Rp <%= parseInt(rincianNominals[i] || 0).toLocaleString('id-ID') %></td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </td>
+                    </tr>
+                    <% } %>
+                <% } else if (is_pembayaran) { %>
+                    <tr data-row-id="diterimaDari" style="display: flex; width: 100%; order: <%= getOrder('diterimaDari') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Telah Diterima Dari</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;">
+                            <span class="editable-field" data-field="diterimaDariPembayaran"><%= diterimaDariPembayaran || (nama_wali + ' (Orang Tua / Wali Santri)') %></span>
+                        </td>
+                    </tr>
+                    <tr data-row-id="namaSantri" style="display: flex; width: 100%; order: <%= getOrder('namaSantri') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Nama Calon Santri</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="value-highlight">
+                                <%= nama_santri %>
+                            </span></td>
+                    </tr>
+                    <tr data-row-id="satuanPendidikan" style="display: flex; width: 100%; order: <%= getOrder('satuanPendidikan') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Satuan Pendidikan</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;">
+                            <%= satuan_pendidikan %> (Jalur: <%= jalur_pendaftaran %>)
+                        </td>
+                    </tr>
+                    <tr data-row-id="untukPembayaran" style="display: flex; width: 100%; order: <%= getOrder('untukPembayaran') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Untuk Pembayaran</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="editable-field" data-field="uraian_pembayaran"><%= uraian_pembayaran %></span></td>
+                    </tr>
+                <% } else { %>
+                    <tr data-row-id="diterimaDari" style="display: flex; width: 100%; order: <%= getOrder('diterimaDari') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Telah Diterima Dari</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;">
+                            <span class="value-highlight editable-field" data-field="diterimaDari"><%= typeof diterimaDari !== 'undefined' && diterimaDari ? diterimaDari : '.................................................................................' %></span>
+                        </td>
+                    </tr>
+                    <tr data-row-id="untukBantuan" style="display: flex; width: 100%; order: <%= getOrder('untukBantuan') %>;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td class="label" style="width: 200px;">Untuk Bantuan</td>
+                        <td class="colon" style="width: 20px;">:</td>
+                        <td class="value" style="flex: 1;"><span class="editable-field" data-field="uraian_pembayaran"><%= uraian_pembayaran %></span></td>
+                    </tr>
+                <% } %>
+                <% if ((typeof is_pengeluaran !== 'undefined' && is_pengeluaran) || (typeof is_pembayaran !== 'undefined' && !is_pembayaran)) { %>
+                    <tr data-row-id="nominalRow" style="display: flex; width: 100%; order: <%= getOrder('nominalRow') %>; align-items: center; margin-top: 15px; margin-bottom: 15px;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td style="width: 100%;">
+                            <div style="font-size: 14pt; font-weight: bold;">
+                                Jumlah Uang &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Rp <%= nominal_format %>,-
+                            </div>
+                        </td>
+                    </tr>
+                <% } else { %>
+                    <tr data-row-id="nominalRow" style="display: flex; width: 100%; order: <%= getOrder('nominalRow') %>; align-items: center; margin-top: 15px; margin-bottom: 15px;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td style="width: 100%;">
+                            <div class="amount-box">
+                                Rp <%= nominal_format %>,-
+                            </div>
+                        </td>
+                    </tr>
+                <% } %>
+                    <tr data-row-id="terbilangRow" style="display: flex; width: 100%; order: <%= getOrder('terbilangRow') %>; margin-bottom: 40px;">
+                        <td class="reorder-controls no-print" style="display: none; width: 40px; padding: 5px; vertical-align: middle;">
+                            <button type="button" onclick="moveRowUp(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block; margin-bottom: 2px;"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveRowDown(this)" style="background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer; padding: 5px; border-radius: 4px; display: block;"><i class="fas fa-arrow-down"></i></button>
+                        </td>
+                        <td style="width: 100%;">
+                            <div class="terbilang-container" style="margin-bottom: 0;">
+                                <div class="terbilang-value">Terbilang: <%= terbilang %></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            
+
+            <% if (typeof is_pengeluaran !== 'undefined' && is_pengeluaran) { %>
+            <table class="footer-table" style="margin-top: 20px;">
+                <tr>
+                    <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                        <p style="margin-bottom: 80px;">Penerima / Dibayarkan Kepada,</p>
+                        <p class="signature-name" style="text-decoration: none;">( <span class="editable-field" data-field="dibayarkanKepadaSign"><%= dibayarkanKepadaSign || dibayarkanKepada || '....................................................' %></span> )</p>
+                    </td>
+                    <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                        <div class="date-text" style="margin-bottom: 10px;">Jakarta, <%= tanggal_cetak %></div>
+                        <div class="ttd-container" style="position: relative; text-align: center; height: 50px;">
+                            <img src="/images/TTD Bendahara.webp" class="ttd-image" alt="TTD Bendahara" style="width: <%= ttdWidth %>; display: <%= ttdVisible ? 'inline-block' : 'none' %>; position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + <%= ttdX || 0 %>px), calc(-50% + <%= ttdY || 0 %>px)); z-index: 1;">
+                            <div class="ttd-controls no-print" style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); z-index: 2; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 5px; border: 1px solid #ccc; white-space: nowrap;">
+                                <button type="button" onclick="deleteTtd(this)" style="background: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-trash"></i></button>
+                                <button type="button" onclick="resizeTtd(this, 10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-plus"></i></button>
+                                <button type="button" onclick="resizeTtd(this, -10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-minus"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, -5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-up"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, 5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-down"></i></button>
+                                <button type="button" onclick="moveTtd(this, -5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-left"></i></button>
+                                <button type="button" onclick="moveTtd(this, 5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <p class="signature-name" style="position: relative; z-index: 2;"><%= nama_petugas %></p>
+                        <p class="signature-role">Bendahara SPMB</p>
+                    </td>
+                </tr>
+            </table>
+            <% } else if (typeof is_pembayaran !== 'undefined' && !is_pembayaran) { %>
+            <table class="footer-table" style="margin-top: 20px;">
+                <tr>
+                    <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                        <p style="margin-bottom: 80px;">Pemberi Dana,</p>
+                        <p class="signature-name" style="text-decoration: none;">( <span class="editable-field" data-field="namaPemberi"><%= typeof namaPemberi !== 'undefined' && namaPemberi ? namaPemberi : '....................................................' %></span> )</p>
+                    </td>
+                    <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                        <div class="date-text" style="margin-bottom: 10px;">Jakarta, <%= tanggal_cetak %></div>
+                        <div class="ttd-container" style="position: relative; text-align: center; height: 50px;">
+                            <img src="/images/TTD Bendahara.webp" class="ttd-image" alt="TTD Bendahara" style="width: <%= ttdWidth %>; display: <%= ttdVisible ? 'inline-block' : 'none' %>; position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + <%= ttdX || 0 %>px), calc(-50% + <%= ttdY || 0 %>px)); z-index: 1;">
+                            <div class="ttd-controls no-print" style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); z-index: 2; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 5px; border: 1px solid #ccc; white-space: nowrap;">
+                                <button type="button" onclick="deleteTtd(this)" style="background: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-trash"></i></button>
+                                <button type="button" onclick="resizeTtd(this, 10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-plus"></i></button>
+                                <button type="button" onclick="resizeTtd(this, -10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-minus"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, -5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-up"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, 5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-down"></i></button>
+                                <button type="button" onclick="moveTtd(this, -5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-left"></i></button>
+                                <button type="button" onclick="moveTtd(this, 5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <p class="signature-name" style="position: relative; z-index: 2;"><%= nama_petugas %></p>
+                        <p class="signature-role">Bendahara SPMB</p>
+                    </td>
+                </tr>
+            </table>
+            <% } else { %>
+            <table class="footer-table">
+                <tr>
+                    <td style="width: 60%;"></td>
+                    <td class="signature-cell">
+                        <div class="date-text" style="margin-bottom: 10px;">Jakarta, <%= tanggal_cetak %></div>
+                        <div class="ttd-container" style="position: relative; text-align: center; height: 50px;">
+                            <img src="/images/TTD Bendahara.webp" class="ttd-image" alt="TTD Bendahara" style="width: <%= ttdWidth %>; display: <%= ttdVisible ? 'inline-block' : 'none' %>; position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + <%= ttdX || 0 %>px), calc(-50% + <%= ttdY || 0 %>px)); z-index: 1;">
+                            <div class="ttd-controls no-print" style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); z-index: 2; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 5px; border: 1px solid #ccc; white-space: nowrap;">
+                                <button type="button" onclick="deleteTtd(this)" style="background: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-trash"></i></button>
+                                <button type="button" onclick="resizeTtd(this, 10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-plus"></i></button>
+                                <button type="button" onclick="resizeTtd(this, -10)" style="background: blue; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-search-minus"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, -5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-up"></i></button>
+                                <button type="button" onclick="moveTtd(this, 0, 5)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-down"></i></button>
+                                <button type="button" onclick="moveTtd(this, -5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-left"></i></button>
+                                <button type="button" onclick="moveTtd(this, 5, 0)" style="background: #059669; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; margin: 0 2px;"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <p class="signature-name" style="position: relative; z-index: 2;"><%= nama_petugas %></p>
+                        <p class="signature-role">Bendahara SPMB</p>
+                    </td>
+                </tr>
+            </table>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        
+        let isEditing = false;
+        let currentMarginTop = parseFloat('<%= layoutMarginTop %>') || 6.5;
+        let currentMarginLeft = parseFloat('<%= layoutMarginLeft %>') || 2.5;
+        let isTtdVisible = <%= ttdVisible %>;
+        let currentTtdWidth = parseInt('<%= ttdWidth %>') || 120;
+        let currentTtdX = parseInt('<%= ttdX %>') || 0;
+        let currentTtdY = parseInt('<%= ttdY %>') || 0;
+
+        function moveRowUp(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+            rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+            
+            const idx = rows.indexOf(tr);
+            if (idx > 0) {
+                const prev = rows[idx - 1];
+                const tempOrder = tr.style.order;
+                tr.style.order = prev.style.order;
+                prev.style.order = tempOrder;
+            }
+        }
+
+        function moveRowDown(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+            rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+            
+            const idx = rows.indexOf(tr);
+            if (idx < rows.length - 1) {
+                const next = rows[idx + 1];
+                const tempOrder = tr.style.order;
+                tr.style.order = next.style.order;
+                next.style.order = tempOrder;
+            }
+        }
+
+        function moveTtd(btn, dx, dy) {
+            currentTtdX += dx;
+            currentTtdY += dy;
+            document.querySelectorAll('.ttd-image').forEach(img => {
+                img.style.transform = `translate(calc(-50% + ${currentTtdX}px), calc(-50% + ${currentTtdY}px))`;
+            });
+        }
+
+        
+        function moveLayout(xPx, yPx) {
+            // Konversi px kasar ke cm (1cm = 37.8px)
+            const cmX = xPx / 37.8;
+            const cmY = yPx / 37.8;
+            
+            currentMarginLeft += cmX;
+            currentMarginTop += cmY;
+            
+            const overlay = document.getElementById('contentOverlay');
+            overlay.style.paddingLeft = currentMarginLeft.toFixed(2) + 'cm';
+            overlay.style.paddingRight = currentMarginLeft.toFixed(2) + 'cm';
+            overlay.style.paddingTop = currentMarginTop.toFixed(2) + 'cm';
+        }
+
+        function resizeTtd(btn, changePx) {
+            currentTtdWidth += changePx;
+            if (currentTtdWidth < 50) currentTtdWidth = 50;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.width = currentTtdWidth + 'px';
+            
+            // Sinkronkan ke semua TTD yang ada (biar konsisten)
+            document.querySelectorAll('.ttd-image').forEach(i => i.style.width = currentTtdWidth + 'px');
+        }
+
+        function deleteTtd(btn) {
+            isTtdVisible = false;
+            document.querySelectorAll('.ttd-image').forEach(i => i.style.display = 'none');
+        }
+
+        function toggleEdit() {
+            const btnEdit = document.getElementById('btnEdit');
+            const btnPrint = document.getElementById('btnPrint');
+            const layoutControls = document.getElementById('layoutControls');
+            const editableFields = document.querySelectorAll('.editable-field');
+            const ttdControls = document.querySelectorAll('.ttd-controls');
+            
+            if (!isEditing) {
+                // Masuk mode edit
+                isEditing = true;
+                document.body.classList.add('editable-mode');
+                editableFields.forEach(el => {
+                    el.contentEditable = "true";
+                });
+                document.querySelectorAll('.reorder-controls').forEach(el => el.style.display = "table-cell");
+                ttdControls.forEach(el => el.style.display = "block");
+                layoutControls.style.display = "flex";
+                
+                btnEdit.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+                btnEdit.style.backgroundColor = '#2563eb';
+                btnPrint.style.display = 'none';
+            } else {
+                // Simpan data
+                const payload = {};
+                
+                // Helper to collect specific single fields
+                const getField = (name) => {
+                    const el = document.querySelector(`.editable-field[data-field="${name}"]`);
+                    return el ? el.innerText.trim() : undefined;
+                };
+
+                const dibayarkanKepada = getField('dibayarkanKepada');
+                if (dibayarkanKepada !== undefined) payload.dibayarkanKepada = dibayarkanKepada;
+                
+                const kategoriDana = getField('kategoriDana');
+                if (kategoriDana !== undefined) payload.kategoriDana = kategoriDana;
+                
+                const uraian = getField('uraian_pembayaran');
+                if (uraian !== undefined) payload.uraian = uraian;
+                
+                const diterimaDari = getField('diterimaDari');
+                if (diterimaDari !== undefined) payload.diterimaDari = diterimaDari;
+                
+                const namaPemberi = getField('namaPemberi');
+                if (namaPemberi !== undefined) payload.namaPemberi = namaPemberi;
+
+                const docTitle = getField('docTitle');
+                if (docTitle !== undefined) payload.docTitle = docTitle;
+                
+                const diterimaDariPembayaran = getField('diterimaDariPembayaran');
+                if (diterimaDariPembayaran !== undefined) payload.diterimaDariPembayaran = diterimaDariPembayaran;
+                
+                const dibayarkanKepadaSign = getField('dibayarkanKepadaSign');
+                if (dibayarkanKepadaSign !== undefined) payload.dibayarkanKepadaSign = dibayarkanKepadaSign;
+
+                // Save layout and TTD settings
+                
+                payload.layoutMarginTop = currentMarginTop.toFixed(2) + 'cm';
+                payload.layoutMarginLeft = currentMarginLeft.toFixed(2) + 'cm';
+                payload.ttdVisible = isTtdVisible;
+                payload.ttdWidth = currentTtdWidth + 'px';
+                payload.ttdX = currentTtdX;
+                payload.ttdY = currentTtdY;
+                
+                const tbody = document.getElementById('kwitansiTbody');
+                const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+                rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+                payload.rowOrder = JSON.stringify(rows.map(tr => tr.getAttribute('data-row-id')));
+
+
+                // Collect Rincian Names
+                const rincianEls = document.querySelectorAll('.editable-field.rincian-name');
+                if (rincianEls.length > 0) {
+                    payload.rincianNames = [];
+                    rincianEls.forEach(el => {
+                        payload.rincianNames.push(el.innerText.trim());
+                    });
+                }
+
+                // Send to backend via AJAX
+                const trxId = window.location.pathname.split('/').pop();
+                
+                // Set loading status
+                btnEdit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                
+                fetch(`/kwitansi/edit/${trxId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload(); // Refresh to reflect synced data (e.g. signatures syncing)
+                    } else {
+                        alert(data.message || 'Gagal menyimpan');
+                        resetEditMode();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan jaringan');
+                    resetEditMode();
+                });
+            }
+        }
+        
+        function resetEditMode() {
+            isEditing = false;
+            document.body.classList.remove('editable-mode');
+            document.querySelectorAll('.editable-field').forEach(el => el.contentEditable = "false");
+            document.querySelectorAll('.reorder-controls').forEach(el => el.style.display = "none");
+            document.querySelectorAll('.ttd-controls').forEach(el => el.style.display = "none");
+            document.getElementById('layoutControls').style.display = "none";
+            const btnEdit = document.getElementById('btnEdit');
+            const btnPrint = document.getElementById('btnPrint');
+            btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+            btnEdit.style.backgroundColor = '#f59e0b';
+            btnPrint.style.display = 'inline-block';
+        }
+        function exportToPDF() {
+            const element = document.querySelector('.page-wrapper');
+            const opt = {
+                margin:       0,
+                filename:     'Kwitansi_<%= no_transaksi %>.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'cm', format: [21.59, 33], orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportToWord() {
+            const btn = document.getElementById('btnWord');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            btn.disabled = true;
+
+            try {
+                const bgDataUrl = await getBase64Image('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+                
+                const clone = document.getElementById('contentOverlay').cloneNode(true);
+                clone.querySelectorAll('.no-print').forEach(el => el.remove());
+                clone.querySelectorAll('.editable-field').forEach(el => {
+                    el.style.border = 'none';
+                    el.style.backgroundColor = 'transparent';
+                });
+
+                const tbody = clone.querySelector('#kwitansiTbody');
+                if (tbody) {
+                    const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+                    rows.sort((a, b) => parseInt(a.style.order || 0) - parseInt(b.style.order || 0));
+                    tbody.innerHTML = '';
+                    rows.forEach(tr => {
+                        tr.style.display = ''; 
+                        tr.style.order = '';
+                        tr.style.width = '';
+                        tbody.appendChild(tr);
+                    });
+                    tbody.style.display = '';
+                    tbody.style.flexDirection = '';
+                    tbody.style.width = '';
+                }
+                
+                const cTable = clone.querySelector('.content-table');
+                if (cTable) cTable.style.display = '';
+
+                const ttdImg = clone.querySelector('.ttd-image');
+                if (ttdImg && isTtdVisible) {
+                    ttdImg.src = await getBase64Image('/images/TTD%20Bendahara.webp');
+                } else if (ttdImg) {
+                    ttdImg.remove();
+                }
+
+                const contentStr = clone.innerHTML;
+
+                const html = `
+                <html xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+                xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                <meta charset="utf-8">
+                <style>
+                  @page WordSection1 {
+                    size: 21.59cm 33.0cm;
+                    margin: 0cm 0cm 0cm 0cm;
+                    mso-header-margin: 0cm;
+                    mso-footer-margin: 0cm;
+                    mso-paper-source: 0;
+                  }
+                  div.WordSection1 { page: WordSection1; }
+                  body { font-family: Arial, sans-serif; font-size: 11pt; margin: 0; padding: 0; }
+                  table { border-collapse: collapse; }
+                  td { vertical-align: top; }
+                </style>
+                <!--[if gte mso 9]>
+                <xml>
+                 <w:WordDocument>
+                  <w:View>Print</w:View>
+                  <w:Zoom>100</w:Zoom>
+                  <w:DoNotOptimizeForBrowser/>
+                 </w:WordDocument>
+                </xml>
+                <![endif]-->
+                </head>
+                <body>
+                <div class="WordSection1">
+                  <!--[if gte vml 1]>
+                  <v:rect id="bgimg" style="position:absolute;left:0;top:0;width:21.59cm;height:33.0cm;z-index:-1" stroked="f">
+                    <v:fill src="\${bgDataUrl}" type="frame"/>
+                  </v:rect>
+                  <![endif]-->
+                  <div style="padding-top: <%= layoutMarginTop %>; padding-left: <%= layoutMarginLeft %>; padding-right: <%= layoutMarginLeft %>; position: relative; z-index: 1;">
+                      \${contentStr}
+                  </div>
+                </div>
+                </body>
+                </html>
+                `;
+
+                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Kwitansi_<%= no_transaksi %>.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (e) {
+                console.error(e);
+                alert('Gagal mengexport ke Word.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

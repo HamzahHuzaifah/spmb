@@ -1,0 +1,35 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">JIC</div>
+        <h2>SPMB JIC 2026</h2>
+    </div>
+    <div class="sidebar-menu">
+        <a href="/dashboard" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'dashboard') ? 'active' : '' %>">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/input-transaksi" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'input-transaksi') ? 'active' : '' %>">
+            <i class="fas fa-plus-circle"></i> Input Transaksi
+        </a>
+        <a href="/laporan" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'laporan') ? 'active' : '' %>">
+            <i class="fas fa-chart-bar"></i> Laporan Utama
+        </a>
+        <a href="/santri" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'santri') ? 'active' : '' %>">
+            <i class="fas fa-user-graduate"></i> Data Santri Baru
+        </a>
+        <a href="/tagihan" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'tagihan') ? 'active' : '' %>">
+            <i class="fas fa-file-invoice-dollar"></i> Tagihan Santri Baru
+        </a>
+        <a href="/tunggakan" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'tunggakan') ? 'active' : '' %>">
+            <i class="fas fa-exclamation-circle"></i> Tunggakan Santri Baru
+        </a>
+        <a href="/santri-daftar-ulang" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'santri-daftar-ulang') ? 'active' : '' %>">
+            <i class="fas fa-users"></i> Data Santri Daftar Ulang
+        </a>
+        <a href="/tagihan-daftar-ulang" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'tagihan-daftar-ulang') ? 'active' : '' %>">
+            <i class="fas fa-file-invoice-dollar"></i> Tagihan Santri Daftar Ulang
+        </a>
+        <a href="/tunggakan-daftar-ulang" class="menu-item <%= (typeof activePage !== 'undefined' && activePage === 'tunggakan-daftar-ulang') ? 'active' : '' %>">
+            <i class="fas fa-exclamation-circle"></i> Tunggakan Santri Daftar Ulang
+        </a>
+    </div>
+</div>
