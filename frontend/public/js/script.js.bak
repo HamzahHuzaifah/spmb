@@ -1,0 +1,1534 @@
+
+/* From dashboard.ejs */
+function parseTanggalIndo(tglStr) {
+        const months = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+        const parts = tglStr.trim().split(/\s+/);
+        if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const monthIndex = months.indexOf(parts[1].toLowerCase());
+            const year = parseInt(parts[2]);
+            if (monthIndex !== -1) {
+                return new Date(year, monthIndex, day);
+            }
+        }
+        return null;
+    }
+
+    function filterDashboard() {
+        const startDateStr = document.getElementById('startDateInput').value;
+        const endDateStr = document.getElementById('endDateInput').value;
+
+        let startDate = null;
+        if (startDateStr) {
+            startDate = new Date(startDateStr);
+            startDate.setHours(0, 0, 0, 0);
+        }
+        let endDate = null;
+        if (endDateStr) {
+            endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+        }
+
+        // 1. Filter Transaksi Terbaru Table
+        const table = document.getElementById('transaksiTable');
+        const trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        let filteredPendapatan = 0;
+        let isFiltered = false;
+        let totalCount = 0;
+        let matchingCount = 0;
+
+        let filteredPengeluaranPAUDQu = 0;
+        let filteredPengeluaranTPQ = 0;
+        let filteredPengeluaranMDT = 0;
+        let filteredPengeluaranMadrasah = 0;
+
+        for (let i = 0; i < trs.length; i++) {
+            const tr = trs[i];
+            if (tr.id === 'noMatchingRow') continue;
+            if (tr.cells.length < 5) continue; // Skip empty row/placeholder row
+            
+            totalCount++;
+            const tdTgl = tr.cells[0];
+            const txtTglRaw = (tdTgl.textContent || tdTgl.innerText);
+            
+            let matchDate = true;
+            if (startDate || endDate) {
+                isFiltered = true;
+                const trxDate = parseTanggalIndo(txtTglRaw);
+                if (trxDate) {
+                    if (startDate && trxDate < startDate) matchDate = false;
+                    if (endDate && trxDate > endDate) matchDate = false;
+                } else {
+                    matchDate = false;
+                }
+            }
+
+            if (matchDate) {
+                tr.style.display = '';
+                matchingCount++;
+                // Calculate visible pendapatan and pengeluaran from table
+                const jenis = tr.getAttribute('data-jenis');
+                const nominal = parseInt(tr.getAttribute('data-nominal') || 0);
+                if (jenis === 'Pemasukan') {
+                    filteredPendapatan += nominal;
+                } else if (jenis === 'Pengeluaran') {
+                    const satuan = tr.getAttribute('data-satuan');
+                    if (satuan === 'PAUDQu') filteredPengeluaranPAUDQu += nominal;
+                    else if (satuan === 'TPQ') filteredPengeluaranTPQ += nominal;
+                    else if (satuan === 'MDT') filteredPengeluaranMDT += nominal;
+                    else filteredPengeluaranMadrasah += nominal;
+                }
+            } else {
+                tr.style.display = 'none';
+            }
+        }
+
+        // Toggle the empty state row for filtered view
+        const noMatchingEl = document.getElementById('noMatchingRow');
+        if (noMatchingEl) {
+            if (isFiltered && matchingCount === 0) {
+                noMatchingEl.style.display = '';
+            } else {
+                noMatchingEl.style.display = 'none';
+            }
+        }
+
+        // 2. Scale ALL Dashboard Stats based on multiplier
+        const valPendapatanEl = document.getElementById('valPendapatan');
+        let multiplier = 1.0;
+        if (isFiltered) {
+            if (matchingCount === 0) {
+                multiplier = 0.0;
+            } else {
+                const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
+                if (originalVal > 0) {
+                    multiplier = filteredPendapatan / originalVal;
+                    if (multiplier > 1.0) multiplier = 1.0;
+                } else {
+                    multiplier = totalCount > 0 ? (matchingCount / totalCount) : 1.0;
+                }
+            }
+        }
+
+        // Process Stat Cards (Top)
+        if (isFiltered) {
+            // Use the actual filtered sum for global pendapatan
+            valPendapatanEl.innerHTML = 'Rp ' + filteredPendapatan.toLocaleString('id-ID');
+        } else {
+            const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
+            valPendapatanEl.innerHTML = 'Rp ' + originalVal.toLocaleString('id-ID');
+        }
+
+        ['valTopTunggakan', 'valTopTarget'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                el.innerHTML = 'Rp ' + Math.round(orig * multiplier).toLocaleString('id-ID');
+            }
+        });
+
+        // Process Main Data Tables
+        document.querySelectorAll('.stat-group').forEach(group => {
+            const santriEl = group.querySelector('.val-santri');
+            let santriVal = 0;
+            if (santriEl) {
+                const orig = parseInt(santriEl.getAttribute('data-original')) || 0;
+                santriVal = Math.round(orig * multiplier);
+                santriEl.innerHTML = santriVal;
+            }
+
+            const tagihanEl = group.querySelector('.val-tagihan');
+            let tagihanVal = 0;
+            if (tagihanEl) {
+                const origTagihan = parseInt(tagihanEl.getAttribute('data-original')) || 0;
+                tagihanVal = Math.round(origTagihan * multiplier);
+                tagihanEl.innerHTML = 'Rp ' + tagihanVal.toLocaleString('id-ID');
+            }
+
+            const bayarEl = group.querySelector('.val-bayar');
+            let bayarVal = 0;
+            if (bayarEl) {
+                const origBayar = parseInt(bayarEl.getAttribute('data-original')) || 0;
+                bayarVal = Math.round(origBayar * multiplier);
+                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
+            }
+
+            const pengeluaranEl = group.querySelector('.val-pengeluaran');
+            let pengeluaranVal = 0;
+            if (pengeluaranEl) {
+                const origPengeluaran = parseInt(pengeluaranEl.getAttribute('data-original')) || 0;
+                pengeluaranVal = Math.round(origPengeluaran * multiplier);
+                pengeluaranEl.innerHTML = 'Rp ' + pengeluaranVal.toLocaleString('id-ID');
+            }
+
+            // Derived
+            const tunggakanVal = tagihanVal - bayarVal;
+            const tunggakanEl = group.querySelector('.val-tunggakan');
+            if (tunggakanEl) tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
+
+            const persenBayarEl = group.querySelector('.val-persen-bayar');
+            if (persenBayarEl) {
+                persenBayarEl.innerHTML = tagihanVal > 0 ? ((bayarVal / tagihanVal) * 100).toFixed(2) + '%' : '0.00%';
+            }
+
+            const saldoVal = bayarVal - pengeluaranVal;
+            const saldoEl = group.querySelector('.val-saldo');
+            if (saldoEl) saldoEl.innerHTML = 'Rp ' + saldoVal.toLocaleString('id-ID');
+        });
+
+        // Process Pengeluaran Global Table
+        if (isFiltered) {
+            const totalFilteredPengeluaran = filteredPengeluaranMadrasah + filteredPengeluaranPAUDQu + filteredPengeluaranTPQ + filteredPengeluaranMDT;
+            if(document.getElementById('valPengeluaranMadrasah')) document.getElementById('valPengeluaranMadrasah').innerHTML = 'Rp ' + filteredPengeluaranMadrasah.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranPAUDQu')) document.getElementById('valPengeluaranPAUDQu').innerHTML = 'Rp ' + filteredPengeluaranPAUDQu.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranTPQ')) document.getElementById('valPengeluaranTPQ').innerHTML = 'Rp ' + filteredPengeluaranTPQ.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranMDT')) document.getElementById('valPengeluaranMDT').innerHTML = 'Rp ' + filteredPengeluaranMDT.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranTotal')) document.getElementById('valPengeluaranTotal').innerHTML = 'Rp ' + totalFilteredPengeluaran.toLocaleString('id-ID');
+        } else {
+            document.querySelectorAll('.val-pengeluaran-unit, .val-pengeluaran-total').forEach(el => {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                el.innerHTML = 'Rp ' + orig.toLocaleString('id-ID');
+            });
+        }
+
+        // Process Ziswaf Table
+        const ziswafGroup = document.querySelector('[data-group="ziswaf-subsidy"]');
+        if (ziswafGroup) {
+            ['val-ziswaf-baru', 'val-ziswaf-lama', 'val-ziswaf-total-santri'].forEach(cls => {
+                const el = ziswafGroup.querySelector('.' + cls);
+                if (el) {
+                    const orig = parseInt(el.getAttribute('data-original')) || 0;
+                    el.innerHTML = Math.round(orig * multiplier);
+                }
+            });
+            const targetEl = ziswafGroup.querySelector('.val-ziswaf-target');
+            let targetVal = 0;
+            if (targetEl) {
+                const orig = parseInt(targetEl.getAttribute('data-original')) || 0;
+                targetVal = Math.round(orig * multiplier);
+                targetEl.innerHTML = 'Rp ' + targetVal.toLocaleString('id-ID');
+            }
+            const bayarEl = ziswafGroup.querySelector('.val-ziswaf-bayar');
+            let bayarVal = 0;
+            if (bayarEl) {
+                const orig = parseInt(bayarEl.getAttribute('data-original')) || 0;
+                bayarVal = Math.round(orig * multiplier);
+                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
+            }
+            const tunggakanEl = ziswafGroup.querySelector('.val-ziswaf-tunggakan');
+            if (tunggakanEl) {
+                const tunggakanVal = Math.max(0, targetVal - bayarVal);
+                tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
+            }
+        }
+
+        // Process Rekap Tables
+        document.querySelectorAll('.rekap-group').forEach(group => {
+            let totalPAUDQu = 0;
+            let totalTPQ = 0;
+            let totalMDT = 0;
+
+            group.querySelectorAll('.val-rekap').forEach(el => {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                const val = Math.round(orig * multiplier);
+                el.innerHTML = val;
+            });
+
+            // Recalculate totals
+            const cells = group.querySelectorAll('.val-rekap');
+            if (cells.length === 8) { // 4 top, 4 bottom
+                totalPAUDQu = parseInt(cells[0].innerText) + parseInt(cells[1].innerText);
+                totalTPQ = parseInt(cells[2].innerText) + parseInt(cells[3].innerText); // simplified
+                totalMDT = parseInt(cells[4].innerText) + parseInt(cells[5].innerText) + parseInt(cells[6].innerText) + parseInt(cells[7].innerText);
+            }
+
+            const paudquEl = group.querySelector('.val-rekap-total-paudqu');
+            if (paudquEl) paudquEl.innerHTML = totalPAUDQu;
+
+            const tpqEl = group.querySelector('.val-rekap-total-tpq');
+            if (tpqEl) tpqEl.innerHTML = totalTPQ;
+
+            const mdtEl = group.querySelector('.val-rekap-total-mdt');
+            if (mdtEl) mdtEl.innerHTML = totalMDT;
+
+            const allEl = group.querySelector('.val-rekap-total-all');
+            if (allEl) allEl.innerHTML = totalPAUDQu + totalTPQ + totalMDT;
+        });
+    }
+
+    function resetFilter() {
+        document.getElementById('startDateInput').value = '';
+        document.getElementById('endDateInput').value = '';
+        filterDashboard();
+    }
+
+/* From input-transaksi.ejs */
+setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 3000);
+
+/* From input-transaksi.ejs */
+setTimeout(() => {
+                document.getElementById('errorAlert').style.display = 'none';
+            }, 5000);
+
+/* From input-transaksi.ejs */
+<%- JSON.stringify(typeof tunggakanDaftarUlang !== 'undefined' ? tunggakanDaftarUlang : []) %>
+
+/* From input-transaksi.ejs */
+<%- JSON.stringify(typeof tunggakan !== 'undefined' ? tunggakan : []) %>
+
+/* From input-transaksi.ejs */
+<%- JSON.stringify(typeof santri !== 'undefined' ? santri : []) %>
+
+/* From input-transaksi.ejs */
+<%- JSON.stringify(typeof santriDaftarUlang !== 'undefined' ? santriDaftarUlang : []) %>
+
+/* From kwitansi.ejs */
+let isEditing = false;
+        let currentMarginTop = parseFloat('<%= layoutMarginTop %>') || 6.5;
+        let currentMarginLeft = parseFloat('<%= layoutMarginLeft %>') || 2.5;
+        let isTtdVisible = <%= ttdVisible %>;
+        let currentTtdWidth = parseInt('<%= ttdWidth %>') || 120;
+        let currentTtdX = parseInt('<%= ttdX %>') || 0;
+        let currentTtdY = parseInt('<%= ttdY %>') || 0;
+
+        function moveRowUp(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+            rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+            
+            const idx = rows.indexOf(tr);
+            if (idx > 0) {
+                const prev = rows[idx - 1];
+                const tempOrder = tr.style.order;
+                tr.style.order = prev.style.order;
+                prev.style.order = tempOrder;
+            }
+        }
+
+        function moveRowDown(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+            rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+            
+            const idx = rows.indexOf(tr);
+            if (idx < rows.length - 1) {
+                const next = rows[idx + 1];
+                const tempOrder = tr.style.order;
+                tr.style.order = next.style.order;
+                next.style.order = tempOrder;
+            }
+        }
+
+        function moveTtd(btn, dx, dy) {
+            currentTtdX += dx;
+            currentTtdY += dy;
+            document.querySelectorAll('.ttd-image').forEach(img => {
+                img.style.transform = `translate(calc(-50% + ${currentTtdX}px), calc(-50% + ${currentTtdY}px))`;
+            });
+        }
+
+        
+        function moveLayout(xPx, yPx) {
+            // Konversi px kasar ke cm (1cm = 37.8px)
+            const cmX = xPx / 37.8;
+            const cmY = yPx / 37.8;
+            
+            currentMarginLeft += cmX;
+            currentMarginTop += cmY;
+            
+            const overlay = document.getElementById('contentOverlay');
+            overlay.style.paddingLeft = currentMarginLeft.toFixed(2) + 'cm';
+            overlay.style.paddingRight = currentMarginLeft.toFixed(2) + 'cm';
+            overlay.style.paddingTop = currentMarginTop.toFixed(2) + 'cm';
+        }
+
+        function resizeTtd(btn, changePx) {
+            currentTtdWidth += changePx;
+            if (currentTtdWidth < 50) currentTtdWidth = 50;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.width = currentTtdWidth + 'px';
+            
+            // Sinkronkan ke semua TTD yang ada (biar konsisten)
+            document.querySelectorAll('.ttd-image').forEach(i => i.style.width = currentTtdWidth + 'px');
+        }
+
+        function deleteTtd(btn) {
+            isTtdVisible = false;
+            document.querySelectorAll('.ttd-image').forEach(i => i.style.display = 'none');
+        }
+
+        function toggleEdit() {
+            const btnEdit = document.getElementById('btnEdit');
+            const btnPrint = document.getElementById('btnPrint');
+            const layoutControls = document.getElementById('layoutControls');
+            const editableFields = document.querySelectorAll('.editable-field');
+            const ttdControls = document.querySelectorAll('.ttd-controls');
+            
+            if (!isEditing) {
+                // Masuk mode edit
+                isEditing = true;
+                document.body.classList.add('editable-mode');
+                editableFields.forEach(el => {
+                    el.contentEditable = "true";
+                });
+                document.querySelectorAll('.reorder-controls').forEach(el => el.style.display = "table-cell");
+                ttdControls.forEach(el => el.style.display = "block");
+                layoutControls.style.display = "flex";
+                
+                btnEdit.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+                btnEdit.style.backgroundColor = '#2563eb';
+                btnPrint.style.display = 'none';
+            } else {
+                // Simpan data
+                const payload = {};
+                
+                // Helper to collect specific single fields
+                const getField = (name) => {
+                    const el = document.querySelector(`.editable-field[data-field="${name}"]`);
+                    return el ? el.innerText.trim() : undefined;
+                };
+
+                const dibayarkanKepada = getField('dibayarkanKepada');
+                if (dibayarkanKepada !== undefined) payload.dibayarkanKepada = dibayarkanKepada;
+                
+                const kategoriDana = getField('kategoriDana');
+                if (kategoriDana !== undefined) payload.kategoriDana = kategoriDana;
+                
+                const uraian = getField('uraian_pembayaran');
+                if (uraian !== undefined) payload.uraian = uraian;
+                
+                const diterimaDari = getField('diterimaDari');
+                if (diterimaDari !== undefined) payload.diterimaDari = diterimaDari;
+                
+                const namaPemberi = getField('namaPemberi');
+                if (namaPemberi !== undefined) payload.namaPemberi = namaPemberi;
+
+                const docTitle = getField('docTitle');
+                if (docTitle !== undefined) payload.docTitle = docTitle;
+                
+                const diterimaDariPembayaran = getField('diterimaDariPembayaran');
+                if (diterimaDariPembayaran !== undefined) payload.diterimaDariPembayaran = diterimaDariPembayaran;
+                
+                const dibayarkanKepadaSign = getField('dibayarkanKepadaSign');
+                if (dibayarkanKepadaSign !== undefined) payload.dibayarkanKepadaSign = dibayarkanKepadaSign;
+
+                // Save layout and TTD settings
+                
+                payload.layoutMarginTop = currentMarginTop.toFixed(2) + 'cm';
+                payload.layoutMarginLeft = currentMarginLeft.toFixed(2) + 'cm';
+                payload.ttdVisible = isTtdVisible;
+                payload.ttdWidth = currentTtdWidth + 'px';
+                payload.ttdX = currentTtdX;
+                payload.ttdY = currentTtdY;
+                
+                const tbody = document.getElementById('kwitansiTbody');
+                const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+                rows.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+                payload.rowOrder = JSON.stringify(rows.map(tr => tr.getAttribute('data-row-id')));
+
+
+                // Collect Rincian Names
+                const rincianEls = document.querySelectorAll('.editable-field.rincian-name');
+                if (rincianEls.length > 0) {
+                    payload.rincianNames = [];
+                    rincianEls.forEach(el => {
+                        payload.rincianNames.push(el.innerText.trim());
+                    });
+                }
+
+                // Send to backend via AJAX
+                const trxId = window.location.pathname.split('/').pop();
+                
+                // Set loading status
+                btnEdit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                
+                fetch(`/kwitansi/edit/${trxId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload(); // Refresh to reflect synced data (e.g. signatures syncing)
+                    } else {
+                        alert(data.message || 'Gagal menyimpan');
+                        resetEditMode();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan jaringan');
+                    resetEditMode();
+                });
+            }
+        }
+        
+        function resetEditMode() {
+            isEditing = false;
+            document.body.classList.remove('editable-mode');
+            document.querySelectorAll('.editable-field').forEach(el => el.contentEditable = "false");
+            document.querySelectorAll('.reorder-controls').forEach(el => el.style.display = "none");
+            document.querySelectorAll('.ttd-controls').forEach(el => el.style.display = "none");
+            document.getElementById('layoutControls').style.display = "none";
+            const btnEdit = document.getElementById('btnEdit');
+            const btnPrint = document.getElementById('btnPrint');
+            btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+            btnEdit.style.backgroundColor = '#f59e0b';
+            btnPrint.style.display = 'inline-block';
+        }
+        function exportToPDF() {
+            const element = document.querySelector('.page-wrapper');
+            const opt = {
+                margin:       0,
+                filename:     'Kwitansi_<%= no_transaksi %>.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'cm', format: [21.59, 33], orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportToWord() {
+            const btn = document.getElementById('btnWord');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            btn.disabled = true;
+
+            try {
+                const bgDataUrl = await getBase64Image('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+                
+                const clone = document.getElementById('contentOverlay').cloneNode(true);
+                clone.querySelectorAll('.no-print').forEach(el => el.remove());
+                clone.querySelectorAll('.editable-field').forEach(el => {
+                    el.style.border = 'none';
+                    el.style.backgroundColor = 'transparent';
+                });
+
+                const tbody = clone.querySelector('#kwitansiTbody');
+                if (tbody) {
+                    const rows = Array.from(tbody.querySelectorAll('tr[data-row-id]'));
+                    rows.sort((a, b) => parseInt(a.style.order || 0) - parseInt(b.style.order || 0));
+                    tbody.innerHTML = '';
+                    rows.forEach(tr => {
+                        tr.style.display = ''; 
+                        tr.style.order = '';
+                        tr.style.width = '';
+                        tbody.appendChild(tr);
+                    });
+                    tbody.style.display = '';
+                    tbody.style.flexDirection = '';
+                    tbody.style.width = '';
+                }
+                
+                const cTable = clone.querySelector('.content-table');
+                if (cTable) cTable.style.display = '';
+
+                const ttdImg = clone.querySelector('.ttd-image');
+                if (ttdImg && isTtdVisible) {
+                    ttdImg.src = await getBase64Image('/images/TTD%20Bendahara.webp');
+                } else if (ttdImg) {
+                    ttdImg.remove();
+                }
+
+                const contentStr = clone.innerHTML;
+
+                const html = `
+                <html xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+                xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                <meta charset="utf-8">
+                
+                <!--[if gte mso 9]>
+                <xml>
+                 <w:WordDocument>
+                  <w:View>Print</w:View>
+                  <w:Zoom>100</w:Zoom>
+                  <w:DoNotOptimizeForBrowser/>
+                 </w:WordDocument>
+                </xml>
+                <![endif]-->
+                </head>
+                <body>
+                <div class="WordSection1">
+                  <!--[if gte vml 1]>
+                  <v:rect id="bgimg" style="position:absolute;left:0;top:0;width:21.59cm;height:33.0cm;z-index:-1" stroked="f">
+                    <v:fill src="\${bgDataUrl}" type="frame"/>
+                  </v:rect>
+                  <![endif]-->
+                  <div style="padding-top: <%= layoutMarginTop %>; padding-left: <%= layoutMarginLeft %>; padding-right: <%= layoutMarginLeft %>; position: relative; z-index: 1;">
+                      \${contentStr}
+                  </div>
+                </div>
+                </body>
+                </html>
+                `;
+
+                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Kwitansi_<%= no_transaksi %>.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (e) {
+                console.error(e);
+                alert('Gagal mengexport ke Word.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+/* From laporan.ejs */
+const rawLaporanData = <%- JSON.stringify(laporan || []) %>;
+        const rawTransaksi = <%- JSON.stringify(typeof transaksiTerbaru !== 'undefined' ? transaksiTerbaru : []) %>;
+
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        function getMonthIndex(name) {
+            return monthNames.indexOf(name);
+        }
+
+        function formatRupiah(num) {
+            if (!num) return '';
+            return 'Rp' + parseInt(num).toLocaleString('id-ID');
+        }
+
+        let currentTtdWidth = 120;
+        let currentTtdX = 0;
+        let currentTtdY = 0;
+
+        function resizeTtd(btn, changePx) {
+            currentTtdWidth += changePx;
+            if (currentTtdWidth < 50) currentTtdWidth = 50;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.width = currentTtdWidth + 'px';
+        }
+
+        function deleteTtd(btn) {
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.display = 'none';
+        }
+
+        function moveTtd(btn, dx, dy) {
+            currentTtdX += dx;
+            currentTtdY += dy;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.transform = `translate(calc(-50% + ${currentTtdX}px), calc(-50% + ${currentTtdY}px))`;
+        }
+
+        let isLaporanEditing = false;
+        let currentLaporanMarginTop = 4.8 * 37.8;
+        let currentLaporanMarginLeft = 1.5 * 37.8;
+
+        function moveLaporanLayout(xPx, yPx) {
+            currentLaporanMarginLeft += xPx;
+            currentLaporanMarginTop += yPx;
+            
+            const overlay = document.getElementById('contentOverlayLaporan');
+            overlay.style.paddingLeft = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingRight = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingTop = (currentLaporanMarginTop / 37.8).toFixed(2) + 'cm';
+        }
+
+        function toggleEditLaporan() {
+            const btnEdit = document.getElementById('btnEditLaporan');
+            const layoutControls = document.getElementById('layoutControlsLaporan');
+            const ttdControls = document.querySelectorAll('#previewModal .ttd-controls');
+            const modal = document.getElementById('previewModal');
+            
+            if (!isLaporanEditing) {
+                isLaporanEditing = true;
+                modal.classList.add('editable-mode');
+                ttdControls.forEach(el => el.style.display = "block");
+                layoutControls.style.display = "flex";
+                
+                btnEdit.innerHTML = '<i class="fas fa-check"></i> Selesai Edit';
+                btnEdit.classList.replace('btn-warning', 'btn-success');
+                btnEdit.style.backgroundColor = '#059669';
+                
+                // Enable editing manually in case they were disabled
+                document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
+            } else {
+                isLaporanEditing = false;
+                modal.classList.remove('editable-mode');
+                ttdControls.forEach(el => el.style.display = "none");
+                layoutControls.style.display = "none";
+                
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+                btnEdit.classList.replace('btn-success', 'btn-warning');
+                btnEdit.style.backgroundColor = '#f59e0b';
+                
+                // Disable editing for cleaner print
+                document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        function openPreviewLaporan() {
+            const filterTahun = document.getElementById("filterTahun").value;
+            const filterBulan = document.getElementById("filterBulan").value;
+
+            if (!filterBulan) {
+                alert("Silakan pilih Bulan terlebih dahulu untuk melihat preview laporan bulanan.");
+                return;
+            }
+
+            document.getElementById('previewTahunJudul').innerText = `TAHUN PELAJARAN ${filterTahun}/${parseInt(filterTahun) + 1}`;
+            document.getElementById('previewBulanJudul').innerText = `Bulan ${filterBulan}`;
+
+            let d = new Date();
+            document.getElementById('previewTanggalCetak').innerText = `${d.getDate()} ${filterBulan} ${filterTahun}`;
+
+            let selTahun = parseInt(filterTahun);
+            let selBulanIdx = getMonthIndex(filterBulan);
+
+            let saldoAwal = 0;
+            let currentData = [];
+
+            rawLaporanData.forEach(item => {
+                let itemTahun = parseInt(item.tahun);
+                let itemBulanIdx = getMonthIndex(item.bulan);
+
+                if (itemTahun < selTahun || (itemTahun === selTahun && itemBulanIdx < selBulanIdx)) {
+                    saldoAwal += (item.pemasukan || 0) - (item.pengeluaran || 0);
+                } else if (itemTahun === selTahun && itemBulanIdx === selBulanIdx) {
+                    currentData.push(item);
+                }
+            });
+
+            const tbody = document.getElementById('previewTbody');
+            tbody.innerHTML = '';
+
+            let no = 1;
+            let prevMonthName = selBulanIdx === 0 ? "Desember" : monthNames[selBulanIdx - 1];
+            let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
+
+            let totalDebit = saldoAwal;
+            let totalKredit = 0;
+            let runningSaldo = saldoAwal;
+
+            // Row 1: Saldo Awal
+            let trAwal = document.createElement('tr');
+            trAwal.innerHTML = `
+            <td style="border: 1px solid #000; padding: 6px; text-align: center;">${no++}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: center;">01/${(selBulanIdx + 1).toString().padStart(2, '0')}/${selTahun}</td>
+            <td style="border: 1px solid #000; padding: 6px;">Saldo Bulan ${prevMonthName} ${prevMonthYear}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(saldoAwal)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;"></td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(saldoAwal)}</td>
+        `;
+            tbody.appendChild(trAwal);
+
+            // Transactions
+            currentData.forEach(item => {
+                runningSaldo += (item.pemasukan || 0) - (item.pengeluaran || 0);
+                totalDebit += (item.pemasukan || 0);
+                totalKredit += (item.pengeluaran || 0);
+
+                // Format Uraian
+                let uraianText = item.uraian;
+
+                // Try cross reference to get namaSantri and satuanPendidikan
+                const trx = rawTransaksi.find(t => t.noTransaksi === item.noTransaksi);
+                if (trx) {
+                    if (item.pemasukan > 0) {
+                        if (uraianText.includes('Pendaftaran Baru') || uraianText.includes('Daftar Ulang') || uraianText.includes('Pembayaran')) {
+                            // Clean up existing 'Pembayaran Pendaftaran Baru [Nama]' to just the action.
+                            let actionType = "Pembayaran Pendaftaran Baru";
+                            if (uraianText.includes('Daftar Ulang')) actionType = "Pembayaran Daftar Ulang";
+                            else if (trx.kategoriDana && trx.kategoriDana !== '-') actionType = `Pembayaran ${trx.kategoriDana}`;
+
+                            let sat = trx.satuanPendidikan || 'SPMB';
+                            if (sat === 'MADRASAH') sat = 'MDT';
+                            uraianText = `Diterima ${actionType} ${sat} Tahun Pelajaran ${filterTahun}/${parseInt(filterTahun) + 1} dari ${trx.namaSantri}`;
+                        } else {
+                            uraianText = `Diterima ${uraianText} dari ${trx.namaSantri || trx.diterimaDari || 'Siswa'}`;
+                        }
+                    } else if (item.pengeluaran > 0) {
+                        uraianText = `Dikeluarkan untuk ${uraianText}`;
+                    }
+                } else {
+                    // Fallback basic text
+                    if (item.pemasukan > 0 && !uraianText.startsWith('Diterima')) uraianText = "Diterima " + uraianText;
+                    if (item.pengeluaran > 0 && !uraianText.startsWith('Dikeluarkan')) uraianText = "Dikeluarkan untuk " + uraianText;
+                }
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${no++}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.tanggal}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${uraianText}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${item.pemasukan ? formatRupiah(item.pemasukan) : ''}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${item.pengeluaran ? formatRupiah(item.pengeluaran) : ''}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;">${formatRupiah(runningSaldo)}</td>
+            `;
+                tbody.appendChild(tr);
+            });
+
+            // Row Terakhir: Total
+            let trTotal = document.createElement('tr');
+            trTotal.innerHTML = `
+            <td colspan="3" style="border: 1px solid #000; padding: 6px; text-align: center; font-style: italic; font-weight: bold;">Total Saldo</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(totalDebit)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(totalKredit)}</td>
+            <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;">${formatRupiah(runningSaldo)}</td>
+        `;
+            tbody.appendChild(trTotal);
+
+            document.getElementById('previewModal').style.display = 'flex';
+            document.getElementById('previewModal').classList.remove('editable-mode');
+            document.querySelectorAll('#previewModal [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            
+            // Reset Edit Button State
+            const btnEdit = document.getElementById('btnEditLaporan');
+            if (btnEdit) {
+                isLaporanEditing = false;
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+                btnEdit.classList.remove('btn-success');
+                btnEdit.classList.add('btn-warning');
+                btnEdit.style.backgroundColor = '#f59e0b';
+                
+                const layoutControls = document.getElementById('layoutControlsLaporan');
+                if (layoutControls) layoutControls.style.display = 'none';
+                
+                const ttdControls = document.querySelectorAll('#previewModal .ttd-controls');
+                ttdControls.forEach(el => el.style.display = 'none');
+            }
+        }
+
+        function closePreviewLaporan() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function printPreview() {
+            const p = document.getElementById('previewF4Wrapper');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+            <html>
+            <head>
+                <title>Cetak Laporan</title>
+                
+            </head>
+            <body>
+                <div class="wrapper">
+                    ${p.innerHTML}
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    };
+                </` + `script>
+            </body>
+            </html>
+        `);
+            printWindow.document.close();
+        }
+
+        function exportPreviewToPDF() {
+            const element = document.getElementById('previewF4Wrapper');
+            const btn = document.querySelector('button[onclick="exportPreviewToPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+
+            const opt = {
+                margin: 0,
+                filename: 'Laporan_Keuangan_SPMB.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'cm', format: [21.59, 33], orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+            });
+        }
+
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportPreviewToWord() {
+            const btn = document.querySelector('button[onclick="exportPreviewToWord()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            btn.disabled = true;
+
+            try {
+                const bgDataUrl = await getBase64Image('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+
+                const clone = document.getElementById('previewF4Wrapper').cloneNode(true);
+                clone.querySelectorAll('[contenteditable]').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                    el.style.border = 'none';
+                });
+                const contentStr = clone.innerHTML;
+
+                const html = `
+            <html xmlns:v="urn:schemas-microsoft-com:vml"
+            xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:w="urn:schemas-microsoft-com:office:word"
+            xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+            xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+            <meta charset="utf-8">
+            
+            <!--[if gte mso 9]>
+            <xml>
+             <w:WordDocument>
+              <w:View>Print</w:View>
+              <w:Zoom>100</w:Zoom>
+              <w:DoNotOptimizeForBrowser/>
+             </w:WordDocument>
+            </xml>
+            <![endif]-->
+            </head>
+            <body>
+            <div class="WordSection1">
+              <!--[if gte vml 1]>
+              <v:rect id="bgimg" style="position:absolute;left:0;top:0;width:21.59cm;height:33.0cm;z-index:-1" stroked="f">
+                <v:fill src="${bgDataUrl}" type="frame"/>
+              </v:rect>
+              <![endif]-->
+              ${contentStr}
+            </div>
+            </body>
+            </html>
+            `;
+
+                const blob = new Blob(['\\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Laporan_Keuangan_SPMB.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (e) {
+                console.error(e);
+                alert('Gagal mengexport ke Word.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function filterData() {
+            var filterTahun = document.getElementById("filterTahun").value.toLowerCase();
+            var filterBulan = document.getElementById("filterBulan").value.toLowerCase();
+            var table = document.getElementById("tabelLaporan");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdBulan = tr[i].getElementsByTagName("td")[2]; // Bulan dan Tahun is index 2
+                if (tdBulan) {
+                    var txtBulan = tdBulan.textContent || tdBulan.innerText;
+                    var txtLower = txtBulan.toLowerCase();
+
+                    var matchTahun = filterTahun === "" || txtLower.indexOf(filterTahun) > -1;
+                    var matchBulan = filterBulan === "" || txtLower.indexOf(filterBulan) > -1;
+
+                    if (matchTahun && matchBulan) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+/* From footer.ejs */
+// Common functionality like print
+    function printPage() {
+        window.print();
+    }
+
+    // Sidebar Toggle for Mobile responsiveness
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (toggleBtn && sidebar) {
+            // Create overlay dynamically if it doesn't exist
+            let overlay = document.querySelector('.sidebar-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'sidebar-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+
+            // Close sidebar on menu item click (on mobile)
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+    });
+
+/* From santri-daftar-ulang.ejs */
+function openSantriModal(btn) {
+            var data = JSON.parse(btn.getAttribute('data-santri'));
+
+            document.getElementById('editSantriForm').action = '/santri-daftar-ulang/edit/' + data.id;
+
+            document.getElementById('m_nomorPendaftaran').value = data.nomorPendaftaran || '';
+            document.getElementById('m_email').value = data.email || '';
+            document.getElementById('m_jalurPendaftaran').value = data.jalurPendaftaran || 'Reguler';
+            document.getElementById('m_nama').value = data.nama || '';
+            document.getElementById('m_namaPanggilan').value = data.namaPanggilan || '';
+            document.getElementById('m_jenisKelamin').value = data.jenisKelamin || 'Laki-laki';
+            document.getElementById('m_unitSebelumnya').value = data.unitSebelumnya || 'PAUDQu A';
+            document.getElementById('m_lanjutKe').value = data.lanjutKe || 'PAUDQu B';
+            document.getElementById('m_tempatLahir').value = data.tempatLahir || '';
+            document.getElementById('m_tanggalLahir').value = data.tanggalLahir || '';
+            document.getElementById('m_agama').value = data.agama || 'Islam';
+            document.getElementById('m_statusKeluarga').value = data.statusKeluarga || 'Anak Kandung';
+            document.getElementById('m_anakKe').value = data.anakKe || '';
+            document.getElementById('m_dariBersaudara').value = data.dariBersaudara || '';
+            document.getElementById('m_asalSekolah').value = data.asalSekolah || '';
+
+            document.getElementById('m_namaAyah').value = data.namaAyah || '';
+            document.getElementById('m_pekerjaanAyah').value = data.pekerjaanAyah || '';
+            document.getElementById('m_teleponAyah').value = data.teleponAyah || '';
+
+            document.getElementById('m_namaIbu').value = data.namaIbu || '';
+            document.getElementById('m_pekerjaanIbu').value = data.pekerjaanIbu || '';
+            document.getElementById('m_teleponIbu').value = data.teleponIbu || '';
+
+            document.getElementById('m_alamat').value = data.alamat || '';
+
+            document.getElementById('santriModal').style.display = 'block';
+        }
+
+        function closeSantriModal() {
+            document.getElementById('santriModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            var modal = document.getElementById('santriModal');
+            var addModal = document.getElementById('addSantriModal');
+            var deleteModal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+            if (event.target == addModal) {
+                addModal.style.display = "none";
+            }
+            if (event.target == deleteModal) {
+                deleteModal.style.display = "none";
+            }
+        }
+
+        function openAddSantriModal() {
+            document.getElementById('addSantriModal').style.display = 'block';
+        }
+
+        function closeAddSantriModal() {
+            document.getElementById('addSantriModal').style.display = 'none';
+        }
+
+        function openDeleteModal(actionUrl) {
+            document.getElementById('deleteForm').action = actionUrl;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+/* From santri-daftar-ulang.ejs */
+function fillTestingDataDaftarUlang() {
+            const modal = document.getElementById('addSantriModal');
+            if (!modal) return;
+            
+            const inputs = modal.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea');
+            inputs.forEach(input => {
+                if (input.name === 'namaSantri') input.value = `Test Daftar Ulang ${Math.floor(Math.random() * 1000)}`;
+                else if (input.name === 'namaPanggilan') input.value = `Test DU`;
+                else if (input.name === 'tempatLahir') input.value = 'Jakarta';
+                else if (input.name === 'asalSekolah') input.value = 'TK Testing';
+                else if (input.name === 'email') input.value = `testdu${Math.floor(Math.random() * 1000)}@example.com`;
+                else if (input.name === 'namaAyah') input.value = 'Ayah Testing';
+                else if (input.name === 'pekerjaanAyah') input.value = 'Karyawan';
+                else if (input.name === 'teleponAyah') input.value = '081234567890';
+                else if (input.name === 'namaIbu') input.value = 'Ibu Testing';
+                else if (input.name === 'pekerjaanIbu') input.value = 'Ibu Rumah Tangga';
+                else if (input.name === 'teleponIbu') input.value = '081234567891';
+                else if (input.name === 'alamat') input.value = 'Jl. Testing No. 123, Jakarta';
+                else if (input.name === 'anakKe') input.value = '1';
+                else if (input.name === 'dariBersaudara') input.value = '2';
+            });
+
+            const dateInputs = modal.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (input.name === 'tanggalLahir') input.value = '2015-01-01';
+            });
+
+            const selects = modal.querySelectorAll('select');
+            selects.forEach(select => {
+                if (select.name === 'pendidikanSebelumnya') select.value = 'PAUDQu B';
+                else if (select.name === 'lanjutKe') select.value = 'TPQ A';
+                else if (select.name === 'agama') select.value = 'Islam';
+                else if (select.name === 'statusKeluarga') select.value = 'Anak Kandung';
+            });
+
+            const radios = modal.querySelectorAll('input[type="radio"]');
+            if (radios.length > 0) {
+                radios.forEach(radio => {
+                    if (radio.value === 'Laki-laki') radio.checked = true;
+                    if (radio.name === 'jalurPendaftaran' && radio.value === 'Reguler') radio.checked = true;
+                });
+            }
+        }
+
+        async function handleAjaxSubmit(event, formElement) {
+            event.preventDefault();
+            const submitBtn = formElement.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(formElement);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(formElement.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if(result.success) {
+                    formElement.closest('.modal').style.display = 'none';
+                    const successModal = document.getElementById('successModal');
+                    if(result.noRef) {
+                        document.getElementById('successNoRef').innerText = result.noRef;
+                        document.getElementById('successNoRefContainer').style.display = 'block';
+                    }
+                    successModal.style.display = 'block';
+                } else {
+                    alert('Terjadi kesalahan saat menyimpan data.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Gagal menghubungi server.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+/* From santri.ejs */
+function filterData() {
+            var searchInput = document.getElementById("searchInput").value.toLowerCase();
+            var pendidikanInput = document.getElementById("pendidikanInput").value.toLowerCase();
+            var table = document.getElementById("dataTable");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdNama = tr[i].getElementsByTagName("td")[5]; // Index 5 is Nama Santri
+                var tdPendidikan = tr[i].getElementsByTagName("td")[7]; // Index 7 is Pendidikan
+                if (tdNama && tdPendidikan) {
+                    var txtNama = tdNama.textContent || tdNama.innerText;
+                    var txtPendidikan = tdPendidikan.textContent || tdPendidikan.innerText;
+                    var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+                    var matchPendidikan = pendidikanInput === "" || txtPendidikan.toLowerCase().indexOf(pendidikanInput) > -1;
+
+                    if (matchNama && matchPendidikan) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function openSantriModal(btn) {
+            var data = JSON.parse(btn.getAttribute('data-santri'));
+
+            document.getElementById('editSantriForm').action = '/santri/edit/' + data.id;
+
+            document.getElementById('m_nomorPendaftaran').value = data.nomorPendaftaran || '';
+            document.getElementById('m_email').value = data.email || '';
+            document.getElementById('m_jalurPendaftaran').value = data.jalurPendaftaran || 'Reguler';
+            document.getElementById('m_nama').value = data.nama || '';
+            document.getElementById('m_namaPanggilan').value = data.namaPanggilan || '';
+            document.getElementById('m_jenisKelamin').value = data.jenisKelamin || 'Laki-laki';
+            document.getElementById('m_pendidikan').value = data.pendidikan || 'PAUDQu A';
+            document.getElementById('m_tempatLahir').value = data.tempatLahir || '';
+            document.getElementById('m_tanggalLahir').value = data.tanggalLahir || '';
+            document.getElementById('m_agama').value = data.agama || 'Islam';
+            document.getElementById('m_statusKeluarga').value = data.statusKeluarga || 'Anak Kandung';
+            document.getElementById('m_anakKe').value = data.anakKe || '';
+            document.getElementById('m_dariBersaudara').value = data.dariBersaudara || '';
+            document.getElementById('m_asalSekolah').value = data.asalSekolah || '';
+
+            document.getElementById('m_namaAyah').value = data.namaAyah || '';
+            document.getElementById('m_pekerjaanAyah').value = data.pekerjaanAyah || '';
+            document.getElementById('m_teleponAyah').value = data.teleponAyah || '';
+
+            document.getElementById('m_namaIbu').value = data.namaIbu || '';
+            document.getElementById('m_pekerjaanIbu').value = data.pekerjaanIbu || '';
+            document.getElementById('m_teleponIbu').value = data.teleponIbu || '';
+
+            document.getElementById('m_alamat').value = data.alamat || '';
+
+            document.getElementById('santriModal').style.display = 'block';
+        }
+
+        function closeSantriModal() {
+            document.getElementById('santriModal').style.display = 'none';
+        }
+
+
+        function openAddSantriModal() {
+            console.log("Opening Add Santri Modal");
+            document.getElementById('addSantriModal').style.display = 'block';
+        }
+
+        function closeAddSantriModal() {
+            document.getElementById('addSantriModal').style.display = 'none';
+        }
+
+        function openAddSantriBeasiswaModal() {
+            console.log("Opening Add Santri Beasiswa Modal");
+            document.getElementById('addSantriBeasiswaModal').style.display = 'block';
+        }
+
+        function closeAddSantriBeasiswaModal() {
+            document.getElementById('addSantriBeasiswaModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            var modal = document.getElementById('santriModal');
+            var addModal = document.getElementById('addSantriModal');
+            var addBeasiswaModal = document.getElementById('addSantriBeasiswaModal');
+            var deleteModal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+            if (event.target == addModal) {
+                addModal.style.display = "none";
+            }
+            if (addBeasiswaModal && event.target == addBeasiswaModal) {
+                addBeasiswaModal.style.display = "none";
+            }
+            if (event.target == deleteModal) {
+                deleteModal.style.display = "none";
+            }
+        }
+
+        function openDeleteModal(actionUrl) {
+            document.getElementById('deleteForm').action = actionUrl;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        function fillTestingDataSantri(isBeasiswa = false) {
+            const prefix = isBeasiswa ? 'B' : 'R';
+            const modalId = isBeasiswa ? 'addSantriBeasiswaModal' : 'addSantriModal';
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            const inputs = modal.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea');
+            inputs.forEach(input => {
+                if (input.name === 'namaSantri') input.value = `Test Santri ${prefix} ${Math.floor(Math.random() * 1000)}`;
+                else if (input.name === 'namaPanggilan') input.value = `Test ${prefix}`;
+                else if (input.name === 'tempatLahir') input.value = 'Jakarta';
+                else if (input.name === 'asalSekolah') input.value = 'TK Testing';
+                else if (input.name === 'email') input.value = `test${prefix}${Math.floor(Math.random() * 1000)}@example.com`;
+                else if (input.name === 'namaAyah') input.value = 'Ayah Testing';
+                else if (input.name === 'pekerjaanAyah') input.value = 'Karyawan';
+                else if (input.name === 'teleponAyah') input.value = '081234567890';
+                else if (input.name === 'namaIbu') input.value = 'Ibu Testing';
+                else if (input.name === 'pekerjaanIbu') input.value = 'Ibu Rumah Tangga';
+                else if (input.name === 'teleponIbu') input.value = '081234567891';
+                else if (input.name === 'alamat') input.value = 'Jl. Testing No. 123, Jakarta';
+                else if (input.name === 'anakKe') input.value = '1';
+                else if (input.name === 'dariBersaudara') input.value = '2';
+            });
+
+            const dateInputs = modal.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (input.name === 'tanggalLahir') input.value = '2015-01-01';
+            });
+
+            const selects = modal.querySelectorAll('select');
+            selects.forEach(select => {
+                if (select.name === 'pendidikan') select.value = 'TPQ A';
+                else if (select.name === 'agama') select.value = 'Islam';
+                else if (select.name === 'statusKeluarga') select.value = 'Anak Kandung';
+            });
+
+            const radios = modal.querySelectorAll('input[type="radio"]');
+            if (radios.length > 0) {
+                radios.forEach(radio => {
+                    if (radio.value === 'Laki-laki') radio.checked = true;
+                    if (isBeasiswa && radio.name === 'jalurBeasiswa' && radio.value === 'Beasiswa Dhuafa') radio.checked = true;
+                });
+            }
+        }
+
+/* From santri.ejs */
+async function handleAjaxSubmit(event, formElement) {
+                event.preventDefault();
+                const submitBtn = formElement.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                submitBtn.disabled = true;
+
+                const formData = new FormData(formElement);
+                const data = Object.fromEntries(formData.entries());
+
+                if (data.jenisKelaminBeasiswa) {
+                    data.jenisKelamin = data.jenisKelaminBeasiswa;
+                    delete data.jenisKelaminBeasiswa;
+                }
+
+                try {
+                    const response = await fetch(formElement.action, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        formElement.closest('.modal').style.display = 'none';
+                        const successModal = document.getElementById('successModal');
+                        if (result.noRef) {
+                            document.getElementById('successNoRef').innerText = result.noRef;
+                            document.getElementById('successNoRefContainer').style.display = 'block';
+                        }
+                        successModal.style.display = 'block';
+                    } else {
+                        alert('Terjadi kesalahan saat menyimpan data.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Gagal menghubungi server.');
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+
+/* From tagihan-daftar-ulang.ejs */
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var satuanInput = document.getElementById("satuanInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[0];
+        var tdSatuan = tr[i].getElementsByTagName("td")[3]; // Lanjut Ke is index 3
+        if (tdNama && tdSatuan) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtSatuan = tdSatuan.textContent || tdSatuan.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            var matchSatuan = satuanInput === "" || txtSatuan.toLowerCase().indexOf(satuanInput) > -1;
+            
+            if (matchNama && matchSatuan) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+function openTagihanModal(btn) {
+    var data = JSON.parse(btn.getAttribute('data-tagihan'));
+    
+    // Ganti URL action form dengan endpoint edit sesuai ID tagihan
+    document.getElementById('editTagihanForm').action = '/tagihan-daftar-ulang/edit/' + (data.id || '');
+    
+    document.getElementById('m_nama').value = data.nama || '';
+    document.getElementById('m_formulir').value = data.formulir || 0;
+    document.getElementById('m_perlengkapan').value = data.perlengkapan || 0;
+    document.getElementById('m_spp').value = data.spp || 0;
+    
+    document.getElementById('tagihanModal').style.display = 'block';
+}
+
+function closeTagihanModal() {
+    document.getElementById('tagihanModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    var modal = document.getElementById('tagihanModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+/* From tagihan.ejs */
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var satuanInput = document.getElementById("satuanInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[0];
+        var tdSatuan = tr[i].getElementsByTagName("td")[2];
+        if (tdNama && tdSatuan) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtSatuan = tdSatuan.textContent || tdSatuan.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            var matchSatuan = satuanInput === "" || txtSatuan.toLowerCase().indexOf(satuanInput) > -1;
+            
+            if (matchNama && matchSatuan) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+function openTagihanModal(btn) {
+    var data = JSON.parse(btn.getAttribute('data-tagihan'));
+    
+    // Ganti URL action form dengan endpoint edit sesuai ID tagihan (misal /tagihan/edit/:id)
+    document.getElementById('editTagihanForm').action = '/tagihan/edit/' + (data.id || '');
+    
+    document.getElementById('m_nama').value = data.nama || '';
+    document.getElementById('m_formulir').value = data.formulir || 0;
+    document.getElementById('m_uangPangkal').value = data.uangPangkal || 0;
+    document.getElementById('m_perlengkapan').value = data.perlengkapan || 0;
+    document.getElementById('m_seragam').value = data.seragam || 0;
+    document.getElementById('m_spp').value = data.spp || 0;
+    
+    document.getElementById('tagihanModal').style.display = 'block';
+}
+
+function closeTagihanModal() {
+    document.getElementById('tagihanModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    var modal = document.getElementById('tagihanModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+/* From tunggakan-daftar-ulang.ejs */
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var statusInput = document.getElementById("statusInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[1]; // Nama is index 1
+        var tdStatus = tr[i].getElementsByTagName("td")[7]; // Status is index 7
+        if (tdNama && tdStatus) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtStatus = tdStatus.textContent || tdStatus.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            // For status, exactly matches the selected, or empty means all
+            var matchStatus = statusInput === "" || txtStatus.toLowerCase().trim() === statusInput;
+            
+            if (matchNama && matchStatus) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+/* From tunggakan.ejs */
+function filterData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var statusInput = document.getElementById("statusInput").value.toLowerCase();
+    var table = document.getElementById("dataTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdNama = tr[i].getElementsByTagName("td")[1]; // Nama is index 1
+        var tdStatus = tr[i].getElementsByTagName("td")[7]; // Status is index 7
+        if (tdNama && tdStatus) {
+            var txtNama = tdNama.textContent || tdNama.innerText;
+            var txtStatus = tdStatus.textContent || tdStatus.innerText;
+            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
+            // For status, exactly matches the selected, or empty means all
+            var matchStatus = statusInput === "" || txtStatus.toLowerCase().trim() === statusInput;
+            
+            if (matchNama && matchStatus) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}

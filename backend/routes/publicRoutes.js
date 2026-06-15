@@ -1,23 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const publicController = require('../controllers/publicController');
+
+const landingController = require('../controllers/public/landingController');
+const pendaftaranController = require('../controllers/public/pendaftaranController');
+const { pendaftaranLimiter } = require('../middlewares/rateLimiter');
 
 // Landing Page
-router.get('/', publicController.getLandingPage);
+router.get('/', landingController.getLanding);
 
 // Form Reguler
-router.get('/daftar', publicController.getFormReguler);
-router.post('/daftar', publicController.postFormReguler);
+router.get('/daftar', pendaftaranController.getFormPendaftaran);
+router.post('/daftar', pendaftaranLimiter, pendaftaranController.postFormPendaftaran);
 
 // Form Daftar Ulang
-router.get('/daftar-ulang', publicController.getFormDaftarUlang);
-router.post('/daftar-ulang', publicController.postFormDaftarUlang);
+router.get('/daftar-ulang', pendaftaranController.getFormDaftarUlang);
+router.post('/daftar-ulang', pendaftaranLimiter, pendaftaranController.postFormDaftarUlang);
 
 // Form Beasiswa
-router.get('/daftar/beasiswa', publicController.getFormBeasiswa);
-router.post('/daftar/beasiswa', publicController.postFormBeasiswa);
+router.get('/daftar/beasiswa', pendaftaranController.getFormBeasiswa);
+router.post('/daftar/beasiswa', pendaftaranLimiter, pendaftaranController.postFormBeasiswa);
 
 // Sukses
-router.get('/daftar/sukses', publicController.getSukses);
+router.get('/daftar/sukses', landingController.getSukses);
 
 module.exports = router;

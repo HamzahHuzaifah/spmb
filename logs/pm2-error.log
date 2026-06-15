@@ -1,0 +1,255 @@
+2026-06-13 00:48 +07:00: TypeError: Cannot read properties of undefined (reading 'replace')
+    at exports.postInputTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:146:56)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at processParams (D:\spmb-web-app\node_modules\router\index.js:582:12)
+    at next (D:\spmb-web-app\node_modules\router\index.js:291:5)
+    at cekAuth (D:\spmb-web-app\backend\middlewares\auth.js:23:9)
+2026-06-13 00:55 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TransaksiModel.addLaporan (D:\spmb-web-app\backend\models\TransaksiModel.js:184:35)
+    at exports.postInputTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:171:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-13 21:54 +07:00: Login Error: AggregateError: 
+    at exports.postLogin (D:\spmb-web-app\backend\controllers\admin\authController.js:25:33)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at processParams (D:\spmb-web-app\node_modules\router\index.js:582:12)
+    at next (D:\spmb-web-app\node_modules\router\index.js:291:5)
+    at Function.handle (D:\spmb-web-app\node_modules\router\index.js:186:3) {
+  code: 'ECONNREFUSED',
+  fatal: true,
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:3306
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 3306
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:3306
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 3306
+    }
+  ]
+}
+2026-06-14 00:09 +07:00: TypeError: TransaksiModel.deleteLaporan is not a function
+    at exports.deleteTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:217:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:09 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:269:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:15 +07:00: TypeError: TransaksiModel.deleteLaporan is not a function
+    at exports.deleteTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:217:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:16 +07:00: TypeError: TransaksiModel.deleteLaporan is not a function
+    at exports.deleteTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:217:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:18 +07:00: TypeError: TransaksiModel.deleteLaporan is not a function
+    at exports.deleteTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:217:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:26 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:269:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:27 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:269:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:27 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:269:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 00:28 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:269:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 01:42 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantri (D:\spmb-web-app\backend\models\SantriModel.js:112:18)
+    at exports.editSantri (D:\spmb-web-app\backend\controllers\admin\santriController.js:71:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 01:42 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantri (D:\spmb-web-app\backend\models\SantriModel.js:112:18)
+    at exports.editSantri (D:\spmb-web-app\backend\controllers\admin\santriController.js:71:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:18 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantri (D:\spmb-web-app\backend\models\SantriModel.js:112:18)
+    at exports.editSantri (D:\spmb-web-app\backend\controllers\admin\santriController.js:72:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:18 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantri (D:\spmb-web-app\backend\models\SantriModel.js:112:18)
+    at exports.editSantri (D:\spmb-web-app\backend\controllers\admin\santriController.js:72:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:43 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantri (D:\spmb-web-app\backend\models\SantriModel.js:112:18)
+    at exports.editSantri (D:\spmb-web-app\backend\controllers\admin\santriController.js:72:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:44 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TagihanModel.updateTagihan (D:\spmb-web-app\backend\models\TagihanModel.js:91:18)
+    at exports.editTagihan (D:\spmb-web-app\backend\controllers\admin\tagihanController.js:73:28)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at param (D:\spmb-web-app\node_modules\router\index.js:600:14)
+    at param (D:\spmb-web-app\node_modules\router\index.js:610:14)
+2026-06-14 03:45 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantriDaftarUlang (D:\spmb-web-app\backend\models\SantriModel.js:227:18)
+    at exports.editSantriDaftarUlang (D:\spmb-web-app\backend\controllers\admin\santriController.js:149:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:45 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TagihanModel.updateTagihan (D:\spmb-web-app\backend\models\TagihanModel.js:91:18)
+    at exports.editTagihan (D:\spmb-web-app\backend\controllers\admin\tagihanController.js:73:28)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at param (D:\spmb-web-app\node_modules\router\index.js:600:14)
+    at param (D:\spmb-web-app\node_modules\router\index.js:610:14)
+2026-06-14 03:45 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at SantriModel.updateSantriDaftarUlang (D:\spmb-web-app\backend\models\SantriModel.js:227:18)
+    at exports.editSantriDaftarUlang (D:\spmb-web-app\backend\controllers\admin\santriController.js:149:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14 03:46 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TagihanModel.updateTagihanDaftarUlang (D:\spmb-web-app\backend\models\TagihanModel.js:217:18)
+    at exports.editTagihanDaftarUlang (D:\spmb-web-app\backend\controllers\admin\tagihanController.js:107:28)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at param (D:\spmb-web-app\node_modules\router\index.js:600:14)
+    at param (D:\spmb-web-app\node_modules\router\index.js:610:14)
+2026-06-16 02:56 +07:00: Login Error: AggregateError: 
+    at exports.postLogin (D:\spmb-web-app\backend\controllers\admin\authController.js:25:33)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at next (D:\spmb-web-app\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\spmb-web-app\node_modules\router\lib\route.js:117:3)
+    at handle (D:\spmb-web-app\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\spmb-web-app\node_modules\router\lib\layer.js:152:17)
+    at D:\spmb-web-app\node_modules\router\index.js:295:15
+    at processParams (D:\spmb-web-app\node_modules\router\index.js:582:12)
+    at next (D:\spmb-web-app\node_modules\router\index.js:291:5)
+    at Function.handle (D:\spmb-web-app\node_modules\router\index.js:186:3) {
+  code: 'ECONNREFUSED',
+  fatal: true,
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:3306
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 3306
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:3306
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 3306
+    }
+  ]
+}
+2026-06-16 02:57 +07:00: Error: Incorrect arguments to mysqld_stmt_execute
+    at SantriModel.updateSantriDaftarUlang (D:\spmb-web-app\backend\models\SantriModel.js:227:18)
+    at exports.editSantriDaftarUlang (D:\spmb-web-app\backend\controllers\admin\santriController.js:149:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_WRONG_ARGUMENTS',
+  errno: 1210,
+  sqlState: 'HY000',
+  sqlMessage: 'Incorrect arguments to mysqld_stmt_execute',
+  sql: '\n' +
+    '            UPDATE santri_daftar_ulang SET \n' +
+    '                email = COALESCE(?, email), \n' +
+    '                jalurPendaftaran = COALESCE(?, jalurPendaftaran), \n' +
+    '                nama = COALESCE(?, nama), \n' +
+    '                namaPanggilan = COALESCE(?, namaPanggilan), \n' +
+    '                jenisKelamin = COALESCE(?, jenisKelamin), \n' +
+    '                unitSebelumnya = COALESCE(?, unitSebelumnya), \n' +
+    '                lanjutKe = COALESCE(?, lanjutKe), \n' +
+    '                tempatLahir = COALESCE(?, tempatLahir), \n' +
+    '                tanggalLahir = COALESCE(?, tanggalLahir), \n' +
+    '                agama = COALESCE(?, agama), \n' +
+    '                statusKeluarga = COALESCE(?, statusKeluarga), \n' +
+    '                anakKe = COALESCE(?, anakKe), \n' +
+    '                dariBersaudara = COALESCE(?, dariBersaudara), \n' +
+    '                asalSekolah = COALESCE(?, asalSekolah), \n' +
+    '                usia = COALESCE(?, usia), \n' +
+    '                namaAyah = COALESCE(?, namaAyah), \n' +
+    '                pekerjaanAyah = COALESCE(?, pekerjaanAyah), \n' +
+    '                teleponAyah = COALESCE(?, teleponAyah), \n' +
+    '                namaIbu = COALESCE(?, namaIbu), \n' +
+    '                pekerjaanIbu = COALESCE(?, pekerjaanIbu), \n' +
+    '                teleponIbu = COALESCE(?, teleponIbu), \n' +
+    '                alamat = COALESCE(?, alamat), \n' +
+    '                noTelepon = COALESCE(?, noTelepon)\n' +
+    '            WHERE id = ?\n' +
+    '        '
+}
+2026-06-16 02:58 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TransaksiModel.addTransaksi (D:\spmb-web-app\backend\models\TransaksiModel.js:78:35)
+    at exports.postInputTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:159:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-16 03:01 +07:00: TypeError: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at TransaksiModel.addTransaksi (D:\spmb-web-app\backend\models\TransaksiModel.js:78:35)
+    at exports.postInputTransaksi (D:\spmb-web-app\backend\controllers\admin\transaksiController.js:159:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-16 03:02 +07:00: Error: Column 'nomorPendaftaran' cannot be null
+    at SantriModel.addSantri (D:\spmb-web-app\backend\models\SantriModel.js:74:35)
+    at exports.postFormPendaftaran (D:\spmb-web-app\backend\controllers\public\pendaftaranController.js:57:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_NULL_ERROR',
+  errno: 1048,
+  sqlState: '23000',
+  sqlMessage: "Column 'nomorPendaftaran' cannot be null",
+  sql: '\n' +
+    '            INSERT INTO santri (\n' +
+    '                nomorPendaftaran, timestamp, email, jalurPendaftaran, nama, namaPanggilan, \n' +
+    '                jenisKelamin, pendidikan, tempatLahir, tanggalLahir, agama, statusKeluarga, \n' +
+    '                anakKe, dariBersaudara, asalSekolah, usia, namaAyah, pekerjaanAyah, \n' +
+    '                teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat, noTelepon\n' +
+    '            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n' +
+    '        '
+}
+2026-06-16 03:02 +07:00: Error: Column 'nomorPendaftaran' cannot be null
+    at SantriModel.addSantri (D:\spmb-web-app\backend\models\SantriModel.js:74:35)
+    at exports.postFormPendaftaran (D:\spmb-web-app\backend\controllers\public\pendaftaranController.js:57:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_NULL_ERROR',
+  errno: 1048,
+  sqlState: '23000',
+  sqlMessage: "Column 'nomorPendaftaran' cannot be null",
+  sql: '\n' +
+    '            INSERT INTO santri (\n' +
+    '                nomorPendaftaran, timestamp, email, jalurPendaftaran, nama, namaPanggilan, \n' +
+    '                jenisKelamin, pendidikan, tempatLahir, tanggalLahir, agama, statusKeluarga, \n' +
+    '                anakKe, dariBersaudara, asalSekolah, usia, namaAyah, pekerjaanAyah, \n' +
+    '                teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat, noTelepon\n' +
+    '            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n' +
+    '        '
+}
+2026-06-16 04:39 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editKwitansiDetail (D:\spmb-web-app\backend\controllers\admin\kwitansiController.js:174:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-16 04:40 +07:00: TypeError: TransaksiModel.updateLaporan is not a function
+    at exports.editKwitansiDetail (D:\spmb-web-app\backend\controllers\admin\kwitansiController.js:174:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)

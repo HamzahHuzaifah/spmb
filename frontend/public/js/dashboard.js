@@ -1,0 +1,1 @@
+// Filter and Pagination are now handled by Server-Side GET requests in dashboard.ejs

@@ -1,0 +1,671 @@
+﻿<%- include('partials/header', { title: 'Input Transaksi Keuangan' , activePage: 'input-transaksi' }) %>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-title">Form Catat Transaksi</div>
+        </div>
+
+        <form action="/input-transaksi" method="POST">
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Cari Nomor Pendaftaran</label>
+                    <input type="text" id="cariNomorPendaftaran" class="form-control" style="width: 100%;" placeholder="SPMB-Daftar..." oninput="handleCariNomor()">
+                    <small style="color: var(--text-muted);">Pencarian cepat untuk auto-fill</small>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Transaksi</label>
+                    <input type="date" name="tanggal" id="tanggal" class="form-control" style="width: 100%;" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jenis Transaksi</label>
+                    <select name="jenisTransaksi" id="jenisTransaksi" class="form-control" style="width: 100%;" required
+                        onchange="handleJenisTransaksi()">
+                        <option value="">-- Pilih Jenis Transaksi --</option>
+                        <option value="Pembayaran Pendaftaran Baru">Pembayaran Pendaftaran Baru</option>
+                        <option value="Pembayaran Daftar Ulang">Pembayaran Daftar Ulang</option>
+                        <option value="Pemasukan">Pemasukan (Selain Biaya Santri)</option>
+                        <option value="Pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section: Pembayaran Pendaftaran -->
+            <div id="sec-pendaftaran"
+                style="display: none; background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Satuan Pendidikan</label>
+                <select id="satuanPendidikanBaru" class="form-control" style="width: 100%; margin-bottom: 15px;">
+                    <option value="">-- Pilih Satuan --</option>
+                    <option value="PAUDQu">PAUDQu</option>
+                    <option value="TPQ">TPQ</option>
+                    <option value="MDT">MDT</option>
+                </select>
+
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Pilih Nama Pendaftar</label>
+                <select name="namaPendaftar" id="namaPendaftar" class="form-control" style="width: 100%; margin-bottom: 15px;">
+                    <option value="">-- Cari Nama Pendaftar --</option>
+                    <% if(typeof tunggakan !=='undefined' && tunggakan.length> 0) { %>
+                        <% tunggakan.forEach(t=> { %>
+                            <option value="<%= t.nama %>">
+                                <%= t.nama %> - Sisa: Rp <%= t.sisaBayar.toLocaleString('id-ID') %>
+                            </option>
+                            <% }) %>
+                                <% } %>
+                </select>
+                <small style="color: var(--text-muted);">Data nama ini otomatis diambil dari form pendaftaran reguler
+                    (publik).</small>
+            </div>
+
+            <!-- Section: Pembayaran Daftar Ulang -->
+            <div id="sec-daftar-ulang"
+                style="display: none; background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Satuan Pendidikan</label>
+                <select name="satuanPendidikan" id="satuanPendidikan" class="form-control" style="width: 100%; margin-bottom: 15px;">
+                    <option value="">-- Pilih Satuan --</option>
+                    <option value="PAUDQu">PAUDQu</option>
+                    <option value="TPQ">TPQ</option>
+                    <option value="MDT">MDT</option>
+                </select>
+
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Nama Santri</label>
+                <select name="namaSantriDaftarUlang" id="namaSantriDaftarUlang" class="form-control" style="width: 100%;">
+                    <option value="">-- Pilih Nama Santri --</option>
+                    <% if(typeof tunggakanDaftarUlang !=='undefined' && tunggakanDaftarUlang.length> 0) { %>
+                        <% tunggakanDaftarUlang.forEach(t=> { %>
+                            <option value="<%= t.nama %>">
+                                <%= t.nama %> - Sisa: Rp <%= t.sisaBayar.toLocaleString('id-ID') %>
+                            </option>
+                            <% }) %>
+                                <% } %>
+                </select>
+            </div>
+
+            <!-- Section: Pemasukan / Pengeluaran Lain -->
+            <div id="sec-lainnya"
+                style="display: none; background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <div id="wrapper-satuan-pengeluaran" style="display: none;">
+                    <label id="label-satuan-pengeluaran" style="display: block; margin-bottom: 8px; font-weight: 600;">Satuan Pendidikan (Khusus Pengeluaran)</label>
+                    <select name="satuanPendidikanPengeluaran" id="satuanPendidikanPengeluaran" class="form-control" style="width: 100%; margin-bottom: 15px;">
+                        <option value="">-- Pilih Satuan (Opsional) --</option>
+                        <option value="MADRASAH">MADRASAH (Umum)</option>
+                        <option value="PAUDQu">PAUDQu</option>
+                        <option value="TPQ">TPQ</option>
+                        <option value="MDT">MDT</option>
+                    </select>
+                </div>
+
+                <label id="label-uraian" style="display: block; margin-bottom: 8px; font-weight: 600;">Uraian Transaksi</label>
+                <input type="text" name="uraianLain" class="form-control" style="width: 100%; margin-bottom: 15px;"
+                    placeholder="Contoh: Beli ATK Jika Pengeluaran / Dana Ziswaf Jika Pemasukan">
+
+                <div id="wrapper-pemasukan-detail" style="display: none;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Telah Diterima Dari</label>
+                    <input type="text" name="diterimaDari" class="form-control" style="width: 100%; margin-bottom: 15px;" placeholder="Nama Instansi/Lembaga/Orang">
+
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Nama Pemberi (Untuk Tanda Tangan)</label>
+                    <input type="text" name="namaPemberi" class="form-control" style="width: 100%; margin-bottom: 15px;" placeholder="Nama Lengkap Pemberi Dana">
+                </div>
+
+                <div id="wrapper-pengeluaran-detail" style="display: none;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Dibayarkan Kepada</label>
+                    <input type="text" name="dibayarkanKepada" class="form-control" style="width: 100%; margin-bottom: 15px;" placeholder="Nama Penerima (Misal: Pak Budi)">
+
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Kategori Dana</label>
+                    <select name="kategoriDana" id="kategoriDana" class="form-control" style="width: 100%; margin-bottom: 10px;" onchange="handleKategoriDana()">
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Operasional">Operasional</option>
+                        <option value="Honorarium">Honorarium</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Sarpras / ATK">Sarpras / ATK</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                    <input type="text" name="kategoriDanaLainnya" id="kategoriDanaLainnya" class="form-control" style="width: 100%; margin-bottom: 15px; display: none;" placeholder="Sebutkan kategori lainnya...">
+
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Rincian Pengeluaran (Opsional)</label>
+                    <div id="rincian-container"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addRincian()" style="margin-bottom: 15px; font-size: 12px; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Tambah Rincian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nominal dan Metode (Selalu Muncul kecuali jika jenis blm dipilih) -->
+            <div id="sec-nominal" style="display: none;">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jumlah Nominal (Rp)</label>
+                        <input type="number" id="inputNominalTotal" name="nominal" class="form-control"
+                            style="width: 100%; font-size: 18px; font-weight: bold; padding: 15px;" placeholder="0" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Metode Pembayaran</label>
+                        <select name="metodePembayaran" class="form-control" style="width: 100%; font-size: 16px; padding: 15px;" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Transfer">Transfer</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;">
+                    <i class="fas fa-save"></i> Simpan Transaksi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="filter-bar" style="margin-top: 30px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center;">
+        <input type="text" id="searchTransaksi" class="form-control" placeholder="Cari Nama Santri atau No Transaksi..." style="width: 250px;" onkeyup="filterTransaksi()">
+        
+        <label style="font-weight: 600; margin-left: 10px;">Dari Tanggal:</label>
+        <input type="date" id="startDateInput" class="form-control" style="width: 140px;" onchange="filterTransaksi()">
+        
+        <label style="font-weight: 600; margin-left: 10px;">Sampai Tanggal:</label>
+        <input type="date" id="endDateInput" class="form-control" style="width: 140px;" onchange="filterTransaksi()">
+
+        <select id="pendidikanTrxInput" class="form-control" style="width: 180px;" onchange="filterTransaksi()">
+            <option value="">Semua Pendidikan</option>
+            <option value="PAUDQu">PAUDQu</option>
+            <option value="TPQ">TPQ</option>
+            <option value="MDT">MDT</option>
+        </select>
+        
+        <button class="btn btn-primary" onclick="filterTransaksi()">Filter</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-title">Transaksi Terbaru</div>
+        </div>
+        <table id="tabelTransaksi">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>No Transaksi</th>
+                    <th>Nama Santri</th>
+                    <th>Jenis</th>
+                    <th>Nominal</th>
+                    <th>Metode</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(data && data.transaksiTerbaru && data.transaksiTerbaru.length> 0) { %>
+                    <% data.transaksiTerbaru.forEach(trx=> { %>
+                        <tr>
+                            <td>
+                                <%= trx.tanggal %>
+                            </td>
+                            <td>
+                                <%= trx.noTransaksi %>
+                            </td>
+                            <td>
+                                <%= trx.namaSantri %>
+                            </td>
+                            <td>
+                                <span class="badge <%= trx.jenis === 'Pemasukan' ? 'badge-success' : 'badge-danger' %>">
+                                    <%= trx.jenis %>
+                                </span>
+                            </td>
+                            <td>Rp <%= trx.nominal.toLocaleString('id-ID') %>
+                            </td>
+                            <td>
+                                <span class="badge <%= trx.metodePembayaran === 'Transfer' ? 'badge-info' : 'badge-warning' %>" style="<%= trx.metodePembayaran === 'Transfer' ? 'background-color: #17a2b8; color: white;' : 'background-color: #ffc107; color: black;' %>">
+                                    <%= trx.metodePembayaran || 'Cash' %>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/kwitansi/<%= trx.id %>" class="btn btn-secondary"
+                                    style="padding: 5px 10px; font-size: 12px;">Cetak</a>
+                                <button type="button" class="btn btn-warning" style="padding: 5px 10px; font-size: 12px; background-color: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openEditModal(<%= trx.id %>, '<%= trx.tanggal %>', <%= trx.nominal %>, '<%= trx.metodePembayaran %>')">Edit</button>
+                                <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openDeleteModal('/input-transaksi/delete/<%= trx.id %>')">Hapus</button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Belum ada transaksi</td>
+                                </tr>
+                                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+    /* Modal Styles */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        background-color: rgba(0,0,0,0.6); 
+        overflow-y: auto;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+    .modal-content {
+        background-color: #ffffff;
+        margin: 0 auto; 
+        padding: 30px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    </style>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+      <div class="modal-content" style="max-width: 400px; text-align: center; padding: 40px 30px; margin-top: 100px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;"></i>
+        <h3 style="margin-bottom: 15px; color: var(--text-main);">Konfirmasi Hapus</h3>
+        <p style="color: #666; margin-bottom: 30px; line-height: 1.5;">Apakah Anda yakin ingin menghapus data ini? Nominal tagihan santri akan dikembalikan seperti semula.</p>
+        <form id="deleteForm" method="POST" action="">
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()" style="padding: 10px 25px;">Batal</button>
+                <button type="submit" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">Ya, Hapus Data</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content" style="max-width: 500px; padding: 40px 30px;">
+        <h3 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">Edit Transaksi</h3>
+        <form id="editForm" method="POST" action="">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Transaksi</label>
+                <input type="text" name="tanggal" id="editTanggal" class="form-control" style="width: 100%;" required>
+                <small style="color: #666;">Format: DD Bulan YYYY (contoh: 15 Juli 2026)</small>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Nominal (Rp)</label>
+                <input type="number" name="nominal" id="editNominal" class="form-control" style="width: 100%;" required>
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Metode Pembayaran</label>
+                <select name="metodePembayaran" id="editMetode" class="form-control" style="width: 100%;" required>
+                    <option value="Cash">Cash</option>
+                    <option value="Transfer">Transfer</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()" style="padding: 10px 25px;">Batal</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">Simpan Perubahan</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal / Pesan Sukses jika dialihkan dari POST redirect (Simulasi) -->
+    <% if(typeof success !=='undefined' && success) { %>
+        <div style="position: fixed; top: 20px; right: 20px; background-color: var(--success); color: white; padding: 15px 25px; border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 1000; display: flex; align-items: center; gap: 10px;"
+            id="successAlert">
+            <i class="fas fa-check-circle"></i> Transaksi Berhasil Disimpan!
+        </div>
+        <script>
+            setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 3000);
+        </script>
+    <% } %>
+
+    <!-- Modal / Pesan Error -->
+    <% if(typeof error !=='undefined' && error) { %>
+        <div style="position: fixed; top: 20px; right: 20px; background-color: var(--danger); color: white; padding: 15px 25px; border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 1000; display: flex; align-items: center; gap: 10px;"
+            id="errorAlert">
+            <i class="fas fa-times-circle"></i> <%= error %>
+        </div>
+        <script>
+            setTimeout(() => {
+                document.getElementById('errorAlert').style.display = 'none';
+            }, 5000);
+        </script>
+    <% } %>
+
+            <script id="tunggakanDaftarUlangData" type="application/json">
+                <%- JSON.stringify(typeof tunggakanDaftarUlang !== 'undefined' ? tunggakanDaftarUlang : []) %>
+            </script>
+            <script id="tunggakanData" type="application/json">
+                <%- JSON.stringify(typeof tunggakan !== 'undefined' ? tunggakan : []) %>
+            </script>
+            <script id="santriData" type="application/json">
+                <%- JSON.stringify(typeof santri !== 'undefined' ? santri : []) %>
+            </script>
+            <script id="santriDaftarUlangData" type="application/json">
+                <%- JSON.stringify(typeof santriDaftarUlang !== 'undefined' ? santriDaftarUlang : []) %>
+            </script>
+            <script>
+                // Data tunggakan dari server untuk difilter dengan JS
+                const tunggakanDaftarUlangList = JSON.parse(document.getElementById('tunggakanDaftarUlangData').textContent);
+                const tunggakanList = JSON.parse(document.getElementById('tunggakanData').textContent);
+                const santriList = JSON.parse(document.getElementById('santriData').textContent);
+                const santriDaftarUlangList = JSON.parse(document.getElementById('santriDaftarUlangData').textContent);
+
+                // Set tanggal hari ini sebagai default
+                document.getElementById('tanggal').valueAsDate = new Date();
+
+                // Logika Filter Satuan Pendidikan ke Nama Santri Daftar Ulang
+                const satPendSelect = document.getElementById('satuanPendidikan');
+                const namaSantriSelect = document.getElementById('namaSantriDaftarUlang');
+
+                satPendSelect.addEventListener('change', function() {
+                    const selectedSatuan = this.value;
+                    namaSantriSelect.innerHTML = '<option value="">-- Pilih Nama Santri --</option>';
+
+                    if (selectedSatuan) {
+                        const filtered = tunggakanDaftarUlangList.filter(t => t.satuanPendidikan && t.satuanPendidikan.includes(selectedSatuan));
+                        filtered.forEach(t => {
+                            const opt = document.createElement('option');
+                            opt.value = t.nama;
+                            opt.textContent = `${t.nama} - Sisa: Rp ${t.sisaBayar.toLocaleString('id-ID')}`;
+                            namaSantriSelect.appendChild(opt);
+                        });
+                    } else {
+                        tunggakanDaftarUlangList.forEach(t => {
+                            const opt = document.createElement('option');
+                            opt.value = t.nama;
+                            opt.textContent = `${t.nama} - Sisa: Rp ${t.sisaBayar.toLocaleString('id-ID')}`;
+                            namaSantriSelect.appendChild(opt);
+                        });
+                    }
+                });
+
+                // Logika Filter Satuan Pendidikan ke Nama Santri Baru
+                const satPendBaruSelect = document.getElementById('satuanPendidikanBaru');
+                const namaPendaftarSelect = document.getElementById('namaPendaftar');
+
+                satPendBaruSelect.addEventListener('change', function() {
+                    const selectedSatuan = this.value;
+                    namaPendaftarSelect.innerHTML = '<option value="">-- Cari Nama Pendaftar --</option>';
+
+                    if (selectedSatuan) {
+                        const filtered = tunggakanList.filter(t => t.satuanPendidikan && t.satuanPendidikan.includes(selectedSatuan));
+                        filtered.forEach(t => {
+                            const opt = document.createElement('option');
+                            opt.value = t.nama;
+                            opt.textContent = `${t.nama} - Sisa: Rp ${t.sisaBayar.toLocaleString('id-ID')}`;
+                            namaPendaftarSelect.appendChild(opt);
+                        });
+                    } else {
+                        tunggakanList.forEach(t => {
+                            const opt = document.createElement('option');
+                            opt.value = t.nama;
+                            opt.textContent = `${t.nama} - Sisa: Rp ${t.sisaBayar.toLocaleString('id-ID')}`;
+                            namaPendaftarSelect.appendChild(opt);
+                        });
+                    }
+                });
+
+                function handleCariNomor() {
+                    const searchNo = document.getElementById('cariNomorPendaftaran').value.trim();
+                    if (!searchNo) return;
+                    
+                    const jenisSelect = document.getElementById('jenisTransaksi');
+
+                    // Cek Daftar Baru
+                    const santriFound = santriList.find(s => s.nomorPendaftaran === searchNo);
+                    if (santriFound) {
+                        jenisSelect.value = 'Pembayaran Pendaftaran Baru';
+                        handleJenisTransaksi();
+                        
+                        const eduPrefix = santriFound.pendidikan ? santriFound.pendidikan.split(' ')[0] : '';
+                        const satSelect = document.getElementById('satuanPendidikanBaru');
+                        satSelect.value = eduPrefix;
+                        
+                        // Set dropdown nama
+                        const opts = namaPendaftarSelect.options;
+                        for(let i=0; i<opts.length; i++) {
+                            if (opts[i].value === santriFound.nama) {
+                                namaPendaftarSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                        return;
+                    }
+
+                    // Cek Daftar Ulang
+                    const daftarUlangFound = santriDaftarUlangList.find(s => s.nomorPendaftaran === searchNo);
+                    if (daftarUlangFound) {
+                        jenisSelect.value = 'Pembayaran Daftar Ulang';
+                        handleJenisTransaksi();
+
+                        const eduPrefix = daftarUlangFound.lanjutKe ? daftarUlangFound.lanjutKe.split(' ')[0] : '';
+                        const satSelect = document.getElementById('satuanPendidikan');
+                        satSelect.value = eduPrefix;
+
+                        // Set dropdown nama
+                        const opts = namaSantriSelect.options;
+                        for(let i=0; i<opts.length; i++) {
+                            if (opts[i].value === daftarUlangFound.nama) {
+                                namaSantriSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                function handleKategoriDana() {
+                    const val = document.getElementById('kategoriDana').value;
+                    const lainnyaInput = document.getElementById('kategoriDanaLainnya');
+                    if (val === 'Lainnya') {
+                        lainnyaInput.style.display = 'block';
+                        lainnyaInput.required = true;
+                    } else {
+                        lainnyaInput.style.display = 'none';
+                        lainnyaInput.required = false;
+                        lainnyaInput.value = '';
+                    }
+                }
+
+                function addRincian() {
+                    const container = document.getElementById('rincian-container');
+                    const div = document.createElement('div');
+                    div.style.display = 'flex';
+                    div.style.gap = '10px';
+                    div.style.marginBottom = '10px';
+                    div.innerHTML = `
+                        <input type="text" name="rincianNames[]" class="form-control" style="flex: 2;" placeholder="Nama Barang / Keperluan">
+                        <input type="number" name="rincianNominals[]" class="form-control rincian-nominal" style="flex: 1;" placeholder="Rp" oninput="calculateTotalNominal()">
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calculateTotalNominal();" style="padding: 5px 10px;"><i class="fas fa-trash"></i></button>
+                    `;
+                    container.appendChild(div);
+                }
+
+                function calculateTotalNominal() {
+                    const jenis = document.getElementById('jenisTransaksi').value;
+                    if (jenis !== 'Pengeluaran') return;
+
+                    const nominalInputs = document.querySelectorAll('.rincian-nominal');
+                    let total = 0;
+                    let hasRincian = false;
+                    nominalInputs.forEach(input => {
+                        hasRincian = true;
+                        total += parseInt(input.value) || 0;
+                    });
+                    
+                    const nominalField = document.getElementById('inputNominalTotal');
+                    if (hasRincian) {
+                        nominalField.value = total || '';
+                        nominalField.readOnly = true;
+                        nominalField.style.backgroundColor = '#e9ecef';
+                    } else {
+                        nominalField.readOnly = false;
+                        nominalField.style.backgroundColor = '#ffffff';
+                    }
+                }
+
+                function handleJenisTransaksi() {
+                    const jenis = document.getElementById('jenisTransaksi').value;
+
+                    // Hide all sections first
+                    document.getElementById('sec-pendaftaran').style.display = 'none';
+                    document.getElementById('sec-daftar-ulang').style.display = 'none';
+                    document.getElementById('sec-lainnya').style.display = 'none';
+                    document.getElementById('sec-nominal').style.display = 'none';
+
+                    if (!jenis) return;
+
+                    // Show nominal for all valid types
+                    document.getElementById('sec-nominal').style.display = 'block';
+                    
+                    const wrapperPengeluaranDetail = document.getElementById('wrapper-pengeluaran-detail');
+                    if (wrapperPengeluaranDetail) wrapperPengeluaranDetail.style.display = 'none';
+
+                    const wrapperPemasukanDetail = document.getElementById('wrapper-pemasukan-detail');
+                    if (wrapperPemasukanDetail) wrapperPemasukanDetail.style.display = 'none';
+                    
+                    const nominalField = document.getElementById('inputNominalTotal');
+                    nominalField.readOnly = false;
+                    nominalField.style.backgroundColor = '#ffffff';
+
+                    if (jenis === 'Pembayaran Pendaftaran Baru') {
+                        document.getElementById('sec-pendaftaran').style.display = 'block';
+                    }
+                    else if (jenis === 'Pembayaran Daftar Ulang') {
+                        document.getElementById('sec-daftar-ulang').style.display = 'block';
+                    }
+                    else if (jenis === 'Pemasukan' || jenis === 'Pengeluaran') {
+                        document.getElementById('sec-lainnya').style.display = 'block';
+
+                        const wrapperSatuan = document.getElementById('wrapper-satuan-pengeluaran');
+                        if (wrapperSatuan) {
+                            wrapperSatuan.style.display = jenis === 'Pengeluaran' ? 'block' : 'none'; // Only for Pengeluaran
+                        }
+
+                        // Ubah label uraian agar lebih jelas
+                        const labelUraian = document.getElementById('label-uraian');
+                        if (labelUraian) {
+                            labelUraian.innerText = jenis === 'Pemasukan' ? 'Uraian Pemasukan' : 'Uraian Pengeluaran';
+                        }
+
+                        if (jenis === 'Pemasukan' && wrapperPemasukanDetail) {
+                            wrapperPemasukanDetail.style.display = 'block';
+                        }
+
+                        if (jenis === 'Pengeluaran' && wrapperPengeluaranDetail) {
+                            wrapperPengeluaranDetail.style.display = 'block';
+                            calculateTotalNominal();
+                        }
+                    }
+                }
+
+                function parseTanggalIndo(tglStr) {
+                    const months = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+                    const parts = tglStr.trim().split(/\s+/);
+                    if (parts.length === 3) {
+                        const day = parseInt(parts[0]);
+                        const monthIndex = months.indexOf(parts[1].toLowerCase());
+                        const year = parseInt(parts[2]);
+                        if (monthIndex !== -1) {
+                            return new Date(year, monthIndex, day);
+                        }
+                    }
+                    return null;
+                }
+
+                function filterTransaksi() {
+                    const search = document.getElementById('searchTransaksi').value.toLowerCase();
+                    const startDateStr = document.getElementById('startDateInput').value;
+                    const endDateStr = document.getElementById('endDateInput').value;
+                    const pendidikan = document.getElementById('pendidikanTrxInput').value.toLowerCase();
+
+                    let startDate = null;
+                    if (startDateStr) {
+                        startDate = new Date(startDateStr);
+                        startDate.setHours(0,0,0,0);
+                    }
+                    let endDate = null;
+                    if (endDateStr) {
+                        endDate = new Date(endDateStr);
+                        endDate.setHours(23,59,59,999);
+                    }
+
+                    const table = document.getElementById('tabelTransaksi');
+                    const tr = table.getElementsByTagName('tr');
+
+                    for (let i = 1; i < tr.length; i++) {
+                        const tdTgl = tr[i].getElementsByTagName('td')[0];
+                        const tdNo = tr[i].getElementsByTagName('td')[1];
+                        const tdNama = tr[i].getElementsByTagName('td')[2];
+                        if (tdNo && tdNama && tdTgl) {
+                            const txtTglRaw = (tdTgl.textContent || tdTgl.innerText);
+                            const txtTgl = txtTglRaw.toLowerCase();
+                            const txtNo = (tdNo.textContent || tdNo.innerText).toLowerCase();
+                            const txtNama = (tdNama.textContent || tdNama.innerText).toLowerCase();
+                            
+                            let txtPend = '';
+                            const realName = (tdNama.textContent || tdNama.innerText).trim().toLowerCase();
+                            
+                            let tFound = tunggakanList.find(t => t.nama.toLowerCase().trim() === realName);
+                            if (tFound && tFound.satuanPendidikan) {
+                                txtPend = tFound.satuanPendidikan.toLowerCase();
+                            } else {
+                                tFound = tunggakanDaftarUlangList.find(t => t.nama.toLowerCase().trim() === realName);
+                                if (tFound && tFound.satuanPendidikan) {
+                                    txtPend = tFound.satuanPendidikan.toLowerCase();
+                                }
+                            }
+                            
+                            const matchSearch = txtNo.indexOf(search) > -1 || txtNama.indexOf(search) > -1;
+                            const matchPend = pendidikan === "" || txtPend.indexOf(pendidikan) > -1;
+                            
+                            let matchDate = true;
+                            if (startDate || endDate) {
+                                const trxDate = parseTanggalIndo(txtTglRaw);
+                                if (trxDate) {
+                                    if (startDate && trxDate < startDate) matchDate = false;
+                                    if (endDate && trxDate > endDate) matchDate = false;
+                                } else {
+                                    matchDate = false;
+                                }
+                            }
+
+                            if (matchSearch && matchPend && matchDate) {
+                                tr[i].style.display = '';
+                            } else {
+                                tr[i].style.display = 'none';
+                            }
+                        }
+                    }
+                }
+
+                function openDeleteModal(actionUrl) {
+                    document.getElementById('deleteForm').action = actionUrl;
+                    document.getElementById('deleteModal').style.display = 'block';
+                }
+
+                function closeDeleteModal() {
+                    document.getElementById('deleteModal').style.display = 'none';
+                }
+
+                function openEditModal(id, tanggal, nominal, metode) {
+                    document.getElementById('editForm').action = '/input-transaksi/edit/' + id;
+                    document.getElementById('editTanggal').value = tanggal;
+                    document.getElementById('editNominal').value = nominal;
+                    document.getElementById('editMetode').value = metode || 'Cash';
+                    document.getElementById('editModal').style.display = 'block';
+                }
+
+                function closeEditModal() {
+                    document.getElementById('editModal').style.display = 'none';
+                }
+
+                window.onclick = function(event) {
+                    var deleteModal = document.getElementById('deleteModal');
+                    var editModal = document.getElementById('editModal');
+                    if (event.target == deleteModal) {
+                        deleteModal.style.display = "none";
+                    }
+                    if (event.target == editModal) {
+                        editModal.style.display = "none";
+                    }
+                }
+            </script>
+
+            <%- include('partials/footer') %>

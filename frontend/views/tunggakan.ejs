@@ -1,17 +1,20 @@
 <%- include('partials/header', { title: 'Tunggakan Santri Baru', activePage: 'tunggakan' }) %>
 
-<div class="filter-bar">
-    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" onkeyup="filterData()">
-    <select id="statusInput" class="form-control" style="width: 200px;" onchange="filterData()">
+<form method="GET" action="/tunggakan" class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+    <select name="status" id="statusInput" class="form-control" style="width: 200px;">
         <option value="">Semua Status Bayar</option>
-        <option value="Lunas">Lunas</option>
-        <option value="Belum Lunas">Belum Lunas</option>
+        <option value="Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Lunas' ? 'selected' : '' %>>Lunas</option>
+        <option value="Belum Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Belum Lunas' ? 'selected' : '' %>>Belum Lunas</option>
     </select>
-    <button class="btn btn-primary" onclick="filterData()">Filter</button>
-    <button class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
+    <button type="submit" class="btn btn-primary">Cari & Filter</button>
+    <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof statusQuery !== 'undefined' && statusQuery)) { %>
+        <a href="/tunggakan" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
+    <% } %>
+    <button type="button" class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
         <i class="fas fa-print"></i> Cetak Tabel
     </button>
-</div>
+</form>
 
 <div class="table-container">
     <div class="table-header">
@@ -56,33 +59,40 @@
             <% } %>
         </tbody>
     </table>
+
+    <!-- Pagination UI -->
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;">
+            <div style="color: #666; font-size: 14px;">
+                Menampilkan Halaman <strong><%= currentPage %></strong> dari <strong><%= totalPages %></strong> 
+                (Total: <%= totalData %> Data)
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof statusQuery !== 'undefined' && statusQuery ? '&status='+statusQuery : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">&laquo; Prev</a>
+                <% } %>
+
+                <% 
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+                for(let i = startPage; i <= endPage; i++) { 
+                %>
+                    <a href="?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof statusQuery !== 'undefined' && statusQuery ? '&status='+statusQuery : '' %>" 
+                       class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" 
+                       style="padding: 5px 12px; text-decoration: none;">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof statusQuery !== 'undefined' && statusQuery ? '&status='+statusQuery : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">Next &raquo;</a>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
 </div>
 
-<script>
-function filterData() {
-    var searchInput = document.getElementById("searchInput").value.toLowerCase();
-    var statusInput = document.getElementById("statusInput").value.toLowerCase();
-    var table = document.getElementById("dataTable");
-    var tr = table.getElementsByTagName("tr");
 
-    for (var i = 1; i < tr.length; i++) {
-        var tdNama = tr[i].getElementsByTagName("td")[1]; // Nama is index 1
-        var tdStatus = tr[i].getElementsByTagName("td")[7]; // Status is index 7
-        if (tdNama && tdStatus) {
-            var txtNama = tdNama.textContent || tdNama.innerText;
-            var txtStatus = tdStatus.textContent || tdStatus.innerText;
-            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
-            // For status, exactly matches the selected, or empty means all
-            var matchStatus = statusInput === "" || txtStatus.toLowerCase().trim() === statusInput;
-            
-            if (matchNama && matchStatus) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }       
-    }
-}
-</script>
 
 <%- include('partials/footer') %>
+<script src="/js/tunggakan.js"></script>

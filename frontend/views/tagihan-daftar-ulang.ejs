@@ -1,18 +1,24 @@
-<%- include('partials/header', { title: 'Tagihan Daftar Ulang', activePage: 'tagihan-daftar-ulang' }) %>
-
-<div class="filter-bar">
-    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" onkeyup="filterData()">
-    <select id="satuanInput" class="form-control" style="width: 200px;" onchange="filterData()">
+<%- include('partials/header', { title: 'Tagihan Daftar Ulang', activePage: 'tagihan-daftar-ulang' }) %><link rel="stylesheet" href="/css/tagihan-daftar-ulang.css">
+<form method="GET" action="/tagihan-daftar-ulang" class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+    <select name="pendidikan" id="satuanInput" class="form-control" style="width: 200px;">
         <option value="">Semua Pendidikan</option>
-        <option value="PAUDQu">PAUDQu</option>
-        <option value="TPQ">TPQ</option>
-        <option value="MDT">MDT</option>
+        <option value="PAUDQu B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'PAUDQu B' ? 'selected' : '' %>>PAUDQu B</option>
+        <option value="TPQ A" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ A' ? 'selected' : '' %>>TPQ A</option>
+        <option value="TPQ B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ B' ? 'selected' : '' %>>TPQ B</option>
+        <option value="MDT 1" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 1' ? 'selected' : '' %>>MDT 1</option>
+        <option value="MDT 2" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 2' ? 'selected' : '' %>>MDT 2</option>
+        <option value="MDT 3" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 3' ? 'selected' : '' %>>MDT 3</option>
+        <option value="MDT 4" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 4' ? 'selected' : '' %>>MDT 4</option>
     </select>
-    <button class="btn btn-primary" onclick="filterData()">Filter</button>
-    <button class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
+    <button type="submit" class="btn btn-primary">Cari & Filter</button>
+    <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof pendidikanQuery !== 'undefined' && pendidikanQuery)) { %>
+        <a href="/tagihan-daftar-ulang" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
+    <% } %>
+    <button type="button" class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
         <i class="fas fa-print"></i> Cetak Tabel
     </button>
-</div>
+</form>
 
 <div class="table-container">
     <div class="table-header">
@@ -72,29 +78,41 @@
             <% } %>
         </tbody>
     </table>
+
+    <!-- Pagination UI -->
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;">
+            <div style="color: #666; font-size: 14px;">
+                Menampilkan Halaman <strong><%= currentPage %></strong> dari <strong><%= totalPages %></strong> 
+                (Total: <%= totalData %> Data)
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery ? '&pendidikan='+pendidikanQuery : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">&laquo; Prev</a>
+                <% } %>
+
+                <% 
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+                for(let i = startPage; i <= endPage; i++) { 
+                %>
+                    <a href="?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery ? '&pendidikan='+pendidikanQuery : '' %>" 
+                       class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" 
+                       style="padding: 5px 12px; text-decoration: none;">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '' %><%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery ? '&pendidikan='+pendidikanQuery : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">Next &raquo;</a>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
 </div>
 
 <!-- Modal Edit Tagihan -->
-<style>
-/* Enhanced Modal Styles */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); overflow-y: auto; padding-top: 50px; padding-bottom: 50px; backdrop-filter: blur(4px); }
-.modal-content { background-color: #ffffff; margin: 0 auto; padding: 35px 40px; border-radius: 12px; width: 90%; max-width: 650px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-.close-modal { color: #999; float: right; font-size: 32px; font-weight: 300; cursor: pointer; transition: color 0.3s; }
-.close-modal:hover { color: #333; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
 
-.modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
-.form-group-modal label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; font-size: 14px; }
-.form-input { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
-.form-input:focus { border-color: #007bff; box-shadow: 0 0 5px rgba(0,123,255,0.3); outline: none; }
-.form-input[readonly] { background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6; cursor: not-allowed; }
-.modal-footer { margin-top: 35px; text-align: right; border-top: 2px solid #f0f0f0; padding-top: 20px; }
-.btn { padding: 10px 25px; font-weight: 600; border-radius: 6px; font-size: 15px; cursor: pointer; border: none; transition: background-color 0.3s; }
-.btn-primary { background-color: #007bff; color: white; }
-.btn-primary:hover { background-color: #0056b3; }
-.btn-secondary { background-color: #6c757d; color: white; }
-.btn-secondary:hover { background-color: #5a6268; }
-</style>
 
 <div id="tagihanModal" class="modal">
   <div class="modal-content">
@@ -103,7 +121,7 @@
         <span class="close-modal" onclick="closeTagihanModal()">&times;</span>
     </div>
     
-    <form id="editTagihanForm" method="POST" action="">
+    <form id="editTagihanForm" method="POST" action="" onsubmit="handleAjaxSubmitGlobal(event, this)">
         <div class="form-group-modal" style="margin-bottom: 20px;">
             <label>Nama Santri</label>
             <input type="text" id="m_nama" class="form-input" readonly>
@@ -132,55 +150,7 @@
   </div>
 </div>
 
-<script>
-function filterData() {
-    var searchInput = document.getElementById("searchInput").value.toLowerCase();
-    var satuanInput = document.getElementById("satuanInput").value.toLowerCase();
-    var table = document.getElementById("dataTable");
-    var tr = table.getElementsByTagName("tr");
 
-    for (var i = 1; i < tr.length; i++) {
-        var tdNama = tr[i].getElementsByTagName("td")[0];
-        var tdSatuan = tr[i].getElementsByTagName("td")[3]; // Lanjut Ke is index 3
-        if (tdNama && tdSatuan) {
-            var txtNama = tdNama.textContent || tdNama.innerText;
-            var txtSatuan = tdSatuan.textContent || tdSatuan.innerText;
-            var matchNama = txtNama.toLowerCase().indexOf(searchInput) > -1;
-            var matchSatuan = satuanInput === "" || txtSatuan.toLowerCase().indexOf(satuanInput) > -1;
-            
-            if (matchNama && matchSatuan) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }       
-    }
-}
-
-function openTagihanModal(btn) {
-    var data = JSON.parse(btn.getAttribute('data-tagihan'));
-    
-    // Ganti URL action form dengan endpoint edit sesuai ID tagihan
-    document.getElementById('editTagihanForm').action = '/tagihan-daftar-ulang/edit/' + (data.id || '');
-    
-    document.getElementById('m_nama').value = data.nama || '';
-    document.getElementById('m_formulir').value = data.formulir || 0;
-    document.getElementById('m_perlengkapan').value = data.perlengkapan || 0;
-    document.getElementById('m_spp').value = data.spp || 0;
-    
-    document.getElementById('tagihanModal').style.display = 'block';
-}
-
-function closeTagihanModal() {
-    document.getElementById('tagihanModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-    var modal = document.getElementById('tagihanModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-</script>
 
 <%- include('partials/footer') %>
+<script src="/js/tagihan-daftar-ulang.js"></script>

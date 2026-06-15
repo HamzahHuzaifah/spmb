@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "prod": "pm2 start ecosystem.config.js --env production",
+    "stop": "pm2 stop spmb-web-app",
+    "log": "pm2 logs spmb-web-app"
   },
   "keywords": [],
   "author": "",
@@ -13,13 +16,19 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.17.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.11.0",
     "mysql2": "^3.22.4",
+    "pm2": "^7.0.1",
     "puppeteer": "^25.1.0",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

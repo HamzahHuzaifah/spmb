@@ -1,26 +1,31 @@
 <%- include('partials/header', { title: 'Laporan Utama' , activePage: 'laporan' }) %>
 
     <div class="filter-bar">
-        <select class="form-control" id="filterTahun">
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-        </select>
-        <select class="form-control" id="filterBulan">
-            <option value="">Semua Bulan</option>
-            <option value="Januari">Januari</option>
-            <option value="Februari">Februari</option>
-            <option value="Maret">Maret</option>
-            <option value="April">April</option>
-            <option value="Mei">Mei</option>
-            <option value="Juni">Juni</option>
-            <option value="Juli">Juli</option>
-            <option value="Agustus">Agustus</option>
-            <option value="September">September</option>
-            <option value="Oktober">Oktober</option>
-            <option value="November">November</option>
-            <option value="Desember">Desember</option>
-        </select>
-        <button class="btn btn-primary" onclick="filterData()">Filter</button>
+        <form method="GET" action="/laporan" style="display: flex; gap: 10px; flex-grow: 1; align-items: center;">
+            <input type="text" name="search" class="form-control" placeholder="Cari Uraian / No Trans..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+            <select class="form-control" name="tahun" id="filterTahun">
+                <option value="">Semua Tahun</option>
+                <option value="2026" <%= (typeof tahunQuery !== 'undefined' && tahunQuery === '2026') ? 'selected' : '' %>>2026</option>
+                <option value="2027" <%= (typeof tahunQuery !== 'undefined' && tahunQuery === '2027') ? 'selected' : '' %>>2027</option>
+            </select>
+            <select class="form-control" name="bulan" id="filterBulan">
+                <option value="">Semua Bulan</option>
+                <option value="Januari" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Januari') ? 'selected' : '' %>>Januari</option>
+                <option value="Februari" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Februari') ? 'selected' : '' %>>Februari</option>
+                <option value="Maret" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Maret') ? 'selected' : '' %>>Maret</option>
+                <option value="April" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'April') ? 'selected' : '' %>>April</option>
+                <option value="Mei" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Mei') ? 'selected' : '' %>>Mei</option>
+                <option value="Juni" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Juni') ? 'selected' : '' %>>Juni</option>
+                <option value="Juli" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Juli') ? 'selected' : '' %>>Juli</option>
+                <option value="Agustus" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Agustus') ? 'selected' : '' %>>Agustus</option>
+                <option value="September" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'September') ? 'selected' : '' %>>September</option>
+                <option value="Oktober" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Oktober') ? 'selected' : '' %>>Oktober</option>
+                <option value="November" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'November') ? 'selected' : '' %>>November</option>
+                <option value="Desember" <%= (typeof bulanQuery !== 'undefined' && bulanQuery === 'Desember') ? 'selected' : '' %>>Desember</option>
+            </select>
+            <button class="btn btn-primary" type="submit">Filter</button>
+            <a href="/laporan" class="btn btn-secondary" style="background-color: #64748b; border: none; padding: 10px 15px; text-decoration: none;">Reset</a>
+        </form>
 
         <div style="margin-left: auto;">
             <button class="btn btn-info" onclick="openPreviewLaporan()"
@@ -58,7 +63,7 @@
                     %>
                     <tr>
                         <td>
-                            <%= index + 1 %>
+                            <%= ((typeof currentPage !== 'undefined' ? currentPage : 1) - 1) * 20 + index + 1 %>
                         </td>
                         <td>
                             <%= item.tanggal %>
@@ -89,6 +94,26 @@
                         <% } %>
             </tbody>
         </table>
+
+        <!-- Pagination Controls -->
+        <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+            <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 5px;">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&bulan=<%= bulanQuery %>&tahun=<%= tahunQuery %>" class="btn btn-secondary" style="padding: 5px 10px;">&laquo; Prev</a>
+                <% } %>
+                
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <a href="?page=<%= i %>&search=<%= searchQuery %>&bulan=<%= bulanQuery %>&tahun=<%= tahunQuery %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 10px;"><%= i %></a>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&bulan=<%= bulanQuery %>&tahun=<%= tahunQuery %>" class="btn btn-secondary" style="padding: 5px 10px;">Next &raquo;</a>
+                <% } %>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: #64748b; font-size: 14px;">
+                Menampilkan halaman <%= currentPage %> dari <%= totalPages %> (Total: <%= totalData %> data)
+            </div>
+        <% } %>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -150,6 +175,9 @@
                     </div>
 
                     <style>
+                        #previewF4Wrapper, #previewF4Wrapper * {
+                            font-family: 'Arial', 'Helvetica', sans-serif !important;
+                        }
                         #previewTable th {
                             background-color: #3a7b5e !important;
                             color: white !important;

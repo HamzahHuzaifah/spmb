@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Dashboard - SPMB JIC
+    </title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Included from Parent -->
+        <div class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">JIC</div>
+        <h2>SPMB JIC 2026</h2>
+    </div>
+    <div class="sidebar-menu">
+        <a href="/dashboard" class="menu-item active">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/input-transaksi" class="menu-item ">
+            <i class="fas fa-plus-circle"></i> Input Transaksi
+        </a>
+        <a href="/laporan" class="menu-item ">
+            <i class="fas fa-chart-bar"></i> Laporan Utama
+        </a>
+        <a href="/santri" class="menu-item ">
+            <i class="fas fa-user-graduate"></i> Data Santri Baru
+        </a>
+        <a href="/tagihan" class="menu-item ">
+            <i class="fas fa-file-invoice-dollar"></i> Tagihan Santri Baru
+        </a>
+        <a href="/tunggakan" class="menu-item ">
+            <i class="fas fa-exclamation-circle"></i> Tunggakan Santri Baru
+        </a>
+        <a href="/santri-daftar-ulang" class="menu-item ">
+            <i class="fas fa-users"></i> Data Santri Daftar Ulang
+        </a>
+        <a href="/tagihan-daftar-ulang" class="menu-item ">
+            <i class="fas fa-file-invoice-dollar"></i> Tagihan Santri Daftar Ulang
+        </a>
+        <a href="/tunggakan-daftar-ulang" class="menu-item ">
+            <i class="fas fa-exclamation-circle"></i> Tunggakan Santri Daftar Ulang
+        </a>
+    </div>
+</div>
+
+
+            <div class="main-content">
+                <div class="topbar">
+                    <div class="topbar-left">
+                        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div class="topbar-title">
+                            Dashboard
+                        </div>
+                    </div>
+                    <div class="topbar-right">
+                        <div class="user-profile">
+                            <span class="user-name">Admin SPMB</span>
+                            <div class="avatar">A</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-area">
+
+<div class="content-area">
+    <!-- Header -->
+    <div class="dashboard-header mb-4" style="border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 30px;">
+        <h1 style="font-size: 24px; font-weight: 700; color: var(--primary-dark); margin: 0;">Dashboard Informasi Keuangan</h1>
+        <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 14px;">Ringkasan pendaftaran dan status keuangan SPMB MJIC</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar mb-4">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Dari Tanggal:</label>
+                <input type="date" id="startDateInput" class="form-control" style="width: 160px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Sampai Tanggal:</label>
+                <input type="date" id="endDateInput" class="form-control" style="width: 160px;">
+            </div>
+            <button class="btn btn-primary" onclick="filterDashboard()"><i class="fas fa-filter"></i> Filter</button>
+            <button class="btn btn-secondary" onclick="resetFilter()"><i class="fas fa-sync"></i> Reset</button>
+        </div>
+    </div>
+
+    <!-- Top Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-4">
+            <div class="stat-card" style="height: 100%;">
+                <div class="stat-title">PENDAPATAN (Berdasarkan Tanggal)</div>
+                <div class="stat-value" id="valPendapatan" data-original="0">
+                    Rp 0
+                </div>
+                <i class="fas fa-wallet stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="stat-card" style="height: 100%;">
+                <div class="stat-title">TUNGGAKAN</div>
+                <div class="stat-value" id="valTopTunggakan" data-original="0">
+                    Rp 0
+                </div>
+                <i class="fas fa-file-invoice-dollar stat-icon" style="color: rgba(239, 68, 68, 0.1);"></i>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="stat-card" style="height: 100%;">
+                <div class="stat-title">TARGET PENDAPATAN</div>
+                <div class="stat-value" id="valTopTarget" data-original="0">
+                    Rp 0
+                </div>
+                <i class="fas fa-bullseye stat-icon" style="color: rgba(217, 119, 6, 0.1);"></i>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Main Tables -->
+    <div class="row mb-4">
+        <!-- Madrasah Total -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">INFORMASI KEUANGAN MADRASAH</div>
+                
+        <div class="table-responsive stat-group" data-group="madrasah-total">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <!-- Madrasah Baru -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">INFO KEUANGAN SANTRI BARU</div>
+                
+        <div class="table-responsive stat-group" data-group="madrasah-baru">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <!-- Madrasah Lama -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">INFO KEUANGAN DAFTAR ULANG</div>
+                
+        <div class="table-responsive stat-group" data-group="madrasah-lama">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <!-- Unit Baru Tables -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN SANTRI BARU PAUDQu</div>
+                
+        <div class="table-responsive stat-group" data-group="baru-paudqu">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN SANTRI BARU TPQ</div>
+                
+        <div class="table-responsive stat-group" data-group="baru-tpq">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN SANTRI BARU MDT</div>
+                
+        <div class="table-responsive stat-group" data-group="baru-mdt">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <!-- Unit Lama Tables -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN DAFTAR ULANG PAUDQu</div>
+                
+        <div class="table-responsive stat-group" data-group="lama-paudqu">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN DAFTAR ULANG TPQ</div>
+                
+        <div class="table-responsive stat-group" data-group="lama-tpq">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">KEUANGAN DAFTAR ULANG MDT</div>
+                
+        <div class="table-responsive stat-group" data-group="lama-mdt">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+                <tr>
+                    <th>JML SANTRI</th>
+                    <th>TOTAL TAGIHAN</th>
+                    <th colspan="2">TOTAL BAYAR</th>
+                </tr>
+                <tr>
+                    
+                        <td class="text-center val-santri" data-original="0">0</td>
+                    
+                    <td class="text-center val-tagihan" data-original="0">Rp 0</td>
+                    <td class="text-center val-bayar" data-original="0">Rp 0</td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);">0.00%</td>
+                </tr>
+                <tr>
+                    <th colspan="2">TUNGGAKAN</th>
+                    <th colspan="2">PENGELUARAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="0">Rp 0</td>
+                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;">0.00%</td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="0">Rp 0</td>
+                </tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="0">Rp 0</td></tr>
+            </table>
+        </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Rekap Baru -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">REKAPITULASI PENDAFTAR SANTRI BARU</div>
+                <div style="overflow-x: auto;" class="rekap-group">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px;">
+                        <tr>
+                            <th>PAUDQu A</th>
+                            <th>PAUDQu B</th>
+                            <th>TPQ A</th>
+                            <th>TPQ B</th>
+                            <th>TOTAL PAUDQu</th>
+                            <th>TOTAL TPQ</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-paudqu" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-tpq" data-original="0">0</td>
+                        </tr>
+                        <tr>
+                            <th>MDT 1</th>
+                            <th>MDT 2</th>
+                            <th>MDT 3</th>
+                            <th>MDT 4</th>
+                            <th>TOTAL MDT</th>
+                            <th>TOTAL PENDAFTAR</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-mdt" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-all" style="color: var(--primary); font-size: 16px;" data-original="0">0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rekap Lama -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">REKAPITULASI DAFTAR ULANG SANTRI LAMA</div>
+                <div style="overflow-x: auto;" class="rekap-group">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px;">
+                        <tr>
+                            <th>PAUDQu A</th>
+                            <th>PAUDQu B</th>
+                            <th>TPQ A</th>
+                            <th>TPQ B</th>
+                            <th>TOTAL PAUDQu</th>
+                            <th>TOTAL TPQ</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-paudqu" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-tpq" data-original="0">0</td>
+                        </tr>
+                        <tr>
+                            <th>MDT 1</th>
+                            <th>MDT 2</th>
+                            <th>MDT 3</th>
+                            <th>MDT 4</th>
+                            <th>TOTAL MDT</th>
+                            <th>TOTAL PENDAFTAR</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center val-rekap" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-mdt" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-rekap-total-all" style="color: var(--primary); font-size: 16px;" data-original="0">0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pengeluaran & Ziswaf Table -->
+    <div class="row mb-4">
+        <!-- Pengeluaran -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
+                <div class="table-responsive stat-group" data-group="pengeluaran-global">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0;">
+                        <tr>
+                            <th>MADRASAH (UMUM)</th>
+                            <th>PAUDQu</th>
+                            <th>TPQ</th>
+                            <th>MDT</th>
+                            <th style="color: var(--danger);">TOTAL PENGELUARAN</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="0">Rp 0</td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranPAUDQu" data-original="0">Rp 0</td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranTPQ" data-original="0">Rp 0</td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMDT" data-original="0">Rp 0</td>
+                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 16px;" data-original="0">Rp 0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ziswaf JIC Subsidy -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header"><i class="fas fa-handshake mr-2"></i> STATUS SUBSIDI SPP BEASISWA (ZISWAF JIC)</div>
+                <div class="table-responsive stat-group" data-group="ziswaf-subsidy">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0;">
+                        <tr>
+                            <th>SANTRI BARU</th>
+                            <th>DAFTAR ULANG</th>
+                            <th>TOTAL SANTRI</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-ziswaf-baru" data-original="0">0</td>
+                            <td class="text-center val-ziswaf-lama" data-original="0">0</td>
+                            <td class="text-center font-weight-bold val-ziswaf-total-santri" data-original="0">0</td>
+                        </tr>
+                        <tr>
+                            <th>TARGET DANA</th>
+                            <th>REALISASI BAYAR</th>
+                            <th style="color: var(--danger);">SISA TUNGGAKAN</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-ziswaf-target" data-original="0">Rp 0</td>
+                            <td class="text-center val-ziswaf-bayar" data-original="0">Rp 0</td>
+                            <td class="text-center font-weight-bold val-ziswaf-tunggakan" style="color: var(--danger);" data-original="0">Rp 0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Transaksi Terbaru ================= -->
+
+    <div class="table-container mb-4">
+        <div class="table-header">
+            <div class="table-title"><i class="fas fa-list-ul mr-2"></i> Transaksi Terbaru</div>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="transaksiTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>No Transaksi</th>
+                        <th>Nama Santri</th>
+                        <th>Jenis</th>
+                        <th>Nominal</th>
+                        <th>Metode</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr>
+                            <td colspan="7" style="text-align: center;">Belum ada transaksi</td>
+                        </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div> <!-- end content-area -->
+
+<script>
+    function parseTanggalIndo(tglStr) {
+        const months = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+        const parts = tglStr.trim().split(/\s+/);
+        if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const monthIndex = months.indexOf(parts[1].toLowerCase());
+            const year = parseInt(parts[2]);
+            if (monthIndex !== -1) {
+                return new Date(year, monthIndex, day);
+            }
+        }
+        return null;
+    }
+
+    function filterDashboard() {
+        const startDateStr = document.getElementById('startDateInput').value;
+        const endDateStr = document.getElementById('endDateInput').value;
+
+        let startDate = null;
+        if (startDateStr) {
+            startDate = new Date(startDateStr);
+            startDate.setHours(0, 0, 0, 0);
+        }
+        let endDate = null;
+        if (endDateStr) {
+            endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+        }
+
+        // 1. Filter Transaksi Terbaru Table
+        const table = document.getElementById('transaksiTable');
+        const trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        let filteredPendapatan = 0;
+        let isFiltered = false;
+        let totalCount = 0;
+        let matchingCount = 0;
+
+        let filteredPengeluaranPAUDQu = 0;
+        let filteredPengeluaranTPQ = 0;
+        let filteredPengeluaranMDT = 0;
+        let filteredPengeluaranMadrasah = 0;
+
+        for (let i = 0; i < trs.length; i++) {
+            const tr = trs[i];
+            if (tr.id === 'noMatchingRow') continue;
+            if (tr.cells.length < 5) continue; // Skip empty row/placeholder row
+            
+            totalCount++;
+            const tdTgl = tr.cells[0];
+            const txtTglRaw = (tdTgl.textContent || tdTgl.innerText);
+            
+            let matchDate = true;
+            if (startDate || endDate) {
+                isFiltered = true;
+                const trxDate = parseTanggalIndo(txtTglRaw);
+                if (trxDate) {
+                    if (startDate && trxDate < startDate) matchDate = false;
+                    if (endDate && trxDate > endDate) matchDate = false;
+                } else {
+                    matchDate = false;
+                }
+            }
+
+            if (matchDate) {
+                tr.style.display = '';
+                matchingCount++;
+                // Calculate visible pendapatan and pengeluaran from table
+                const jenis = tr.getAttribute('data-jenis');
+                const nominal = parseInt(tr.getAttribute('data-nominal') || 0);
+                if (jenis === 'Pemasukan') {
+                    filteredPendapatan += nominal;
+                } else if (jenis === 'Pengeluaran') {
+                    const satuan = tr.getAttribute('data-satuan');
+                    if (satuan === 'PAUDQu') filteredPengeluaranPAUDQu += nominal;
+                    else if (satuan === 'TPQ') filteredPengeluaranTPQ += nominal;
+                    else if (satuan === 'MDT') filteredPengeluaranMDT += nominal;
+                    else filteredPengeluaranMadrasah += nominal;
+                }
+            } else {
+                tr.style.display = 'none';
+            }
+        }
+
+        // Toggle the empty state row for filtered view
+        const noMatchingEl = document.getElementById('noMatchingRow');
+        if (noMatchingEl) {
+            if (isFiltered && matchingCount === 0) {
+                noMatchingEl.style.display = '';
+            } else {
+                noMatchingEl.style.display = 'none';
+            }
+        }
+
+        // 2. Scale ALL Dashboard Stats based on multiplier
+        const valPendapatanEl = document.getElementById('valPendapatan');
+        let multiplier = 1.0;
+        if (isFiltered) {
+            if (matchingCount === 0) {
+                multiplier = 0.0;
+            } else {
+                const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
+                if (originalVal > 0) {
+                    multiplier = filteredPendapatan / originalVal;
+                    if (multiplier > 1.0) multiplier = 1.0;
+                } else {
+                    multiplier = totalCount > 0 ? (matchingCount / totalCount) : 1.0;
+                }
+            }
+        }
+
+        // Process Stat Cards (Top)
+        if (isFiltered) {
+            // Use the actual filtered sum for global pendapatan
+            valPendapatanEl.innerHTML = 'Rp ' + filteredPendapatan.toLocaleString('id-ID');
+        } else {
+            const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
+            valPendapatanEl.innerHTML = 'Rp ' + originalVal.toLocaleString('id-ID');
+        }
+
+        ['valTopTunggakan', 'valTopTarget'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                el.innerHTML = 'Rp ' + Math.round(orig * multiplier).toLocaleString('id-ID');
+            }
+        });
+
+        // Process Main Data Tables
+        document.querySelectorAll('.stat-group').forEach(group => {
+            const santriEl = group.querySelector('.val-santri');
+            let santriVal = 0;
+            if (santriEl) {
+                const orig = parseInt(santriEl.getAttribute('data-original')) || 0;
+                santriVal = Math.round(orig * multiplier);
+                santriEl.innerHTML = santriVal;
+            }
+
+            const tagihanEl = group.querySelector('.val-tagihan');
+            let tagihanVal = 0;
+            if (tagihanEl) {
+                const origTagihan = parseInt(tagihanEl.getAttribute('data-original')) || 0;
+                tagihanVal = Math.round(origTagihan * multiplier);
+                tagihanEl.innerHTML = 'Rp ' + tagihanVal.toLocaleString('id-ID');
+            }
+
+            const bayarEl = group.querySelector('.val-bayar');
+            let bayarVal = 0;
+            if (bayarEl) {
+                const origBayar = parseInt(bayarEl.getAttribute('data-original')) || 0;
+                bayarVal = Math.round(origBayar * multiplier);
+                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
+            }
+
+            const pengeluaranEl = group.querySelector('.val-pengeluaran');
+            let pengeluaranVal = 0;
+            if (pengeluaranEl) {
+                const origPengeluaran = parseInt(pengeluaranEl.getAttribute('data-original')) || 0;
+                pengeluaranVal = Math.round(origPengeluaran * multiplier);
+                pengeluaranEl.innerHTML = 'Rp ' + pengeluaranVal.toLocaleString('id-ID');
+            }
+
+            // Derived
+            const tunggakanVal = tagihanVal - bayarVal;
+            const tunggakanEl = group.querySelector('.val-tunggakan');
+            if (tunggakanEl) tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
+
+            const persenBayarEl = group.querySelector('.val-persen-bayar');
+            if (persenBayarEl) {
+                persenBayarEl.innerHTML = tagihanVal > 0 ? ((bayarVal / tagihanVal) * 100).toFixed(2) + '%' : '0.00%';
+            }
+
+            const saldoVal = bayarVal - pengeluaranVal;
+            const saldoEl = group.querySelector('.val-saldo');
+            if (saldoEl) saldoEl.innerHTML = 'Rp ' + saldoVal.toLocaleString('id-ID');
+        });
+
+        // Process Pengeluaran Global Table
+        if (isFiltered) {
+            const totalFilteredPengeluaran = filteredPengeluaranMadrasah + filteredPengeluaranPAUDQu + filteredPengeluaranTPQ + filteredPengeluaranMDT;
+            if(document.getElementById('valPengeluaranMadrasah')) document.getElementById('valPengeluaranMadrasah').innerHTML = 'Rp ' + filteredPengeluaranMadrasah.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranPAUDQu')) document.getElementById('valPengeluaranPAUDQu').innerHTML = 'Rp ' + filteredPengeluaranPAUDQu.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranTPQ')) document.getElementById('valPengeluaranTPQ').innerHTML = 'Rp ' + filteredPengeluaranTPQ.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranMDT')) document.getElementById('valPengeluaranMDT').innerHTML = 'Rp ' + filteredPengeluaranMDT.toLocaleString('id-ID');
+            if(document.getElementById('valPengeluaranTotal')) document.getElementById('valPengeluaranTotal').innerHTML = 'Rp ' + totalFilteredPengeluaran.toLocaleString('id-ID');
+        } else {
+            document.querySelectorAll('.val-pengeluaran-unit, .val-pengeluaran-total').forEach(el => {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                el.innerHTML = 'Rp ' + orig.toLocaleString('id-ID');
+            });
+        }
+
+        // Process Ziswaf Table
+        const ziswafGroup = document.querySelector('[data-group="ziswaf-subsidy"]');
+        if (ziswafGroup) {
+            ['val-ziswaf-baru', 'val-ziswaf-lama', 'val-ziswaf-total-santri'].forEach(cls => {
+                const el = ziswafGroup.querySelector('.' + cls);
+                if (el) {
+                    const orig = parseInt(el.getAttribute('data-original')) || 0;
+                    el.innerHTML = Math.round(orig * multiplier);
+                }
+            });
+            const targetEl = ziswafGroup.querySelector('.val-ziswaf-target');
+            let targetVal = 0;
+            if (targetEl) {
+                const orig = parseInt(targetEl.getAttribute('data-original')) || 0;
+                targetVal = Math.round(orig * multiplier);
+                targetEl.innerHTML = 'Rp ' + targetVal.toLocaleString('id-ID');
+            }
+            const bayarEl = ziswafGroup.querySelector('.val-ziswaf-bayar');
+            let bayarVal = 0;
+            if (bayarEl) {
+                const orig = parseInt(bayarEl.getAttribute('data-original')) || 0;
+                bayarVal = Math.round(orig * multiplier);
+                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
+            }
+            const tunggakanEl = ziswafGroup.querySelector('.val-ziswaf-tunggakan');
+            if (tunggakanEl) {
+                const tunggakanVal = Math.max(0, targetVal - bayarVal);
+                tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
+            }
+        }
+
+        // Process Rekap Tables
+        document.querySelectorAll('.rekap-group').forEach(group => {
+            let totalPAUDQu = 0;
+            let totalTPQ = 0;
+            let totalMDT = 0;
+
+            group.querySelectorAll('.val-rekap').forEach(el => {
+                const orig = parseInt(el.getAttribute('data-original')) || 0;
+                const val = Math.round(orig * multiplier);
+                el.innerHTML = val;
+            });
+
+            // Recalculate totals
+            const cells = group.querySelectorAll('.val-rekap');
+            if (cells.length === 8) { // 4 top, 4 bottom
+                totalPAUDQu = parseInt(cells[0].innerText) + parseInt(cells[1].innerText);
+                totalTPQ = parseInt(cells[2].innerText) + parseInt(cells[3].innerText); // simplified
+                totalMDT = parseInt(cells[4].innerText) + parseInt(cells[5].innerText) + parseInt(cells[6].innerText) + parseInt(cells[7].innerText);
+            }
+
+            const paudquEl = group.querySelector('.val-rekap-total-paudqu');
+            if (paudquEl) paudquEl.innerHTML = totalPAUDQu;
+
+            const tpqEl = group.querySelector('.val-rekap-total-tpq');
+            if (tpqEl) tpqEl.innerHTML = totalTPQ;
+
+            const mdtEl = group.querySelector('.val-rekap-total-mdt');
+            if (mdtEl) mdtEl.innerHTML = totalMDT;
+
+            const allEl = group.querySelector('.val-rekap-total-all');
+            if (allEl) allEl.innerHTML = totalPAUDQu + totalTPQ + totalMDT;
+        });
+    }
+
+    function resetFilter() {
+        document.getElementById('startDateInput').value = '';
+        document.getElementById('endDateInput').value = '';
+        filterDashboard();
+    }
+</script>
+
+</div> <!-- End of content-area -->
+</div> <!-- End of main-content -->
+</div> <!-- End of app-container -->
+
+<!-- Scripts -->
+<script>
+    // Common functionality like print
+    function printPage() {
+        window.print();
+    }
+
+    // Sidebar Toggle for Mobile responsiveness
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (toggleBtn && sidebar) {
+            // Create overlay dynamically if it doesn't exist
+            let overlay = document.querySelector('.sidebar-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'sidebar-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+
+            // Close sidebar on menu item click (on mobile)
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+    });
+</script>
+</body>
+
+</html>

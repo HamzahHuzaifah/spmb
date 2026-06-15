@@ -17,8 +17,22 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- jQuery & Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <!-- Custom CSS -->
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -37,9 +51,14 @@
                         </div>
                     </div>
                     <div class="topbar-right">
-                        <div class="user-profile">
-                            <span class="user-name">Admin SPMB</span>
-                            <div class="avatar">A</div>
+                        <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="user-name">Admin SPMB</span>
+                                <div class="avatar">A</div>
+                            </div>
+                            <a href="/logout" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px; background-color: #dc2626; color: white; border-radius: 4px; text-decoration: none;">
+                                <i class="fas fa-sign-out-alt"></i> Keluar
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -9,18 +9,18 @@
 
     <!-- Filter Bar -->
     <div class="filter-bar mb-4">
-        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%;">
+        <form method="GET" action="/dashboard" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Dari Tanggal:</label>
-                <input type="date" id="startDateInput" class="form-control" style="width: 160px;">
+                <input type="date" name="startDate" id="startDateInput" class="form-control" style="width: 160px;" value="<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>">
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Sampai Tanggal:</label>
-                <input type="date" id="endDateInput" class="form-control" style="width: 160px;">
+                <input type="date" name="endDate" id="endDateInput" class="form-control" style="width: 160px;" value="<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>">
             </div>
-            <button class="btn btn-primary" onclick="filterDashboard()"><i class="fas fa-filter"></i> Filter</button>
-            <button class="btn btn-secondary" onclick="resetFilter()"><i class="fas fa-sync"></i> Reset</button>
-        </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+            <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;"><i class="fas fa-sync"></i> Reset</a>
+        </form>
     </div>
 
     <!-- Top Stats -->
@@ -348,9 +348,6 @@
                                 </td>
                             </tr>
                         <% }) %>
-                        <tr id="noMatchingRow" style="display: none;">
-                            <td colspan="7" style="text-align: center; color: var(--text-muted);">Tidak ada transaksi dalam rentang tanggal ini</td>
-                        </tr>
                     <% } else { %>
                         <tr>
                             <td colspan="7" style="text-align: center;">Belum ada transaksi</td>
@@ -359,273 +356,31 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+            <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 5px;">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">&laquo; Prev</a>
+                <% } %>
+                
+                <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                    <a href="?page=<%= i %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 10px;"><%= i %></a>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">Next &raquo;</a>
+                <% } %>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: #64748b; font-size: 14px;">
+                Menampilkan halaman <%= currentPage %> dari <%= totalPages %> (Total: <%= totalData %> data)
+            </div>
+        <% } %>
     </div>
 
 </div> <!-- end content-area -->
 
-<script>
-    function parseTanggalIndo(tglStr) {
-        const months = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
-        const parts = tglStr.trim().split(/\s+/);
-        if (parts.length === 3) {
-            const day = parseInt(parts[0]);
-            const monthIndex = months.indexOf(parts[1].toLowerCase());
-            const year = parseInt(parts[2]);
-            if (monthIndex !== -1) {
-                return new Date(year, monthIndex, day);
-            }
-        }
-        return null;
-    }
 
-    function filterDashboard() {
-        const startDateStr = document.getElementById('startDateInput').value;
-        const endDateStr = document.getElementById('endDateInput').value;
-
-        let startDate = null;
-        if (startDateStr) {
-            startDate = new Date(startDateStr);
-            startDate.setHours(0, 0, 0, 0);
-        }
-        let endDate = null;
-        if (endDateStr) {
-            endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999);
-        }
-
-        // 1. Filter Transaksi Terbaru Table
-        const table = document.getElementById('transaksiTable');
-        const trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-        
-        let filteredPendapatan = 0;
-        let isFiltered = false;
-        let totalCount = 0;
-        let matchingCount = 0;
-
-        let filteredPengeluaranPAUDQu = 0;
-        let filteredPengeluaranTPQ = 0;
-        let filteredPengeluaranMDT = 0;
-        let filteredPengeluaranMadrasah = 0;
-
-        for (let i = 0; i < trs.length; i++) {
-            const tr = trs[i];
-            if (tr.id === 'noMatchingRow') continue;
-            if (tr.cells.length < 5) continue; // Skip empty row/placeholder row
-            
-            totalCount++;
-            const tdTgl = tr.cells[0];
-            const txtTglRaw = (tdTgl.textContent || tdTgl.innerText);
-            
-            let matchDate = true;
-            if (startDate || endDate) {
-                isFiltered = true;
-                const trxDate = parseTanggalIndo(txtTglRaw);
-                if (trxDate) {
-                    if (startDate && trxDate < startDate) matchDate = false;
-                    if (endDate && trxDate > endDate) matchDate = false;
-                } else {
-                    matchDate = false;
-                }
-            }
-
-            if (matchDate) {
-                tr.style.display = '';
-                matchingCount++;
-                // Calculate visible pendapatan and pengeluaran from table
-                const jenis = tr.getAttribute('data-jenis');
-                const nominal = parseInt(tr.getAttribute('data-nominal') || 0);
-                if (jenis === 'Pemasukan') {
-                    filteredPendapatan += nominal;
-                } else if (jenis === 'Pengeluaran') {
-                    const satuan = tr.getAttribute('data-satuan');
-                    if (satuan === 'PAUDQu') filteredPengeluaranPAUDQu += nominal;
-                    else if (satuan === 'TPQ') filteredPengeluaranTPQ += nominal;
-                    else if (satuan === 'MDT') filteredPengeluaranMDT += nominal;
-                    else filteredPengeluaranMadrasah += nominal;
-                }
-            } else {
-                tr.style.display = 'none';
-            }
-        }
-
-        // Toggle the empty state row for filtered view
-        const noMatchingEl = document.getElementById('noMatchingRow');
-        if (noMatchingEl) {
-            if (isFiltered && matchingCount === 0) {
-                noMatchingEl.style.display = '';
-            } else {
-                noMatchingEl.style.display = 'none';
-            }
-        }
-
-        // 2. Scale ALL Dashboard Stats based on multiplier
-        const valPendapatanEl = document.getElementById('valPendapatan');
-        let multiplier = 1.0;
-        if (isFiltered) {
-            if (matchingCount === 0) {
-                multiplier = 0.0;
-            } else {
-                const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
-                if (originalVal > 0) {
-                    multiplier = filteredPendapatan / originalVal;
-                    if (multiplier > 1.0) multiplier = 1.0;
-                } else {
-                    multiplier = totalCount > 0 ? (matchingCount / totalCount) : 1.0;
-                }
-            }
-        }
-
-        // Process Stat Cards (Top)
-        if (isFiltered) {
-            // Use the actual filtered sum for global pendapatan
-            valPendapatanEl.innerHTML = 'Rp ' + filteredPendapatan.toLocaleString('id-ID');
-        } else {
-            const originalVal = parseInt(valPendapatanEl.getAttribute('data-original')) || 0;
-            valPendapatanEl.innerHTML = 'Rp ' + originalVal.toLocaleString('id-ID');
-        }
-
-        ['valTopTunggakan', 'valTopTarget'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                const orig = parseInt(el.getAttribute('data-original')) || 0;
-                el.innerHTML = 'Rp ' + Math.round(orig * multiplier).toLocaleString('id-ID');
-            }
-        });
-
-        // Process Main Data Tables
-        document.querySelectorAll('.stat-group').forEach(group => {
-            const santriEl = group.querySelector('.val-santri');
-            let santriVal = 0;
-            if (santriEl) {
-                const orig = parseInt(santriEl.getAttribute('data-original')) || 0;
-                santriVal = Math.round(orig * multiplier);
-                santriEl.innerHTML = santriVal;
-            }
-
-            const tagihanEl = group.querySelector('.val-tagihan');
-            let tagihanVal = 0;
-            if (tagihanEl) {
-                const origTagihan = parseInt(tagihanEl.getAttribute('data-original')) || 0;
-                tagihanVal = Math.round(origTagihan * multiplier);
-                tagihanEl.innerHTML = 'Rp ' + tagihanVal.toLocaleString('id-ID');
-            }
-
-            const bayarEl = group.querySelector('.val-bayar');
-            let bayarVal = 0;
-            if (bayarEl) {
-                const origBayar = parseInt(bayarEl.getAttribute('data-original')) || 0;
-                bayarVal = Math.round(origBayar * multiplier);
-                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
-            }
-
-            const pengeluaranEl = group.querySelector('.val-pengeluaran');
-            let pengeluaranVal = 0;
-            if (pengeluaranEl) {
-                const origPengeluaran = parseInt(pengeluaranEl.getAttribute('data-original')) || 0;
-                pengeluaranVal = Math.round(origPengeluaran * multiplier);
-                pengeluaranEl.innerHTML = 'Rp ' + pengeluaranVal.toLocaleString('id-ID');
-            }
-
-            // Derived
-            const tunggakanVal = tagihanVal - bayarVal;
-            const tunggakanEl = group.querySelector('.val-tunggakan');
-            if (tunggakanEl) tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
-
-            const persenBayarEl = group.querySelector('.val-persen-bayar');
-            if (persenBayarEl) {
-                persenBayarEl.innerHTML = tagihanVal > 0 ? ((bayarVal / tagihanVal) * 100).toFixed(2) + '%' : '0.00%';
-            }
-
-            const saldoVal = bayarVal - pengeluaranVal;
-            const saldoEl = group.querySelector('.val-saldo');
-            if (saldoEl) saldoEl.innerHTML = 'Rp ' + saldoVal.toLocaleString('id-ID');
-        });
-
-        // Process Pengeluaran Global Table
-        if (isFiltered) {
-            const totalFilteredPengeluaran = filteredPengeluaranMadrasah + filteredPengeluaranPAUDQu + filteredPengeluaranTPQ + filteredPengeluaranMDT;
-            if(document.getElementById('valPengeluaranMadrasah')) document.getElementById('valPengeluaranMadrasah').innerHTML = 'Rp ' + filteredPengeluaranMadrasah.toLocaleString('id-ID');
-            if(document.getElementById('valPengeluaranPAUDQu')) document.getElementById('valPengeluaranPAUDQu').innerHTML = 'Rp ' + filteredPengeluaranPAUDQu.toLocaleString('id-ID');
-            if(document.getElementById('valPengeluaranTPQ')) document.getElementById('valPengeluaranTPQ').innerHTML = 'Rp ' + filteredPengeluaranTPQ.toLocaleString('id-ID');
-            if(document.getElementById('valPengeluaranMDT')) document.getElementById('valPengeluaranMDT').innerHTML = 'Rp ' + filteredPengeluaranMDT.toLocaleString('id-ID');
-            if(document.getElementById('valPengeluaranTotal')) document.getElementById('valPengeluaranTotal').innerHTML = 'Rp ' + totalFilteredPengeluaran.toLocaleString('id-ID');
-        } else {
-            document.querySelectorAll('.val-pengeluaran-unit, .val-pengeluaran-total').forEach(el => {
-                const orig = parseInt(el.getAttribute('data-original')) || 0;
-                el.innerHTML = 'Rp ' + orig.toLocaleString('id-ID');
-            });
-        }
-
-        // Process Ziswaf Table
-        const ziswafGroup = document.querySelector('[data-group="ziswaf-subsidy"]');
-        if (ziswafGroup) {
-            ['val-ziswaf-baru', 'val-ziswaf-lama', 'val-ziswaf-total-santri'].forEach(cls => {
-                const el = ziswafGroup.querySelector('.' + cls);
-                if (el) {
-                    const orig = parseInt(el.getAttribute('data-original')) || 0;
-                    el.innerHTML = Math.round(orig * multiplier);
-                }
-            });
-            const targetEl = ziswafGroup.querySelector('.val-ziswaf-target');
-            let targetVal = 0;
-            if (targetEl) {
-                const orig = parseInt(targetEl.getAttribute('data-original')) || 0;
-                targetVal = Math.round(orig * multiplier);
-                targetEl.innerHTML = 'Rp ' + targetVal.toLocaleString('id-ID');
-            }
-            const bayarEl = ziswafGroup.querySelector('.val-ziswaf-bayar');
-            let bayarVal = 0;
-            if (bayarEl) {
-                const orig = parseInt(bayarEl.getAttribute('data-original')) || 0;
-                bayarVal = Math.round(orig * multiplier);
-                bayarEl.innerHTML = 'Rp ' + bayarVal.toLocaleString('id-ID');
-            }
-            const tunggakanEl = ziswafGroup.querySelector('.val-ziswaf-tunggakan');
-            if (tunggakanEl) {
-                const tunggakanVal = Math.max(0, targetVal - bayarVal);
-                tunggakanEl.innerHTML = 'Rp ' + tunggakanVal.toLocaleString('id-ID');
-            }
-        }
-
-        // Process Rekap Tables
-        document.querySelectorAll('.rekap-group').forEach(group => {
-            let totalPAUDQu = 0;
-            let totalTPQ = 0;
-            let totalMDT = 0;
-
-            group.querySelectorAll('.val-rekap').forEach(el => {
-                const orig = parseInt(el.getAttribute('data-original')) || 0;
-                const val = Math.round(orig * multiplier);
-                el.innerHTML = val;
-            });
-
-            // Recalculate totals
-            const cells = group.querySelectorAll('.val-rekap');
-            if (cells.length === 8) { // 4 top, 4 bottom
-                totalPAUDQu = parseInt(cells[0].innerText) + parseInt(cells[1].innerText);
-                totalTPQ = parseInt(cells[2].innerText) + parseInt(cells[3].innerText); // simplified
-                totalMDT = parseInt(cells[4].innerText) + parseInt(cells[5].innerText) + parseInt(cells[6].innerText) + parseInt(cells[7].innerText);
-            }
-
-            const paudquEl = group.querySelector('.val-rekap-total-paudqu');
-            if (paudquEl) paudquEl.innerHTML = totalPAUDQu;
-
-            const tpqEl = group.querySelector('.val-rekap-total-tpq');
-            if (tpqEl) tpqEl.innerHTML = totalTPQ;
-
-            const mdtEl = group.querySelector('.val-rekap-total-mdt');
-            if (mdtEl) mdtEl.innerHTML = totalMDT;
-
-            const allEl = group.querySelector('.val-rekap-total-all');
-            if (allEl) allEl.innerHTML = totalPAUDQu + totalTPQ + totalMDT;
-        });
-    }
-
-    function resetFilter() {
-        document.getElementById('startDateInput').value = '';
-        document.getElementById('endDateInput').value = '';
-        filterDashboard();
-    }
-</script>
 
 <%- include('partials/footer') %>
+<script src="/js/dashboard.js"></script>

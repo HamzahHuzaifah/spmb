@@ -1,0 +1,67 @@
+#previewTable th {
+                            background-color: #3a7b5e !important;
+                            color: white !important;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+
+                        #previewTable td {
+                            white-space: normal !important;
+                            word-wrap: break-word !important;
+                        }
+
+                        /* --- KODE PENANGKAL BOCORAN CSS TEMPLATE --- */
+
+                        /* 1. Mencegah efek "background gelap" pada baris tabel saat kursor diarahkan */
+                        #previewModal table tr:hover,
+                        #previewModal table td:hover,
+                        .footer-table tr:hover td,
+                        .footer-table td:hover {
+                            background-color: transparent !important;
+                        }
+
+                        /* 2. Menghilangkan "garis bawah" (border) dan background di text TTD */
+                        #previewModal [contenteditable] {
+                            outline: none !important;
+                            box-shadow: none !important;
+                            background: transparent !important;
+                            border: none !important; /* Ini yang menghilangkan garis bawaan template */
+                            text-decoration: none !important;
+                        }
+
+                        #previewModal [contenteditable]:hover,
+                        #previewModal [contenteditable]:focus {
+                            background: transparent !important;
+                            background-color: transparent !important;
+                            outline: none !important;
+                            border: none !important; /* Tangkal garis bawah tambahan saat di-hover */
+                            text-decoration: none !important;
+                            box-shadow: none !important;
+                        }
+
+                        #previewModal.editable-mode [contenteditable]:focus {
+                            outline: 2px dashed #007bff !important;
+                            background-color: #f8f9fa !important;
+                        }
+
+@page { size: 21.59cm 33cm; margin: 0; }
+                    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .wrapper { 
+                        width: 21.59cm; height: 33cm; 
+                        background-image: url('${window.location.origin}/images/Template%20Laporan%20dan%20Kwintasi.webp'); 
+                        background-size: 100% 100%; 
+                        position: relative;
+                        font-family: Arial, sans-serif;
+                    }
+
+@page WordSection1 {
+                size: 21.59cm 33.0cm;
+                margin: 0cm 0cm 0cm 0cm;
+                mso-header-margin: 0cm;
+                mso-footer-margin: 0cm;
+                mso-paper-source: 0;
+              }
+              div.WordSection1 { page: WordSection1; }
+              body { font-family: Arial, sans-serif; font-size: 10pt; margin: 0; padding: 0; }
+              table { border-collapse: collapse; }
+              td, th { vertical-align: top; }
