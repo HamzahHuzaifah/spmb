@@ -26,6 +26,12 @@
             <i class="fas fa-file-word"></i> Export Word
         </button>
         <a href="/input-transaksi" class="btn-back">Kembali</a>
+        <script>
+            // Sembunyikan tombol kembali jika kwitansi dibuka dari dalam Iframe (Pop-up Modal)
+            if (window.self !== window.top) {
+                document.querySelector('.btn-back').style.display = 'none';
+            }
+        </script>
         
         <div id="layoutControls" class="no-print" style="display: none; margin-top: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ccc; width: 100%; flex-direction: column; align-items: center; gap: 10px;">
             <strong style="text-align: center; margin-bottom: 5px;">Geser Tata Letak:</strong>
@@ -41,7 +47,7 @@
 
         <!-- KONTEN KWITANSI OVERLAY (Diatas Template) -->
         <% 
-        const defaultOrder = ['diterimaDari', 'namaSantri', 'satuanPendidikan', 'untukPembayaran', 'terbilangRow', 'nominalRow', 'dibayarkanKepada', 'kategoriDana', 'keteranganPengeluaran', 'rincianPengeluaran', 'untukBantuan'];
+        const defaultOrder = ['diterimaDari', 'namaSantri', 'satuanPendidikan', 'untukPembayaran', 'dibayarkanKepada', 'kategoriDana', 'keteranganPengeluaran', 'rincianPengeluaran', 'untukBantuan', 'terbilangRow', 'nominalRow'];
     let currentOrder = [];
     try {
         if (typeof rowOrder !== 'undefined' && rowOrder) {
@@ -640,6 +646,39 @@
                 btn.disabled = false;
             }
         }
+        function adjustKwitansiScale() {
+            const wrapper = document.querySelector('.page-wrapper');
+            if (!wrapper) return;
+            wrapper.style.transform = 'none';
+            
+            let availableWidth = window.innerWidth;
+            if (window.innerWidth > 1100) {
+                availableWidth -= 250; // Jatah ruang untuk tombol di sebelah kanan
+            } else {
+                availableWidth -= 20; // Jatah padding untuk layar kecil
+            }
+            
+            const targetWidth = 816; // Lebar perkiraan 21.59cm dalam px
+            if (availableWidth < targetWidth) {
+                const scale = availableWidth / targetWidth;
+                wrapper.style.transform = `scale(${scale})`;
+                wrapper.style.transformOrigin = 'top left'; // Mengubah titik tumpu scale ke kiri atas
+                wrapper.style.alignSelf = 'flex-start'; // Memaksa agar tidak ditarik ke tengah oleh flex container
+                
+                // Menghindari margin bottom yang terlalu jauh karena elemen asli tetap berukuran penuh
+                const scaledHeight = 1247 * scale;
+                const diff = 1247 - scaledHeight;
+                wrapper.style.marginBottom = `-${diff}px`;
+            } else {
+                wrapper.style.transform = 'none';
+                wrapper.style.marginBottom = '30px';
+                wrapper.style.alignSelf = 'center';
+            }
+        }
+        window.addEventListener('resize', adjustKwitansiScale);
+        window.addEventListener('load', adjustKwitansiScale);
+        setTimeout(adjustKwitansiScale, 100);
+        setTimeout(adjustKwitansiScale, 500);
     </script>
 </body>
 </html>

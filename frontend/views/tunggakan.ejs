@@ -1,20 +1,25 @@
 <%- include('partials/header', { title: 'Tunggakan Santri Baru', activePage: 'tunggakan' }) %>
 
-<form method="GET" action="/tunggakan" class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-    <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
-    <select name="status" id="statusInput" class="form-control" style="width: 200px;">
-        <option value="">Semua Status Bayar</option>
-        <option value="Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Lunas' ? 'selected' : '' %>>Lunas</option>
-        <option value="Belum Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Belum Lunas' ? 'selected' : '' %>>Belum Lunas</option>
-    </select>
-    <button type="submit" class="btn btn-primary">Cari & Filter</button>
-    <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof statusQuery !== 'undefined' && statusQuery)) { %>
-        <a href="/tunggakan" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
-    <% } %>
-    <button type="button" class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
-        <i class="fas fa-print"></i> Cetak Tabel
-    </button>
-</form>
+<div class="filter-bar">
+    <form method="GET" action="/tunggakan" class="filter-form">
+        <input type="text" name="search" id="searchInput" class="form-control filter-search" placeholder="Cari Nama Santri..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <select name="status" id="statusInput" class="form-control filter-select">
+            <option value="">Semua Status Bayar</option>
+            <option value="Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Lunas' ? 'selected' : '' %>>Lunas</option>
+            <option value="Belum Lunas" <%= typeof statusQuery !== 'undefined' && statusQuery === 'Belum Lunas' ? 'selected' : '' %>>Belum Lunas</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-submit-filter">Cari & Filter</button>
+        <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof statusQuery !== 'undefined' && statusQuery)) { %>
+            <a href="/tunggakan" class="btn btn-secondary btn-reset-filter" style="text-decoration: none;">Reset</a>
+        <% } %>
+    </form>
+
+    <div class="filter-actions">
+        <button type="button" class="btn btn-secondary btn-print" onclick="window.print()">
+            <i class="fas fa-print"></i> Cetak Tabel
+        </button>
+    </div>
+</div>
 
 <div class="table-container">
     <div class="table-header">

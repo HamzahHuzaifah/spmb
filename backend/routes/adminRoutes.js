@@ -26,6 +26,7 @@ router.get('/dashboard', dashboardController.getDashboard);
 
 // Laporan
 router.get('/laporan', laporanController.getLaporan);
+router.get('/laporan-bulanan', laporanController.getLaporanBulanan);
 
 // Tagihan
 router.get('/tagihan', tagihanController.getTagihan);

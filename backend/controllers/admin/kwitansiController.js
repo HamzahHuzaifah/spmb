@@ -91,8 +91,17 @@ exports.getKwitansi = async (req, res) => {
         // Parse rincian from JSON strings if needed
         let rincianNames = [];
         let rincianNominals = [];
-        try { rincianNames = trx.rincianNames ? JSON.parse(trx.rincianNames) : []; } catch (e) {}
-        try { rincianNominals = trx.rincianNominals ? JSON.parse(trx.rincianNominals) : []; } catch (e) {}
+        try { 
+            let pNames = trx.rincianNames ? JSON.parse(trx.rincianNames) : [];
+            if (typeof pNames === 'string') pNames = JSON.parse(pNames);
+            rincianNames = pNames;
+        } catch (e) { rincianNames = []; }
+        
+        try { 
+            let pNoms = trx.rincianNominals ? JSON.parse(trx.rincianNominals) : [];
+            if (typeof pNoms === 'string') pNoms = JSON.parse(pNoms);
+            rincianNominals = pNoms;
+        } catch (e) { rincianNominals = []; }
 
         // Format Tanggal (YYYY-MM-DD -> DD Bulan YYYY)
         let tanggalCetak = trx.tanggal;

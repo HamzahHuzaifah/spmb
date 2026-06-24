@@ -5,12 +5,12 @@ const TransaksiModel = require('../../models/TransaksiModel');
 
 exports.getDashboard = async (req, res) => {
     try {
-        const santriData = await SantriModel.getAllSantri();
-        const santriDaftarUlangData = await SantriModel.getAllSantriDaftarUlang();
-        const tagihanData = await TagihanModel.getAllTagihan();
-        const tagihanDaftarUlangData = await TagihanModel.getAllTagihanDaftarUlang();
-        const tunggakanData = await TunggakanModel.getAllTunggakan();
-        const tunggakanDaftarUlangData = await TunggakanModel.getAllTunggakanDaftarUlang();
+        let santriData = await SantriModel.getAllSantri();
+        let santriDaftarUlangData = await SantriModel.getAllSantriDaftarUlang();
+        let tagihanData = await TagihanModel.getAllTagihan();
+        let tagihanDaftarUlangData = await TagihanModel.getAllTagihanDaftarUlang();
+        let tunggakanData = await TunggakanModel.getAllTunggakan();
+        let tunggakanDaftarUlangData = await TunggakanModel.getAllTunggakanDaftarUlang();
         
         // Paginasi tabel transaksi terbaru
         const page = parseInt(req.query.page) || 1;
@@ -20,6 +20,30 @@ exports.getDashboard = async (req, res) => {
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
         const filterTanggal = { start: startDate, end: endDate };
+
+        if (startDate && endDate) {
+            // Filter data pendaftaran berdasarkan rentang tanggal
+            santriData = santriData.filter(s => {
+                if (!s.timestamp) return false;
+                const tDate = s.timestamp.substring(0, 10);
+                return tDate >= startDate && tDate <= endDate;
+            });
+            santriDaftarUlangData = santriDaftarUlangData.filter(s => {
+                if (!s.timestamp) return false;
+                const tDate = s.timestamp.substring(0, 10);
+                return tDate >= startDate && tDate <= endDate;
+            });
+
+            // Ambil daftar nama santri yang masuk dalam rentang tanggal
+            const validNamesBaru = new Set(santriData.map(s => s.nama));
+            const validNamesLama = new Set(santriDaftarUlangData.map(s => s.nama));
+
+            // Sinkronisasi data tagihan dan tunggakan agar sesuai dengan santri yang terfilter
+            tagihanData = tagihanData.filter(t => validNamesBaru.has(t.nama));
+            tunggakanData = tunggakanData.filter(t => validNamesBaru.has(t.nama));
+            tagihanDaftarUlangData = tagihanDaftarUlangData.filter(t => validNamesLama.has(t.nama));
+            tunggakanDaftarUlangData = tunggakanDaftarUlangData.filter(t => validNamesLama.has(t.nama));
+        }
         
         // Ambil transaksi terbaru untuk tabel sesuai pagination
         const transaksiTerbaru = await TransaksiModel.getTransaksiPaginated(limit, offset, '', filterTanggal, '');
@@ -39,10 +63,12 @@ exports.getDashboard = async (req, res) => {
         const totalSantriBeasiswa = countBeasiswaBaru + countBeasiswaLama;
         const targetDanaZiswaf = totalSantriBeasiswa * 150000;
         
-        // Hitung Realisasi dari Pemasukan dengan kata kunci "ziswaf" (Dari SQL)
-        const realisasiZiswaf = await TransaksiModel.getRealisasiZiswafGlobal();
+        // Hitung Realisasi dari Pemasukan dengan kata kunci "ziswaf" (Dari SQL, filtered by date range for flow card)
+        const realisasiZiswaf = await TransaksiModel.getRealisasiZiswafGlobal(filterTanggal);
         
-        const tunggakanZiswaf = Math.max(0, targetDanaZiswaf - realisasiZiswaf);
+        // Cumulative Ziswaf for overall outstanding calculations (state snapshot)
+        const overallRealisasiZiswaf = await TransaksiModel.getRealisasiZiswafGlobal();
+        const tunggakanZiswaf = Math.max(0, targetDanaZiswaf - overallRealisasiZiswaf);
         
         // Total Target & Tunggakan setelah digabung dengan Ziswaf
         const totalTargetPendapatan = targetPendapatanBaruNoZiswaf + targetPendapatanLamaNoZiswaf + targetDanaZiswaf;
@@ -51,8 +77,8 @@ exports.getDashboard = async (req, res) => {
         const tunggakanLamaNoZiswaf = tunggakanDaftarUlangData.reduce((sum, item) => sum + item.sisaBayar, 0);
         const totalTunggakan = tunggakanBaruNoZiswaf + tunggakanLamaNoZiswaf + tunggakanZiswaf;
         
-        // Total Pemasukan riil global (Dari SQL)
-        const totalPemasukanGlobal = await TransaksiModel.getTotalPemasukanGlobal();
+        // Total Pemasukan riil global (Dari SQL, filtered by date range)
+        const totalPemasukanGlobal = await TransaksiModel.getTotalPemasukanGlobal(filterTanggal);
 
         // Helper for grouping (async karena panggil SQL)
         const getUnitStats = async (unitPrefix, tghData, tggData, isBaru) => {
@@ -77,15 +103,23 @@ exports.getDashboard = async (req, res) => {
             
             let targetZiswafUnit = countBeasiswaUnit * 150000;
             
-            // Realisasi Ziswaf per unit (Dari SQL)
-            let realisasiZiswafUnit = await TransaksiModel.getRealisasiZiswafByUnit(unitPrefix, isBaru);
+            // Realisasi Ziswaf per unit (Dari SQL, filtered by date range)
+            let realisasiZiswafUnit = await TransaksiModel.getRealisasiZiswafByUnit(unitPrefix, isBaru, filterTanggal);
             
-            let tunggakanZiswafUnit = Math.max(0, targetZiswafUnit - realisasiZiswafUnit);
+            // Cumulative Ziswaf per unit for static tunggakan snapshot
+            let overallRealisasiZiswafUnit = await TransaksiModel.getRealisasiZiswafByUnit(unitPrefix, isBaru);
+            let tunggakanZiswafUnit = Math.max(0, targetZiswafUnit - overallRealisasiZiswafUnit);
             
             let totalTagihan = tagihanGroup.reduce((sum, item) => sum + item.totalTagihan, 0) + targetZiswafUnit;
-            let totalBayar = tunggakanGroup.reduce((sum, item) => sum + item.totalBayar, 0) + realisasiZiswafUnit;
+            
+            // regular payments from the transaksi table within the date range
+            let regularBayarUnit = await TransaksiModel.getRealisasiBayarByUnit(unitPrefix, isBaru, filterTanggal);
+            let totalBayar = regularBayarUnit + realisasiZiswafUnit;
+            
             let tunggakan = tunggakanGroup.reduce((sum, item) => sum + item.sisaBayar, 0) + tunggakanZiswafUnit;
-            let pengeluaran = 0;
+            
+            // query unit-specific expenses within the date range
+            let pengeluaran = await TransaksiModel.getPengeluaranByUnit(unitPrefix, filterTanggal);
             let saldo = totalBayar - pengeluaran;
 
             let persenTunggakan = totalTagihan > 0 ? (tunggakan / totalTagihan) * 100 : 0;
@@ -119,8 +153,8 @@ exports.getDashboard = async (req, res) => {
             totalTagihan: baruPAUDQu.totalTagihan + baruTPQ.totalTagihan + baruMDT.totalTagihan,
             totalBayar: baruPAUDQu.totalBayar + baruTPQ.totalBayar + baruMDT.totalBayar,
             tunggakan: baruPAUDQu.tunggakan + baruTPQ.tunggakan + baruMDT.tunggakan,
-            pengeluaran: 0,
-            saldo: baruPAUDQu.totalBayar + baruTPQ.totalBayar + baruMDT.totalBayar
+            pengeluaran: baruPAUDQu.pengeluaran + baruTPQ.pengeluaran + baruMDT.pengeluaran,
+            saldo: (baruPAUDQu.totalBayar + baruTPQ.totalBayar + baruMDT.totalBayar) - (baruPAUDQu.pengeluaran + baruTPQ.pengeluaran + baruMDT.pengeluaran)
         };
         madrasahBaru.persenTunggakan = madrasahBaru.totalTagihan > 0 ? ((madrasahBaru.tunggakan / madrasahBaru.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
         madrasahBaru.persenBayar = madrasahBaru.totalTagihan > 0 ? ((madrasahBaru.totalBayar / madrasahBaru.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
@@ -130,8 +164,8 @@ exports.getDashboard = async (req, res) => {
             totalTagihan: lamaPAUDQu.totalTagihan + lamaTPQ.totalTagihan + lamaMDT.totalTagihan,
             totalBayar: lamaPAUDQu.totalBayar + lamaTPQ.totalBayar + lamaMDT.totalBayar,
             tunggakan: lamaPAUDQu.tunggakan + lamaTPQ.tunggakan + lamaMDT.tunggakan,
-            pengeluaran: 0,
-            saldo: lamaPAUDQu.totalBayar + lamaTPQ.totalBayar + lamaMDT.totalBayar
+            pengeluaran: lamaPAUDQu.pengeluaran + lamaTPQ.pengeluaran + lamaMDT.pengeluaran,
+            saldo: (lamaPAUDQu.totalBayar + lamaTPQ.totalBayar + lamaMDT.totalBayar) - (lamaPAUDQu.pengeluaran + lamaTPQ.pengeluaran + lamaMDT.pengeluaran)
         };
         madrasahLama.persenTunggakan = madrasahLama.totalTagihan > 0 ? ((madrasahLama.tunggakan / madrasahLama.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
         madrasahLama.persenBayar = madrasahLama.totalTagihan > 0 ? ((madrasahLama.totalBayar / madrasahLama.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
@@ -141,8 +175,8 @@ exports.getDashboard = async (req, res) => {
             totalTagihan: madrasahBaru.totalTagihan + madrasahLama.totalTagihan,
             totalBayar: madrasahBaru.totalBayar + madrasahLama.totalBayar,
             tunggakan: madrasahBaru.tunggakan + madrasahLama.tunggakan,
-            pengeluaran: 0, 
-            saldo: madrasahBaru.totalBayar + madrasahLama.totalBayar
+            pengeluaran: madrasahBaru.pengeluaran + madrasahLama.pengeluaran, 
+            saldo: madrasahBaru.totalBayar + madrasahLama.totalBayar - (madrasahBaru.pengeluaran + madrasahLama.pengeluaran)
         };
         madrasahTotal.persenTunggakan = madrasahTotal.totalTagihan > 0 ? ((madrasahTotal.tunggakan / madrasahTotal.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
         madrasahTotal.persenBayar = madrasahTotal.totalTagihan > 0 ? ((madrasahTotal.totalBayar / madrasahTotal.totalTagihan) * 100).toFixed(2) + '%' : '0.00%';
@@ -164,8 +198,8 @@ exports.getDashboard = async (req, res) => {
         const rekapBaru = countKelas(santriData, 'pendidikan');
         const rekapLama = countKelas(santriDaftarUlangData, 'lanjutKe');
 
-        // 4. Rekapitulasi Pengeluaran (Dari SQL)
-        const pengeluaranRekap = await TransaksiModel.getPengeluaranRekap();
+        // 4. Rekapitulasi Pengeluaran (Dari SQL, filtered by date range)
+        const pengeluaranRekap = await TransaksiModel.getPengeluaranRekap(filterTanggal);
 
         res.render('dashboard', { 
             data: { transaksiTerbaru }, // Needed by table mapping

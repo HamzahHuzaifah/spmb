@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak Laporan Keuangan SPMB JIC</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .action-buttons { position: sticky; top: 0; z-index: 100; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; gap: 10px; }
+        .btn-print { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background-color: #059669; transition: all 0.2s; }
+        .btn-print:hover { opacity: 0.9; }
+        .page-wrapper { width: 100%; }
+        
+        #previewF4Wrapper, #previewF4Wrapper * {
+            font-family: 'Arial', 'Helvetica', sans-serif !important;
+        }
+
+        /* Tangkal style contenteditable default */
+        [contenteditable] {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            border: none !important;
+            text-decoration: none !important;
+        }
+        .editable-mode [contenteditable="true"] {
+            outline: 2px dashed #007bff !important;
+            background-color: rgba(0, 123, 255, 0.05) !important;
+            padding: 2px 4px;
+        }
+
+        #previewTable, #previewTable th, #previewTable td {
+            border: 1px solid #000 !important;
+        }
+
+        #previewTbody td:nth-child(4),
+        #previewTbody td:nth-child(5),
+        #previewTbody td:nth-child(6) {
+            white-space: nowrap !important;
+        }
+
+        #previewTable th {
+            background-color: #166534 !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #previewTable td {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: transparent; padding: 0; margin: 0; }
+            .page-wrapper { display: block; }
+            #previewF4ScaleContainer { height: auto !important; }
+            #previewF4Wrapper { margin: 0 !important; box-shadow: none !important; transform: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print action-buttons">
+        <button onclick="window.print()" class="btn-print"><i class="fas fa-print"></i> Cetak PDF Biasa</button>
+        <button onclick="exportToPDF()" class="btn-print" style="background-color: #dc2626;"><i class="fas fa-file-pdf"></i> Export PDF (High Res)</button>
+        <button onclick="exportToWord()" class="btn-print" style="background-color: #2563eb;"><i class="fas fa-file-word"></i> Export Word</button>
+        <button onclick="toggleEditLaporan()" class="btn-print" id="btnEditLaporan" style="background-color: #f59e0b;"><i class="fas fa-edit"></i> Edit Data</button>
+        
+        <div id="layoutControlsLaporan" class="no-print" style="display: none; margin-top: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ccc; width: 100%; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <strong style="width: 100%; text-align: center; margin-bottom: 5px;">Geser Tata Letak:</strong>
+            <button type="button" onclick="moveLaporanLayout(0, -10)" class="btn-print" style="padding: 5px 10px; background-color: #475569; width: 45%;"><i class="fas fa-arrow-up"></i> Naik</button>
+            <button type="button" onclick="moveLaporanLayout(0, 10)" class="btn-print" style="padding: 5px 10px; background-color: #475569; width: 45%;"><i class="fas fa-arrow-down"></i> Turun</button>
+            <button type="button" onclick="moveLaporanLayout(-10, 0)" class="btn-print" style="padding: 5px 10px; background-color: #475569; width: 45%;"><i class="fas fa-arrow-left"></i> Kiri</button>
+            <button type="button" onclick="moveLaporanLayout(10, 0)" class="btn-print" style="padding: 5px 10px; background-color: #475569; width: 45%;"><i class="fas fa-arrow-right"></i> Kanan</button>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <div id="previewF4ScaleContainer" style="width: 100%; overflow: hidden; position: relative; display: block;">
+            <div id="previewF4Wrapper" style="width: 21.59cm; height: 33cm; background-color: #ffffff; background-image: url('/images/Template%20Laporan%20dan%20Kwintasi.webp'); background-size: 100% 100%; background-repeat: no-repeat; position: relative; font-family: 'Arial', sans-serif; font-size: 10pt; color: #000; box-sizing: border-box; flex-shrink: 0; overflow: hidden; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <!-- content overlay -->
+                <div id="contentOverlayLaporan" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding-top: 5.5cm; padding-left: 1.5cm; padding-right: 1.5cm; padding-bottom: 2cm; box-sizing: border-box; display: flex; flex-direction: column;">
+                    
+                    <%
+                        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                        let selBulanIdx = bulanQuery ? monthNames.indexOf(bulanQuery) : new Date().getMonth();
+                        if (selBulanIdx === -1 && bulanQuery) {
+                            selBulanIdx = parseInt(bulanQuery) - 1;
+                        }
+                        if (isNaN(selBulanIdx) || selBulanIdx < 0 || selBulanIdx > 11) selBulanIdx = new Date().getMonth();
+                        let namaBulan = monthNames[selBulanIdx];
+                        
+                        function formatDateIndo(dateStr) {
+                            if(!dateStr) return '';
+                            let d = new Date(dateStr);
+                            if(isNaN(d)) return dateStr;
+                            let dd = String(d.getDate()).padStart(2, '0');
+                            let mm = String(d.getMonth() + 1).padStart(2, '0');
+                            let yyyy = d.getFullYear();
+                            return `${dd}/${mm}/${yyyy}`;
+                        }
+                    %>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 12pt; text-transform: uppercase;">LAPORAN KAS KEUANGAN SPMB</h3>
+                        <h4 style="margin: 5px 0 0 0; font-size: 11pt;" id="previewTahunJudul" contenteditable="false" spellcheck="false">TAHUN PELAJARAN <%= (tahunQuery ? tahunQuery : new Date().getFullYear()) %>/<%= parseInt(tahunQuery ? tahunQuery : new Date().getFullYear()) + 1 %></h4>
+                        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 10pt;" id="previewBulanJudul" contenteditable="false" spellcheck="false">Bulan <%= namaBulan %></p>
+                    </div>
+
+                    <table id="previewTable" style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9pt;">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 5%;">NO</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 15%;">TANGGAL</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 40%;">URAIAN</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 15%;">DEBIT</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 15%;">KREDIT</th>
+                                <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 15%;">SALDO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewTbody">
+                            <% 
+                            let saldoAwal = typeof saldoAwalQuery !== 'undefined' ? saldoAwalQuery : 0;
+                            let no = 1;
+                            let runningSaldo = saldoAwal;
+                            let totalDebit = saldoAwal;
+                            let totalKredit = 0;
+                            
+                            let selTahun = tahunQuery ? parseInt(tahunQuery) : new Date().getFullYear();
+                            let prevMonthName = selBulanIdx === 0 ? "Desember" : monthNames[selBulanIdx - 1];
+                            let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
+
+                            function formatRupiah(num) {
+                                if (!num && num !== 0) return '';
+                                return 'Rp ' + parseInt(num).toLocaleString('id-ID');
+                            }
+                            %>
+                            
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: center;" contenteditable="false" spellcheck="false"><%= no++ %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: center;" contenteditable="false" spellcheck="false">01/<%= (selBulanIdx + 1).toString().padStart(2, '0') %>/<%= selTahun %></td>
+                                <td style="border: 1px solid #000; padding: 6px;" contenteditable="false" spellcheck="false">Saldo Bulan <%= prevMonthName %> <%= prevMonthYear %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"><%= formatRupiah(saldoAwal) %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"><%= formatRupiah(saldoAwal) %></td>
+                            </tr>
+
+                            <% 
+                            if(laporan && laporan.length > 0) {
+                                laporan.forEach(item => {
+                                    let pemasukan = item.pemasukan || 0;
+                                    let pengeluaran = item.pengeluaran || 0;
+                                    runningSaldo += (pemasukan - pengeluaran);
+                                    totalDebit += pemasukan;
+                                    totalKredit += pengeluaran;
+
+                                    let uraianText = item.uraian;
+                                    if (pemasukan > 0 && !uraianText.startsWith('Diterima')) uraianText = "Diterima " + uraianText;
+                                    if (pengeluaran > 0 && !uraianText.startsWith('Dikeluarkan')) uraianText = "Dikeluarkan untuk " + uraianText;
+                            %>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: center;" contenteditable="false" spellcheck="false"><%= no++ %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: center;" contenteditable="false" spellcheck="false"><%= formatDateIndo(item.tanggal) %></td>
+                                <td style="border: 1px solid #000; padding: 6px;" contenteditable="false" spellcheck="false"><%= uraianText %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"><%= pemasukan ? formatRupiah(pemasukan) : '' %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"><%= pengeluaran ? formatRupiah(pengeluaran) : '' %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right;" contenteditable="false" spellcheck="false"><%= formatRupiah(runningSaldo) %></td>
+                            </tr>
+                            <%  }) 
+                            } %>
+
+                            <tr>
+                                <td colspan="3" style="border: 1px solid #000; padding: 6px; text-align: center; font-style: italic; font-weight: bold;" contenteditable="false" spellcheck="false">Total Saldo</td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" contenteditable="false" spellcheck="false"><%= formatRupiah(totalDebit) %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" contenteditable="false" spellcheck="false"><%= formatRupiah(totalKredit) %></td>
+                                <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" contenteditable="false" spellcheck="false"><%= formatRupiah(runningSaldo) %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 30px; padding-right: 30px;">
+                        <div style="text-align: center;">
+                            <p style="margin: 0 0 5px 0;">Jakarta, <span id="previewTanggalCetak" contenteditable="false" spellcheck="false"><%= new Date().getDate() %> <%= namaBulan %> <%= tahunQuery || new Date().getFullYear() %></span></p>
+                            
+                            <div class="ttd-container" style="position: relative; display: inline-block;">
+                                <div class="ttd-controls no-print" style="display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #ccc; border-radius: 4px; padding: 2px 5px; white-space: nowrap; z-index: 10;">
+                                    <button type="button" onclick="resizeTtd(this, -10)" title="Perkecil" style="background: none; border: none; cursor: pointer;"><i class="fas fa-search-minus"></i></button>
+                                    <button type="button" onclick="resizeTtd(this, 10)" title="Perbesar" style="background: none; border: none; cursor: pointer;"><i class="fas fa-search-plus"></i></button>
+                                    <button type="button" onclick="moveTtd(this, 0, -10)" title="Naik" style="background: none; border: none; cursor: pointer;"><i class="fas fa-arrow-up"></i></button>
+                                    <button type="button" onclick="moveTtd(this, 0, 10)" title="Turun" style="background: none; border: none; cursor: pointer;"><i class="fas fa-arrow-down"></i></button>
+                                    <button type="button" onclick="moveTtd(this, -10, 0)" title="Kiri" style="background: none; border: none; cursor: pointer;"><i class="fas fa-arrow-left"></i></button>
+                                    <button type="button" onclick="moveTtd(this, 10, 0)" title="Kanan" style="background: none; border: none; cursor: pointer;"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" onclick="deleteTtd(this)" title="Hapus" style="background: none; border: none; cursor: pointer;"><i class="fas fa-trash" style="color:red;"></i></button>
+                                </div>
+                                <img src="/images/TTD Bendahara.webp" alt="Ttd" class="ttd-image" style="width: 120px; display: block; margin: -15px auto -15px auto; position: relative; z-index: 1;">
+                            </div>
+
+                            <p class="signature-name" style="margin: 5px 0 0 0; font-weight: bold;" contenteditable="false" spellcheck="false">Henny Maulida, S.Pd.</p>
+                            <p style="margin: 0;">Bendahara SPMB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SCALING LOGIC ---
+        function adjustPreviewScale() {
+            const container = document.getElementById('previewF4ScaleContainer');
+            const wrapper = document.getElementById('previewF4Wrapper');
+            if (!container || !wrapper) return;
+
+            wrapper.style.transform = 'none';
+            wrapper.style.marginLeft = '0';
+            container.style.height = 'auto';
+
+            const containerWidth = container.offsetWidth;
+            const targetWidth = wrapper.offsetWidth || 816;
+            const targetHeight = wrapper.offsetHeight || 1247;
+
+            if (containerWidth < targetWidth) {
+                const scale = containerWidth / targetWidth;
+                wrapper.style.transform = `scale(${scale})`;
+                wrapper.style.transformOrigin = 'top left';
+                container.style.height = (targetHeight * scale) + 'px';
+                wrapper.style.marginLeft = '0';
+            } else {
+                wrapper.style.transform = 'none';
+                container.style.height = 'auto';
+                const marginLeft = (containerWidth - targetWidth) / 2;
+                wrapper.style.marginLeft = marginLeft + 'px';
+            }
+        }
+
+        window.addEventListener('resize', adjustPreviewScale);
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(adjustPreviewScale, 100);
+        });
+
+        // --- EDIT LOGIC ---
+        let isLaporanEditing = false;
+        let currentLaporanMarginTop = 5.5 * 37.8;
+        let currentLaporanMarginLeft = 1.5 * 37.8;
+
+        function moveLaporanLayout(xPx, yPx) {
+            currentLaporanMarginLeft += xPx;
+            currentLaporanMarginTop += yPx;
+            const overlay = document.getElementById('contentOverlayLaporan');
+            overlay.style.paddingLeft = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingRight = (currentLaporanMarginLeft / 37.8).toFixed(2) + 'cm';
+            overlay.style.paddingTop = (currentLaporanMarginTop / 37.8).toFixed(2) + 'cm';
+        }
+
+        function toggleEditLaporan() {
+            const btnEdit = document.getElementById('btnEditLaporan');
+            const layoutControls = document.getElementById('layoutControlsLaporan');
+            const ttdControls = document.querySelectorAll('.ttd-controls');
+            
+            if (!isLaporanEditing) {
+                isLaporanEditing = true;
+                document.body.classList.add('editable-mode');
+                ttdControls.forEach(el => el.style.display = "block");
+                layoutControls.style.display = "flex";
+                
+                btnEdit.innerHTML = '<i class="fas fa-check"></i> Selesai Edit';
+                btnEdit.style.backgroundColor = '#059669'; 
+                
+                document.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
+            } else {
+                isLaporanEditing = false;
+                document.body.classList.remove('editable-mode');
+                ttdControls.forEach(el => el.style.display = "none");
+                layoutControls.style.display = "none";
+                
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i> Edit Data';
+                btnEdit.style.backgroundColor = '#f59e0b';
+                
+                document.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        let currentTtdWidth = 120;
+        let currentTtdX = 0;
+        let currentTtdY = 0;
+
+        function resizeTtd(btn, changePx) {
+            currentTtdWidth += changePx;
+            if (currentTtdWidth < 50) currentTtdWidth = 50;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.width = currentTtdWidth + 'px';
+        }
+
+        function deleteTtd(btn) {
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.display = 'none';
+        }
+
+        function moveTtd(btn, dx, dy) {
+            currentTtdX += dx;
+            currentTtdY += dy;
+            const img = btn.closest('.ttd-container').querySelector('.ttd-image');
+            if (img) img.style.transform = `translate(calc(-50% + ${currentTtdX}px), calc(-50% + ${currentTtdY}px))`;
+        }
+
+        // --- EXPORT LOGIC ---
+        function exportToPDF() {
+            const element = document.getElementById('previewF4Wrapper');
+            const btn = document.querySelector('button[onclick="exportToPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+
+            // Nonaktifkan edit mode saat export
+            if(isLaporanEditing) toggleEditLaporan();
+
+            const opt = {
+                margin: 0,
+                filename: 'Laporan_Keuangan_SPMB.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'cm', format: [21.59, 33], orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+            });
+        }
+
+        function getBase64Image(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportToWord() {
+            const btn = document.querySelector('button[onclick="exportToWord()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            btn.disabled = true;
+
+            // Nonaktifkan edit mode saat export
+            if(isLaporanEditing) toggleEditLaporan();
+
+            try {
+                const bgDataUrl = await getBase64Image('/images/Template%20Laporan%20dan%20Kwintasi.webp');
+
+                const clone = document.getElementById('previewF4Wrapper').cloneNode(true);
+                const contentStr = clone.innerHTML;
+
+                const html = `
+                <html xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+                xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"></head>
+                <body>
+                <div class="WordSection1">
+                <!--[if gte vml 1]>
+                <v:rect id="bgimg" style="position:absolute;left:0;top:0;width:21.59cm;height:33.0cm;z-index:-1" stroked="f">
+                    <v:fill src="${bgDataUrl}" type="frame"/>
+                </v:rect>
+                <![endif]-->
+                ${contentStr}
+                </div>
+                </body>
+                </html>
+                `;
+
+                const blob = new Blob(['\\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Laporan_Keuangan_SPMB.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error(e);
+                alert('Gagal mengexport ke Word.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

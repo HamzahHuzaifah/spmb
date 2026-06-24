@@ -59,31 +59,40 @@
       function renderStatsTable(stats, groupId, showSantri = true) { 
     %>
         <div class="table-responsive stat-group" data-group="<%= groupId %>">
-            <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 400px;">
+            <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
                 <tr>
-                    <% if(showSantri) { %><th>JML SANTRI</th><% } %>
-                    <th>TOTAL TAGIHAN</th>
-                    <th colspan="2">TOTAL BAYAR</th>
+                    <% if(showSantri) { %>
+                        <th style="width: 22%; text-align: center;">JML SANTRI</th>
+                        <th style="width: 28%; text-align: center;">TOTAL TAGIHAN</th>
+                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL BAYAR</th>
+                    <% } else { %>
+                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL TAGIHAN</th>
+                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL BAYAR</th>
+                    <% } %>
                 </tr>
                 <tr>
                     <% if(showSantri) { %>
                         <td class="text-center val-santri" data-original="<%= stats.jumlahSantri %>"><%= stats.jumlahSantri %></td>
+                        <td class="text-center val-tagihan" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
+                        <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
+                        <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
+                    <% } else { %>
+                        <td class="text-center val-tagihan" colspan="2" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
+                        <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
+                        <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
                     <% } %>
-                    <td class="text-center val-tagihan" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
-                    <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
-                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
                 </tr>
                 <tr>
-                    <th colspan="<%= showSantri ? 2 : 2 %>">TUNGGAKAN</th>
-                    <th colspan="<%= showSantri ? 2 : 2 %>">PENGELUARAN</th>
+                    <th colspan="2" style="width: 50%; text-align: center;">TUNGGAKAN</th>
+                    <th colspan="2" style="width: 50%; text-align: center;">PENGELUARAN</th>
                 </tr>
                 <tr>
-                    <td class="text-center val-tunggakan" colspan="<%= showSantri ? 2 : 2 %>" data-original="<%= stats.tunggakan %>">Rp <%= stats.tunggakan.toLocaleString('id-ID') %></td>
+                    <td class="text-center val-tunggakan" colspan="2" data-original="<%= stats.tunggakan %>">Rp <%= stats.tunggakan.toLocaleString('id-ID') %></td>
                     <td class="text-center text-danger val-persen-tunggakan" style="display: none;"><%= stats.persenTunggakan %></td>
-                    <td class="text-center val-pengeluaran" colspan="<%= showSantri ? 2 : 2 %>" data-original="<%= stats.pengeluaran %>">Rp <%= stats.pengeluaran.toLocaleString('id-ID') %></td>
+                    <td class="text-center val-pengeluaran" colspan="2" data-original="<%= stats.pengeluaran %>">Rp <%= stats.pengeluaran.toLocaleString('id-ID') %></td>
                 </tr>
-                <tr><th colspan="<%= showSantri ? 4 : 4 %>" class="text-center">SALDO</th></tr>
-                <tr><td colspan="<%= showSantri ? 4 : 4 %>" class="text-center font-weight-bold val-saldo" data-original="<%= stats.saldo %>">Rp <%= stats.saldo.toLocaleString('id-ID') %></td></tr>
+                <tr><th colspan="4" class="text-center">SALDO</th></tr>
+                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="<%= stats.saldo %>">Rp <%= stats.saldo.toLocaleString('id-ID') %></td></tr>
             </table>
         </div>
     <% } %>
@@ -252,20 +261,20 @@
             <div class="card h-100">
                 <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
                 <div class="table-responsive stat-group" data-group="pengeluaran-global">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
                         <tr>
-                            <th>MADRASAH (UMUM)</th>
-                            <th>PAUDQu</th>
-                            <th>TPQ</th>
-                            <th>MDT</th>
-                            <th style="color: var(--danger);">TOTAL PENGELUARAN</th>
+                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">MADRASAH (UMUM)</th>
+                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">PAUDQu</th>
+                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TPQ</th>
+                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">MDT</th>
+                            <th style="width: 32%; text-align: center; color: var(--danger); white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
                         </tr>
                         <tr>
                             <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
                             <td class="text-center val-pengeluaran-unit" id="valPengeluaranPAUDQu" data-original="<%= dashboardStats.pengeluaranRekap.PAUDQu %>">Rp <%= dashboardStats.pengeluaranRekap.PAUDQu.toLocaleString('id-ID') %></td>
                             <td class="text-center val-pengeluaran-unit" id="valPengeluaranTPQ" data-original="<%= dashboardStats.pengeluaranRekap.TPQ %>">Rp <%= dashboardStats.pengeluaranRekap.TPQ.toLocaleString('id-ID') %></td>
                             <td class="text-center val-pengeluaran-unit" id="valPengeluaranMDT" data-original="<%= dashboardStats.pengeluaranRekap.MDT %>">Rp <%= dashboardStats.pengeluaranRekap.MDT.toLocaleString('id-ID') %></td>
-                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 16px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
+                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 14px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
                         </tr>
                     </table>
                 </div>
@@ -277,11 +286,11 @@
             <div class="card h-100">
                 <div class="card-header"><i class="fas fa-handshake mr-2"></i> STATUS SUBSIDI SPP BEASISWA (ZISWAF JIC)</div>
                 <div class="table-responsive stat-group" data-group="ziswaf-subsidy">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
                         <tr>
-                            <th>SANTRI BARU</th>
-                            <th>DAFTAR ULANG</th>
-                            <th>TOTAL SANTRI</th>
+                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">SANTRI BARU</th>
+                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">DAFTAR ULANG</th>
+                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TOTAL SANTRI</th>
                         </tr>
                         <tr>
                             <td class="text-center val-ziswaf-baru" data-original="<%= dashboardStats.ziswafStats.santriBaru %>"><%= dashboardStats.ziswafStats.santriBaru %></td>
@@ -289,9 +298,9 @@
                             <td class="text-center font-weight-bold val-ziswaf-total-santri" data-original="<%= dashboardStats.ziswafStats.totalSantri %>"><%= dashboardStats.ziswafStats.totalSantri %></td>
                         </tr>
                         <tr>
-                            <th>TARGET DANA</th>
-                            <th>REALISASI BAYAR</th>
-                            <th style="color: var(--danger);">SISA TUNGGAKAN</th>
+                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TARGET DANA</th>
+                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">REALISASI BAYAR</th>
+                            <th style="width: 33.33%; text-align: center; color: var(--danger); white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">SISA TUNGGAKAN</th>
                         </tr>
                         <tr>
                             <td class="text-center val-ziswaf-target" data-original="<%= dashboardStats.ziswafStats.targetDana %>">Rp <%= dashboardStats.ziswafStats.targetDana.toLocaleString('id-ID') %></td>

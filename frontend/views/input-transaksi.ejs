@@ -7,13 +7,12 @@
         </div>
 
         <form action="/input-transaksi" method="POST" id="formTransaksi" onsubmit="handleAjaxSubmitGlobal(event, this)">
-            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-                
-                <div style="flex: 1;">
+            <div class="row" style="margin-bottom: 10px;">
+                <div class="col-md-6 mb-3">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Transaksi</label>
                     <input type="date" name="tanggal" id="tanggal" class="form-control" style="width: 100%;" required>
                 </div>
-                <div style="flex: 1;">
+                <div class="col-md-6 mb-3">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jenis Transaksi</label>
                     <select name="jenisTransaksi" id="jenisTransaksi" class="form-control" style="width: 100%;" required
                         onchange="handleJenisTransaksi()">
@@ -113,13 +112,13 @@
 
             <!-- Nominal dan Metode (Selalu Muncul kecuali jika jenis blm dipilih) -->
             <div id="sec-nominal" style="display: none;">
-                <div style="display: flex; gap: 20px;">
-                    <div style="flex: 1;">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jumlah Nominal (Rp)</label>
                         <input type="number" id="inputNominalTotal" name="nominal" class="form-control"
                             style="width: 100%; font-size: 18px; font-weight: bold; padding: 15px;" placeholder="0" required>
                     </div>
-                    <div style="flex: 1;">
+                    <div class="col-md-6 mb-3">
                         <label style="display: block; margin-bottom: 8px; font-weight: 600;">Metode Pembayaran</label>
                         <select name="metodePembayaran" class="form-control" style="width: 100%; font-size: 16px; padding: 15px;" required>
                             <option value="Cash">Cash</option>
@@ -138,25 +137,27 @@
     </div>
 
     
-    <form method="GET" action="/input-transaksi" class="filter-bar" style="margin-top: 30px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        <input type="text" name="search" class="form-control" placeholder="Cari Nama Santri atau No Transaksi..." style="width: 250px;" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
-        
-        <label style="font-weight: 600; margin-left: 10px;">Dari Tanggal:</label>
-        <input type="date" name="startDate" class="form-control" style="width: 140px;" value="<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>">
-        
-        <label style="font-weight: 600; margin-left: 10px;">Sampai Tanggal:</label>
-        <input type="date" name="endDate" class="form-control" style="width: 140px;" value="<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>">
+    <div class="filter-bar" style="margin-top: 30px;">
+        <form method="GET" action="/input-transaksi" class="filter-form">
+            <input type="text" name="search" class="form-control filter-search" placeholder="Cari Nama Santri atau No Transaksi..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+            
+            <label style="font-weight: 600;">Dari Tanggal:</label>
+            <input type="date" name="startDate" class="form-control filter-date" value="<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>">
+            
+            <label style="font-weight: 600;">Sampai Tanggal:</label>
+            <input type="date" name="endDate" class="form-control filter-date" value="<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>">
 
-        <select name="pendidikan" class="form-control" style="width: 180px;">
-            <option value="">Semua Pendidikan</option>
-            <option value="PAUDQu" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'PAUDQu' ? 'selected' : '' %>>PAUDQu</option>
-            <option value="TPQ" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ' ? 'selected' : '' %>>TPQ</option>
-            <option value="MDT" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT' ? 'selected' : '' %>>MDT</option>
-        </select>
-        
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/input-transaksi" class="btn btn-secondary">Reset</a>
-    </form>
+            <select name="pendidikan" class="form-control filter-select">
+                <option value="">Semua Pendidikan</option>
+                <option value="PAUDQu" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'PAUDQu' ? 'selected' : '' %>>PAUDQu</option>
+                <option value="TPQ" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ' ? 'selected' : '' %>>TPQ</option>
+                <option value="MDT" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT' ? 'selected' : '' %>>MDT</option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary btn-submit-filter">Filter</button>
+            <a href="/input-transaksi" class="btn btn-secondary btn-reset-filter">Reset</a>
+        </form>
+    </div>
 
 
     <div class="table-container">
@@ -201,8 +202,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="/kwitansi/<%= trx.id %>" class="btn btn-secondary"
-                                    style="padding: 5px 10px; font-size: 12px;">Cetak</a>
+                                <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px; cursor: pointer; border: none; border-radius: 4px;" onclick="openKwitansiModal(<%= trx.id %>)">Cetak</button>
                                 <button type="button" class="btn btn-warning" style="padding: 5px 10px; font-size: 12px; background-color: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openEditModal(<%= trx.id %>, '<%= trx.tanggal %>', <%= trx.nominal %>, '<%= trx.metodePembayaran %>')">Edit</button>
                                 <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openDeleteModal('/input-transaksi/delete/<%= trx.id %>')">Hapus</button>
                             </td>
@@ -334,6 +334,29 @@
         </script>
 
     <% } %>
+
+    <!-- Kwitansi Modal (Iframe) -->
+    <div id="kwitansiModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px; padding: 0; position: relative; height: 90vh; display: flex; flex-direction: column;">
+            <div style="background-color: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;">
+                <h3 style="margin: 0; color: var(--primary);"><i class="fas fa-file-invoice-dollar"></i> Preview Kwitansi</h3>
+                <button type="button" onclick="closeKwitansiModal()" class="btn btn-danger" style="padding: 8px 15px; border-radius: 4px; background-color: #dc3545; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold;"><i class="fas fa-times"></i> Tutup</button>
+            </div>
+            <div style="flex: 1; padding: 0; background-color: #e5e7eb;">
+                <iframe id="kwitansiIframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 0 0 8px 8px;"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openKwitansiModal(trxId) {
+            document.getElementById('kwitansiIframe').src = '/kwitansi/' + trxId;
+            document.getElementById('kwitansiModal').style.display = 'block';
+        }
+        function closeKwitansiModal() {
+            document.getElementById('kwitansiModal').style.display = 'none';
+            document.getElementById('kwitansiIframe').src = '';
+        }
+    </script>
 
     <script src="/js/input-transaksi.js?v=6"></script>
 <%- include('partials/footer') %>

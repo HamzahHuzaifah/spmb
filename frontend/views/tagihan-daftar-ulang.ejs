@@ -1,24 +1,29 @@
 <%- include('partials/header', { title: 'Tagihan Daftar Ulang', activePage: 'tagihan-daftar-ulang' }) %><link rel="stylesheet" href="/css/tagihan-daftar-ulang.css">
-<form method="GET" action="/tagihan-daftar-ulang" class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-    <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari Nama Santri..." style="width: 250px;" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
-    <select name="pendidikan" id="satuanInput" class="form-control" style="width: 200px;">
-        <option value="">Semua Pendidikan</option>
-        <option value="PAUDQu B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'PAUDQu B' ? 'selected' : '' %>>PAUDQu B</option>
-        <option value="TPQ A" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ A' ? 'selected' : '' %>>TPQ A</option>
-        <option value="TPQ B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ B' ? 'selected' : '' %>>TPQ B</option>
-        <option value="MDT 1" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 1' ? 'selected' : '' %>>MDT 1</option>
-        <option value="MDT 2" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 2' ? 'selected' : '' %>>MDT 2</option>
-        <option value="MDT 3" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 3' ? 'selected' : '' %>>MDT 3</option>
-        <option value="MDT 4" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 4' ? 'selected' : '' %>>MDT 4</option>
-    </select>
-    <button type="submit" class="btn btn-primary">Cari & Filter</button>
-    <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof pendidikanQuery !== 'undefined' && pendidikanQuery)) { %>
-        <a href="/tagihan-daftar-ulang" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
-    <% } %>
-    <button type="button" class="btn btn-secondary btn-print" onclick="window.print()" style="margin-left: auto;">
-        <i class="fas fa-print"></i> Cetak Tabel
-    </button>
-</form>
+<div class="filter-bar">
+    <form method="GET" action="/tagihan-daftar-ulang" class="filter-form">
+        <input type="text" name="search" id="searchInput" class="form-control filter-search" placeholder="Cari Nama Santri..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <select name="pendidikan" id="satuanInput" class="form-control filter-select">
+            <option value="">Semua Pendidikan</option>
+            <option value="PAUDQu B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'PAUDQu B' ? 'selected' : '' %>>PAUDQu B</option>
+            <option value="TPQ A" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ A' ? 'selected' : '' %>>TPQ A</option>
+            <option value="TPQ B" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'TPQ B' ? 'selected' : '' %>>TPQ B</option>
+            <option value="MDT 1" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 1' ? 'selected' : '' %>>MDT 1</option>
+            <option value="MDT 2" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 2' ? 'selected' : '' %>>MDT 2</option>
+            <option value="MDT 3" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 3' ? 'selected' : '' %>>MDT 3</option>
+            <option value="MDT 4" <%= typeof pendidikanQuery !== 'undefined' && pendidikanQuery === 'MDT 4' ? 'selected' : '' %>>MDT 4</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-submit-filter">Cari & Filter</button>
+        <% if ((typeof searchQuery !== 'undefined' && searchQuery) || (typeof pendidikanQuery !== 'undefined' && pendidikanQuery)) { %>
+            <a href="/tagihan-daftar-ulang" class="btn btn-secondary btn-reset-filter" style="text-decoration: none;">Reset</a>
+        <% } %>
+    </form>
+
+    <div class="filter-actions">
+        <button type="button" class="btn btn-secondary btn-print" onclick="window.print()">
+            <i class="fas fa-print"></i> Cetak Tabel
+        </button>
+    </div>
+</div>
 
 <div class="table-container">
     <div class="table-header">

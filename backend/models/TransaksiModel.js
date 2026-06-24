@@ -109,8 +109,8 @@ class TransaksiModel {
         const values = [
             data.tanggal !== undefined ? data.tanggal : null, data.noTransaksi !== undefined ? data.noTransaksi : null, data.namaSantri !== undefined ? data.namaSantri : null, data.jenis !== undefined ? data.jenis : null, data.nominal !== undefined ? data.nominal : null, data.satuanPendidikan !== undefined ? data.satuanPendidikan : null,
             data.metodePembayaran !== undefined ? data.metodePembayaran : null, data.dibayarkanKepada !== undefined ? data.dibayarkanKepada : null, data.kategoriDana !== undefined ? data.kategoriDana : null, 
-            data.rincianNames ? JSON.stringify(data.rincianNames) : null, 
-            data.rincianNominals ? JSON.stringify(data.rincianNominals) : null, 
+            data.rincianNames !== undefined ? (typeof data.rincianNames === 'string' ? data.rincianNames : JSON.stringify(data.rincianNames)) : null, 
+            data.rincianNominals !== undefined ? (typeof data.rincianNominals === 'string' ? data.rincianNominals : JSON.stringify(data.rincianNominals)) : null, 
             data.diterimaDari !== undefined ? data.diterimaDari : null, data.namaPemberi !== undefined ? data.namaPemberi : null,
             id
         ];
@@ -157,7 +157,7 @@ class TransaksiModel {
             params.push(filterTahun);
         }
 
-        query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+        query += ' ORDER BY tanggal ASC, id ASC LIMIT ? OFFSET ?';
         params.push(limit.toString(), offset.toString());
 
         const [rows] = await db.execute(query, params);
@@ -185,6 +185,16 @@ class TransaksiModel {
 
         const [rows] = await db.execute(query, params);
         return rows[0].total;
+    }
+
+    static async getSaldoAwalLaporan(filterBulan, filterTahun) {
+        const query = `
+            SELECT SUM(pemasukan - pengeluaran) as saldoAwal 
+            FROM laporan 
+            WHERE (tahun < ?) OR (tahun = ? AND bulan < ?)
+        `;
+        const [rows] = await db.execute(query, [filterTahun, filterTahun, filterBulan]);
+        return rows[0].saldoAwal || 0;
     }
 
     static async getLaporanByNoTransaksi(noTransaksi) {
@@ -240,26 +250,37 @@ class TransaksiModel {
 
     // ---- Dashboard Aggregations (Untuk Kinerja SQL yang Optimal) ----
     
-    // Total Pemasukan Global (Semua Transaksi Jenis Pemasukan)
-    static async getTotalPemasukanGlobal() {
-        const [rows] = await db.execute('SELECT SUM(nominal) as total FROM transaksi WHERE jenis = "Pemasukan"');
-        return rows[0].total || 0;
+    // Total Pemasukan Global (Semua Transaksi Jenis Pemasukan / Inflows)
+    static async getTotalPemasukanGlobal(filterTanggal) {
+        let query = 'SELECT SUM(nominal) as total FROM transaksi WHERE jenis != "Pengeluaran"';
+        let params = [];
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+        const [rows] = await db.execute(query, params);
+        return parseInt(rows[0].total) || 0;
     }
 
     // Realisasi Ziswaf (Pemasukan yang namaSantri atau uraian mengandung kata 'ziswaf')
-    static async getRealisasiZiswafGlobal() {
-        const query = `
+    static async getRealisasiZiswafGlobal(filterTanggal) {
+        let query = `
             SELECT SUM(nominal) as total 
             FROM transaksi 
             WHERE jenis = 'Pemasukan' 
             AND LOWER(namaSantri) LIKE '%ziswaf%'
         `;
-        const [rows] = await db.execute(query);
-        return rows[0].total || 0;
+        let params = [];
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+        const [rows] = await db.execute(query, params);
+        return parseInt(rows[0].total) || 0;
     }
 
     // Mendapatkan realisasi Ziswaf per satuan pendidikan (PAUDQu, TPQ, MDT), dipisah Baru dan Lama
-    static async getRealisasiZiswafByUnit(satuanPendidikan, isBaru) {
+    static async getRealisasiZiswafByUnit(satuanPendidikan, isBaru, filterTanggal) {
         let query = `
             SELECT SUM(nominal) as total 
             FROM transaksi 
@@ -267,6 +288,7 @@ class TransaksiModel {
             AND satuanPendidikan = ? 
             AND LOWER(namaSantri) LIKE '%ziswaf%'
         `;
+        let params = [satuanPendidikan];
         
         if (isBaru) {
             // Baru: TIDAK mengandung kata daftar ulang, lama, du
@@ -280,19 +302,54 @@ class TransaksiModel {
                        OR LOWER(namaSantri) LIKE '%du%')`;
         }
 
-        const [rows] = await db.execute(query, [satuanPendidikan]);
-        return rows[0].total || 0;
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+
+        const [rows] = await db.execute(query, params);
+        return parseInt(rows[0].total) || 0;
+    }
+
+    // Mendapatkan realisasi Bayar non-Ziswaf per satuan pendidikan, dipisah Baru dan Lama
+    static async getRealisasiBayarByUnit(satuanPendidikan, isBaru, filterTanggal) {
+        let query = `
+            SELECT SUM(nominal) as total 
+            FROM transaksi 
+            WHERE satuanPendidikan = ?
+        `;
+        let params = [satuanPendidikan];
+        
+        if (isBaru) {
+            query += ` AND jenis = 'Pembayaran Pendaftaran Baru'`;
+        } else {
+            query += ` AND jenis = 'Pembayaran Daftar Ulang'`;
+        }
+
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+
+        const [rows] = await db.execute(query, params);
+        return parseInt(rows[0].total) || 0;
     }
 
     // Mendapatkan Pengeluaran per Unit (PAUDQu, TPQ, MDT, MADRASAH)
-    static async getPengeluaranRekap() {
-        const query = `
+    static async getPengeluaranRekap(filterTanggal) {
+        let query = `
             SELECT satuanPendidikan, SUM(nominal) as total
             FROM transaksi
             WHERE jenis = 'Pengeluaran'
-            GROUP BY satuanPendidikan
         `;
-        const [rows] = await db.execute(query);
+        let params = [];
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+        query += ' GROUP BY satuanPendidikan';
+        
+        const [rows] = await db.execute(query, params);
         let result = { MADRASAH: 0, PAUDQu: 0, TPQ: 0, MDT: 0, TOTAL: 0 };
         
         rows.forEach(row => {
@@ -306,6 +363,25 @@ class TransaksiModel {
         });
         
         return result;
+    }
+
+    // Mendapatkan Pengeluaran per Unit secara spesifik
+    static async getPengeluaranByUnit(satuanPendidikan, filterTanggal) {
+        let query = `
+            SELECT SUM(nominal) as total 
+            FROM transaksi 
+            WHERE jenis = 'Pengeluaran' 
+            AND satuanPendidikan = ?
+        `;
+        let params = [satuanPendidikan];
+        
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+
+        const [rows] = await db.execute(query, params);
+        return parseInt(rows[0].total) || 0;
     }
 }
 
