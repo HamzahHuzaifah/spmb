@@ -1,3 +1,8 @@
+@page {
+    size: 21.59cm 33cm;
+    margin: 0;
+}
+
 body { background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
 .action-buttons { position: sticky; top: 0; z-index: 100; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; gap: 10px; }
 .btn-print { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background-color: #059669; transition: all 0.2s; }
@@ -49,5 +54,11 @@ body { background: #f0f2f5; display: flex; flex-direction: column; align-items: 
     body { background: transparent; padding: 0; margin: 0; }
     .page-wrapper { display: block; }
     #previewF4ScaleContainer { height: auto !important; }
-    #previewF4Wrapper { margin: 0 !important; box-shadow: none !important; transform: none !important; }
+    #previewF4Wrapper { 
+        margin: 0 !important; 
+        box-shadow: none !important; 
+        transform: none !important; 
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }

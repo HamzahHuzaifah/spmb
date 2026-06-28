@@ -206,7 +206,9 @@
 
         @media print {
             body {
-                background-color: #ffffff;
+                background-color: transparent;
+                padding: 0;
+                margin: 0;
             }
             .page-wrapper {
                 margin: 0;
