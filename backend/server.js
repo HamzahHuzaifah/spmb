@@ -59,3 +59,11 @@ app.listen(PORT, () => {
     logger.info(`Server berjalan di http://localhost:${PORT}`);
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
+
+// Cari baris port Anda, ubah menjadi seperti ini:
+const PORT = process.env.PORT || 5000;
+
+// Pastikan bagian listen menggunakan variabel PORT tersebut:
+app.listen(PORT, () => {
+    console.log(`Server berjalan di port ${PORT}`);
+});
