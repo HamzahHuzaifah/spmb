@@ -59,3 +59,4 @@ app.listen(PORT, () => {
     logger.info(`Server berjalan di http://localhost:${PORT}`);
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
+
