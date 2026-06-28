@@ -13727,3 +13727,25 @@
 {"level":"info","message":"\u001b[0mGET /js/global.js?v=3 \u001b[32m200\u001b[0m 22.237 ms - 18000\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 12:35:34"}
 {"level":"info","message":"\u001b[0mGET /favicon.ico \u001b[36m302\u001b[0m 11.039 ms - 28\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 12:35:35"}
 {"level":"info","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 5.863 ms - 2291\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 12:35:35"}
+{"level":"info","message":"\u001b[0mGET / \u001b[32m200\u001b[0m 18.396 ms - 8179\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:50"}
+{"level":"info","message":"\u001b[0mGET /css/style.css \u001b[32m200\u001b[0m 14.704 ms - 31273\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:50"}
+{"level":"info","message":"\u001b[0mGET /css/style-public.css \u001b[32m200\u001b[0m 20.527 ms - 9403\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:50"}
+{"level":"info","message":"\u001b[0mGET /js/global.js?v=3 \u001b[32m200\u001b[0m 25.111 ms - 18000\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:50"}
+{"level":"info","message":"\u001b[0mGET /favicon.ico \u001b[36m302\u001b[0m 3.444 ms - 28\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:51"}
+{"level":"info","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 10.236 ms - 2291\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:51"}
+{"level":"info","message":"\u001b[0mGET /login \u001b[36m304\u001b[0m 11.313 ms - -\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:58"}
+{"level":"info","message":"\u001b[0mGET /css/admin-login.css \u001b[32m200\u001b[0m 6.912 ms - 3971\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:58"}
+{"level":"info","message":"\u001b[0mGET /js/admin-login.js \u001b[32m200\u001b[0m 8.537 ms - 1059\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:58"}
+{"level":"info","message":"\u001b[0mGET /favicon.ico \u001b[36m302\u001b[0m 8.121 ms - 28\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:59"}
+{"level":"info","message":"\u001b[0mGET /login \u001b[36m304\u001b[0m 3.564 ms - -\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:30:59"}
+{"level":"info","message":"\u001b[0mPOST /login \u001b[36m302\u001b[0m 344.241 ms - 39\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:03"}
+{"level":"info","message":"\u001b[0mGET /dashboard \u001b[32m200\u001b[0m 225.449 ms - 50847\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:04"}
+{"level":"info","message":"\u001b[0mGET /css/style.css?v=2 \u001b[32m200\u001b[0m 1.393 ms - 31273\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:04"}
+{"level":"info","message":"\u001b[0mGET /js/global.js?v=4 \u001b[32m200\u001b[0m 1.904 ms - 18000\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:04"}
+{"level":"info","message":"\u001b[0mGET /js/dashboard.js \u001b[32m200\u001b[0m 4.718 ms - 85\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:04"}
+{"level":"info","message":"\u001b[0mGET /favicon.ico \u001b[33m404\u001b[0m 4.930 ms - 150\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:04"}
+{"level":"info","message":"\u001b[0mGET /logout \u001b[36m302\u001b[0m 1.828 ms - 35\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:06"}
+{"level":"info","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 1.978 ms - 2291\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:06"}
+{"level":"info","message":"\u001b[0mGET /css/admin-login.css \u001b[36m304\u001b[0m 9.503 ms - -\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:06"}
+{"level":"info","message":"\u001b[0mGET /js/admin-login.js \u001b[36m304\u001b[0m 6.917 ms - -\u001b[0m","service":"spmb-web-app","timestamp":"2026-06-28 13:31:06"}
+{"level":"info","message":"Server berjalan di http://localhost:5000","service":"spmb-web-app","timestamp":"2026-06-28 14:04:46"}
