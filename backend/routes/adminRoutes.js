@@ -63,6 +63,11 @@ router.post('/input-transaksi/delete/:id', transaksiController.deleteTransaksi);
 
 // API AJAX
 router.get('/api/search-santri', transaksiController.apiSearchTunggakan);
+router.put('/api/admin/profile', authController.updateProfile);
+router.post('/api/admin/add', authController.addAdmin);
+router.get('/api/admin/list', authController.getAdminList);
+router.put('/api/admin/edit/:id', authController.editAdmin);
+router.delete('/api/admin/delete/:id', authController.deleteAdmin);
 
 // Kwitansi
 router.get('/kwitansi/:id', kwitansiController.getKwitansi);

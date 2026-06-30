@@ -62,40 +62,7 @@
             background-color: #138496;
         }
 
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            #santriModal,
-            #santriModal * {
-                visibility: visible;
-            }
-
-            #santriModal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: transparent;
-                margin: 0;
-                padding: 0;
-            }
-
-            .modal-content {
-                width: 100%;
-                margin: 0;
-                border: none;
-                box-shadow: none;
-            }
-
-            .close-modal,
-            .btn-print,
-            .btn-submit,
-            .modal-footer {
-                display: none !important;
-            }
-        }
+        
 
         .modal-grid {
             display: grid;
@@ -273,3 +240,128 @@
         .radio-label input[type="radio"], .radio-label input[type="checkbox"] {
             margin-top: 3px;
         }
+
+.print-only {
+    display: none;
+}
+
+@page {
+    size: 21.59cm 33cm;
+    margin: 0;
+}
+
+@media print {
+    .sidebar, 
+    .topbar, 
+    .filter-bar, 
+    .table-container, 
+    .modal, 
+    .no-print,
+    #pageLoader {
+        display: none !important;
+    }
+
+    .app-container,
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+    }
+
+    #printDetailArea {
+        display: block !important;
+        width: 21.59cm;
+        height: 33cm;
+        position: relative;
+        box-sizing: border-box;
+        padding: 6.5cm 2.2cm 2.5cm 2.2cm !important;
+        font-family: 'Arial', sans-serif;
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.4;
+        margin: 0 auto;
+        background-image: url('/images/Template%20Laporan%20dan%20Kwintasi.webp') !important;
+        background-size: 100% 100% !important;
+        background-repeat: no-repeat !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .print-kop-surat,
+    .print-divider {
+        display: none !important;
+    }
+
+    .print-document-title {
+        font-size: 14pt;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: underline;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .print-section-title {
+        font-size: 11pt;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 8px;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 3px;
+        width: 100%;
+    }
+
+    .print-data-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 15px !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .print-data-table tr {
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .print-data-table td {
+        padding: 4px 5px !important;
+        vertical-align: top !important;
+        border: none !important;
+        font-size: 10.5pt !important;
+        background: transparent !important;
+    }
+
+    .print-data-table td:first-child {
+        width: 30% !important;
+    }
+
+    .print-data-table td:nth-child(2) {
+        width: 3% !important;
+        text-align: center !important;
+    }
+
+    .print-data-table td:last-child {
+        border-bottom: 1px dotted #000 !important;
+        font-weight: bold !important;
+        background: transparent !important;
+    }
+
+    .print-footer-signatures {
+        margin-top: 30px !important;
+        width: 100% !important;
+        page-break-inside: avoid !important;
+    }
+
+    .signature-box {
+        width: 40% !important;
+        text-align: center !important;
+    }
+
+    .signature-box p {
+        margin: 2px 0 !important;
+    }
+}

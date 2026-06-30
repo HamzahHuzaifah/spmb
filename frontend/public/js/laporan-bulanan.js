@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- EDIT LOGIC ---
 let isLaporanEditing = false;
-let currentLaporanMarginTop = 5.5 * 37.8;
+let currentLaporanMarginTop = 3.5 * 37.8;
 let currentLaporanMarginLeft = 1.5 * 37.8;
 
 function moveLaporanLayout(xPx, yPx) {
@@ -42,9 +42,13 @@ function moveLaporanLayout(xPx, yPx) {
 
     const overlay = document.getElementById('contentOverlayLaporan');
     if (overlay) {
-        overlay.style.paddingTop = currentLaporanMarginTop + 'px';
         overlay.style.paddingLeft = currentLaporanMarginLeft + 'px';
         overlay.style.paddingRight = currentLaporanMarginLeft + 'px';
+    }
+    
+    const spacer = document.getElementById('printSpacerTop');
+    if (spacer) {
+        spacer.style.height = currentLaporanMarginTop + 'px';
     }
 }
 

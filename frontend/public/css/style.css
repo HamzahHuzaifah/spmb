@@ -1329,4 +1329,6 @@ input[type="date"].flatpickr-input {
 }
 .hidden { display: none !important; }
 
-.hidden { display: none !important; }
+.swal2-container {
+    z-index: 999999 !important;
+}

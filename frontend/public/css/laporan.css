@@ -49,10 +49,47 @@ body { background: #f0f2f5; display: flex; flex-direction: column; align-items: 
     word-wrap: break-word !important;
 }
 
+.print-bg-layer { display: none; }
+.top-spacer { height: 0; }
+.print-only-layout { display: none; }
+.signatures-container {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+}
+
 @media print {
     .no-print { display: none !important; }
     body { background: transparent; padding: 0; margin: 0; }
     .page-wrapper { display: block; }
+    
+    thead.print-only-layout {
+        display: table-header-group !important;
+    }
+    tfoot.print-only-layout {
+        display: table-footer-group !important;
+    }
+    
+    .print-bg-layer {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 21.59cm;
+        height: 33cm;
+        z-index: -1;
+        object-fit: fill;
+    }
+
+    .top-spacer {
+        display: block !important;
+        height: 3.5cm !important;
+    }
+
+    #contentOverlayLaporan {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
     #previewF4ScaleContainer { height: auto !important; }
     #previewF4Wrapper { 
         margin: 0 !important; 
@@ -60,5 +97,9 @@ body { background: #f0f2f5; display: flex; flex-direction: column; align-items: 
         transform: none !important; 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        background-image: none !important;
+        background-color: transparent !important;
+        height: auto !important;
+        min-height: 33cm !important;
     }
 }

@@ -232,7 +232,7 @@ class TransaksiModel {
             WHERE (tahun < ?) OR (tahun = ? AND bulan < ?)
         `;
         const [rows] = await db.execute(query, [filterTahun, filterTahun, filterBulan]);
-        return rows[0].saldoAwal || 0;
+        return Number(rows[0].saldoAwal) || 0;
     }
 
     static async getLaporanByNoTransaksi(noTransaksi) {

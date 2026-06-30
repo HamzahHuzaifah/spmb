@@ -18,14 +18,14 @@ exports.getLaporan = async (req, res) => {
 
         let saldoAwal = 0;
         if (filterBulan && filterTahun) {
-            saldoAwal = await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun);
+            saldoAwal = Number(await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun)) || 0;
         }
 
         // Tambahkan selisih pemasukan-pengeluaran dari data yang di-skip karena pagination
         if (offset > 0) {
             const skippedData = await TransaksiModel.getLaporanPaginated(offset, 0, search, filterBulan, filterTahun);
             skippedData.forEach(item => {
-                saldoAwal += ((item.pemasukan || 0) - (item.pengeluaran || 0));
+                saldoAwal += ((Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0));
             });
         }
 
@@ -59,7 +59,7 @@ exports.getLaporanBulanan = async (req, res) => {
         
         let saldoAwal = 0;
         if (filterBulan && filterTahun) {
-            saldoAwal = await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun);
+            saldoAwal = Number(await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun)) || 0;
         }
 
         res.render('laporan-bulanan', { 
@@ -87,11 +87,11 @@ exports.exportLaporanExcel = async (req, res) => {
         
         let saldoAwal = 0;
         if (filterBulan && filterTahun) {
-            saldoAwal = await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun);
+            saldoAwal = Number(await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun)) || 0;
         }
 
         const dataToExport = [];
-        let saldo = saldoAwal;
+        let saldo = Number(saldoAwal);
 
         // If specific month/year is requested, add an initial row for the starting balance
         if (filterBulan && filterTahun) {
@@ -114,14 +114,14 @@ exports.exportLaporanExcel = async (req, res) => {
 
         let no = 1;
         fullLaporanData.forEach(item => {
-            saldo = saldo + item.pemasukan - item.pengeluaran;
+            saldo = Number(saldo) + (Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0);
             dataToExport.push({
                 'No': no++,
                 'Tanggal': item.tanggal,
                 'Uraian': item.uraian,
                 'No. Transaksi': item.noTransaksi,
-                'Pemasukan': item.pemasukan,
-                'Pengeluaran': item.pengeluaran,
+                'Pemasukan': Number(item.pemasukan) || 0,
+                'Pengeluaran': Number(item.pengeluaran) || 0,
                 'Saldo Akhir': saldo
             });
         });

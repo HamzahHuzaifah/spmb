@@ -57,6 +57,48 @@
             document.getElementById('editSantriForm').action = '/santri-daftar-ulang/edit/' + data.id;
 
             document.getElementById('santriModal').style.display = 'block';
+
+            // Populate print area
+            document.getElementById('p_nomorPendaftaran').innerText = data.nomorPendaftaran || '-';
+            document.getElementById('p_email').innerText = data.email || '-';
+            document.getElementById('p_jalurPendaftaran').innerText = data.jalurPendaftaran || 'Reguler';
+            document.getElementById('p_unitSebelumnya').innerText = data.unitSebelumnya || '-';
+            document.getElementById('p_lanjutKe').innerText = data.lanjutKe || '-';
+            document.getElementById('p_nama').innerText = data.nama || '-';
+            document.getElementById('p_namaPanggilan').innerText = data.namaPanggilan || '-';
+            document.getElementById('p_jenisKelamin').innerText = data.jenisKelamin || '-';
+            
+            // Format TTL
+            let ttlText = data.tempatLahir || '-';
+            if (data.tanggalLahir) {
+                const dateObj = new Date(data.tanggalLahir);
+                const monthsList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                const formattedDate = `${dateObj.getDate()} ${monthsList[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+                ttlText += `, ${formattedDate}`;
+            }
+            document.getElementById('p_ttl').innerText = ttlText;
+            
+            document.getElementById('p_agama').innerText = data.agama || '-';
+            document.getElementById('p_statusKeluarga').innerText = data.statusKeluarga || '-';
+            document.getElementById('p_anakKe').innerText = data.anakKe || '-';
+            document.getElementById('p_dariBersaudara').innerText = data.dariBersaudara || '-';
+            document.getElementById('p_asalSekolah').innerText = data.asalSekolah || '-';
+            
+            document.getElementById('p_namaAyah').innerText = data.namaAyah || '-';
+            document.getElementById('p_pekerjaanAyah').innerText = data.pekerjaanAyah || '-';
+            document.getElementById('p_teleponAyah').innerText = data.teleponAyah || '-';
+            
+            document.getElementById('p_namaIbu').innerText = data.namaIbu || '-';
+            document.getElementById('p_pekerjaanIbu').innerText = data.pekerjaanIbu || '-';
+            document.getElementById('p_teleponIbu').innerText = data.teleponIbu || '-';
+            
+            document.getElementById('p_alamat').innerText = data.alamat || '-';
+            
+            // Current Date for signature
+            const today = new Date();
+            const monthsList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const currentDateStr = `${today.getDate()} ${monthsList[today.getMonth()]} ${today.getFullYear()}`;
+            document.querySelector('#printDetailArea .print-current-date').innerText = currentDateStr;
         }
 
         function closeSantriModal() {

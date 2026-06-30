@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Kwitansi Pembayaran SPMB JIC - <%= no_transaksi %></title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="/images/Logo%20Madrasah.webp">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/kwitansi.css?v=6">
@@ -20,12 +22,12 @@
         <button type="button" onclick="toggleEdit()" class="btn-print" id="btnEdit" style="background-color: #f59e0b; margin-left: 10px;">
             <i class="fas fa-edit"></i> Edit Data
         </button>
-        <button type="button" onclick="exportToPDF()" class="btn-print" id="btnPdf" style="background-color: #dc2626; margin-left: 10px;">
+        <!-- <button type="button" onclick="exportToPDF()" class="btn-print" id="btnPdf" style="background-color: #dc2626; margin-left: 10px;">
             <i class="fas fa-file-pdf"></i> Export PDF
         </button>
         <button type="button" onclick="exportToWord()" class="btn-print" id="btnWord" style="background-color: #2563eb; margin-left: 10px;">
             <i class="fas fa-file-word"></i> Export Word
-        </button>
+        </button> -->
         <a href="/input-transaksi" class="btn-back">Kembali</a>
         <script>
             // Sembunyikan tombol kembali jika kwitansi dibuka dari dalam Iframe (Pop-up Modal)

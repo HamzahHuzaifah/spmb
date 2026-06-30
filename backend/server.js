@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
+// PENTING: Trust Proxy agar rate-limit bisa membaca IP asli di balik reverse proxy cPanel
+app.set('trust proxy', 1);
+
 
 // Set View Engine ke EJS
 app.set('view engine', 'ejs');
@@ -44,6 +47,28 @@ const publicRoutes = require('./routes/publicRoutes');
 // Agar halaman publik (landing page) tidak ikut tertangkap oleh gembok admin
 app.use('/', publicRoutes);
 app.use('/', adminRoutes);
+
+// Middleware untuk menangkap rute yang tidak ditemukan (404 Page Not Found)
+app.use((req, res, next) => {
+    const jwt = require('jsonwebtoken');
+    const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_super_aman_spmb';
+    let isAdmin = false;
+    const token = req.cookies ? req.cookies.admin_token : null;
+    if (token) {
+        try {
+            jwt.verify(token, JWT_SECRET);
+            isAdmin = true;
+        } catch (err) {
+            // Token tidak valid, abaikan
+        }
+    }
+
+    res.status(404).render('public/layout', { 
+        title: 'Halaman Tidak Ditemukan', 
+        bodyView: '404',
+        isAdmin: isAdmin
+    });
+});
 
 // Tambahkan Global Error Handler
 app.use((err, req, res, next) => {

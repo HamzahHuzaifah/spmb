@@ -1,0 +1,26 @@
+<div class="form-card" style="text-align: center; padding: 50px 30px; max-width: 600px; margin: 40px auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border-radius: 12px; background: white; border: 1px solid var(--border);">
+    <div style="font-size: 80px; color: #e11d48; margin-bottom: 20px;">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <h2 style="font-size: 28px; color: var(--text-main); margin-bottom: 10px; font-weight: 700;">Halaman Tidak Ditemukan</h2>
+    <p style="color: var(--text-muted); margin-bottom: 35px; font-size: 16px; line-height: 1.6;">
+        Maaf, halaman yang Anda cari tidak ditemukan atau telah dipindahkan ke alamat lain.
+    </p>
+    
+    <% 
+    const isUserAdmin = typeof isAdmin !== 'undefined' && isAdmin;
+    const homeUrl = isUserAdmin ? '/dashboard' : '/';
+    const homeLabel = isUserAdmin ? 'Dashboard Admin' : 'Halaman Utama';
+    const homeIcon = isUserAdmin ? 'fa-tachometer-alt' : 'fa-home';
+    %>
+    
+    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+        <button onclick="if(document.referrer && document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); } else { window.location.href = '<%= homeUrl %>'; }" class="btn btn-primary" style="padding: 12px 25px; font-size: 16px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; background-color: var(--primary); color: white;">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </button>
+        <a href="<%= homeUrl %>" class="btn btn-secondary" style="padding: 12px 25px; font-size: 16px; border-radius: 8px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
+            <i class="fas <%= homeIcon %>"></i> <%= homeLabel %>
+        </a>
+    </div>
+</div>

@@ -35,8 +35,8 @@ async function generateDashboardStats(startDate, endDate) {
         tunggakanDaftarUlangData = tunggakanDaftarUlangData.filter(t => validNamesLama.has(t.nama));
     }
 
-    const targetPendapatanBaruNoZiswaf = tagihanData.reduce((sum, item) => sum + item.totalTagihan, 0);
-    const targetPendapatanLamaNoZiswaf = tagihanDaftarUlangData.reduce((sum, item) => sum + item.totalTagihan, 0);
+    const targetPendapatanBaruNoZiswaf = tagihanData.reduce((sum, item) => sum + (Number(item.totalTagihan) || 0), 0);
+    const targetPendapatanLamaNoZiswaf = tagihanDaftarUlangData.reduce((sum, item) => sum + (Number(item.totalTagihan) || 0), 0);
     
     const countBeasiswaBaru = santriData.filter(s => s.jalurPendaftaran === 'Beasiswa Dhuafa' || s.jalurPendaftaran === 'Beasiswa Yatim/Piatu').length;
     const countBeasiswaLama = santriDaftarUlangData.filter(s => s.jalurPendaftaran === 'Beasiswa Dhuafa' || s.jalurPendaftaran === 'Beasiswa Yatim/Piatu').length;
@@ -50,8 +50,8 @@ async function generateDashboardStats(startDate, endDate) {
     
     const totalTargetPendapatan = targetPendapatanBaruNoZiswaf + targetPendapatanLamaNoZiswaf + targetDanaZiswaf;
     
-    const tunggakanBaruNoZiswaf = tunggakanData.reduce((sum, item) => sum + item.sisaBayar, 0);
-    const tunggakanLamaNoZiswaf = tunggakanDaftarUlangData.reduce((sum, item) => sum + item.sisaBayar, 0);
+    const tunggakanBaruNoZiswaf = tunggakanData.reduce((sum, item) => sum + (Number(item.sisaBayar) || 0), 0);
+    const tunggakanLamaNoZiswaf = tunggakanDaftarUlangData.reduce((sum, item) => sum + (Number(item.sisaBayar) || 0), 0);
     const totalTunggakan = tunggakanBaruNoZiswaf + tunggakanLamaNoZiswaf + tunggakanZiswaf;
     
     const totalPemasukanGlobal = await TransaksiModel.getTotalPemasukanGlobal(filterTanggal);
@@ -79,12 +79,12 @@ async function generateDashboardStats(startDate, endDate) {
         let overallRealisasiZiswafUnit = await TransaksiModel.getRealisasiZiswafByUnit(unitPrefix, isBaru);
         let tunggakanZiswafUnit = Math.max(0, targetZiswafUnit - overallRealisasiZiswafUnit);
         
-        let totalTagihan = tagihanGroup.reduce((sum, item) => sum + item.totalTagihan, 0) + targetZiswafUnit;
+        let totalTagihan = tagihanGroup.reduce((sum, item) => sum + (Number(item.totalTagihan) || 0), 0) + targetZiswafUnit;
         
         let regularBayarUnit = await TransaksiModel.getRealisasiBayarByUnit(unitPrefix, isBaru, filterTanggal);
         let totalBayar = regularBayarUnit + realisasiZiswafUnit;
         
-        let tunggakan = tunggakanGroup.reduce((sum, item) => sum + item.sisaBayar, 0) + tunggakanZiswafUnit;
+        let tunggakan = tunggakanGroup.reduce((sum, item) => sum + (Number(item.sisaBayar) || 0), 0) + tunggakanZiswafUnit;
         
         let pengeluaran = await TransaksiModel.getPengeluaranByUnit(unitPrefix, filterTanggal);
         let saldo = totalBayar - pengeluaran;

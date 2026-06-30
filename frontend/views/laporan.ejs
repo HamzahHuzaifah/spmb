@@ -63,7 +63,8 @@
                     return `${dd}/${mm}/${yyyy}`;
                 }
                 
-                let saldo = typeof saldoAwalQuery !== 'undefined' ? saldoAwalQuery : 0; 
+                let saldo = typeof saldoAwalQuery !== 'undefined' ? Number(saldoAwalQuery) : 0; 
+                if (isNaN(saldo)) saldo = 0;
                 let no = ((typeof currentPage !== 'undefined' ? currentPage : 1) - 1) * 10 + 1;
                 const monthsList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 %>
@@ -83,15 +84,15 @@
                     <td><%= monthsList[selBulanIdx] %> <%= selTahun %></td>
                     <td>-</td>
                     <td>Saldo Bulan <%= prevMonthName %> <%= prevMonthYear %></td>
-                    <td style="color: var(--success);"><%= saldo > 0 ? 'Rp ' + saldo.toLocaleString('id-ID') : (saldo === 0 ? 'Rp 0' : '-') %></td>
-                    <td style="color: var(--danger);"><%= saldo < 0 ? 'Rp ' + Math.abs(saldo).toLocaleString('id-ID') : '-' %></td>
-                    <td style="font-weight: bold;">Rp <%= saldo.toLocaleString('id-ID') %></td>
+                    <td style="color: var(--success);"><%= saldo > 0 ? 'Rp ' + Number(saldo).toLocaleString('id-ID') : (saldo === 0 ? 'Rp 0' : '-') %></td>
+                    <td style="color: var(--danger);"><%= saldo < 0 ? 'Rp ' + Math.abs(Number(saldo)).toLocaleString('id-ID') : '-' %></td>
+                    <td style="font-weight: bold;">Rp <%= Number(saldo).toLocaleString('id-ID') %></td>
                 </tr>
                 <% } %>
 
                 <% if(laporan && laporan.length > 0) {
                     laporan.forEach((item) => {
-                    saldo = saldo + item.pemasukan - item.pengeluaran;
+                    saldo = Number(saldo) + (Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0);
                     %>
                     <tr>
                         <td><%= no++ %></td>
@@ -106,12 +107,12 @@
                         <td><%= item.noTransaksi %></td>
                         <td><%= item.uraian %></td>
                         <td style="color: var(--success);">
-                            <%= item.pemasukan > 0 ? 'Rp ' + item.pemasukan.toLocaleString('id-ID') : '-' %>
+                            <%= Number(item.pemasukan) > 0 ? 'Rp ' + Number(item.pemasukan).toLocaleString('id-ID') : '-' %>
                         </td>
                         <td style="color: var(--danger);">
-                            <%= item.pengeluaran > 0 ? 'Rp ' + item.pengeluaran.toLocaleString('id-ID') : '-' %>
+                            <%= Number(item.pengeluaran) > 0 ? 'Rp ' + Number(item.pengeluaran).toLocaleString('id-ID') : '-' %>
                         </td>
-                        <td style="font-weight: bold;">Rp <%= saldo.toLocaleString('id-ID') %></td>
+                        <td style="font-weight: bold;">Rp <%= Number(saldo).toLocaleString('id-ID') %></td>
                     </tr>
                 <% }) } else if ((typeof currentPage !== 'undefined' && currentPage !== 1) || typeof bulanQuery === 'undefined' || !bulanQuery) { %>
                     <tr>

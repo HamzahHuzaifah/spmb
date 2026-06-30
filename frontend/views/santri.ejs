@@ -359,5 +359,142 @@
             </div>
         </div>
 
+        <!-- PRINT ONLY DETAIL AREA -->
+        <div id="printDetailArea" class="print-only">
+            <div class="print-kop-surat">
+                <img src="/images/Logo%20Madrasah.webp" alt="Logo Madrasah" class="kop-logo-kiri">
+                <div class="kop-text">
+                    <h1 class="kop-title">PANITIA PENERIMAAN SANTRI BARU (PSB)</h1>
+                    <h2 class="kop-subtitle">MADRASAH AL-QUR'AN & MADRASAH DINIYAH</h2>
+                    <h2 class="kop-highlight">JAKARTA ISLAMIC CENTRE</h2>
+                    <p class="kop-address">Gd. Sosial Budaya Lt. 2, Jl. Kramat Jaya, Tugu Utara, Koja, Jakarta Utara 14260</p>
+                    <p class="kop-contact">No. Telp: 0878-8996-9936 / 0857-1406-5288</p>
+                </div>
+                <img src="/images/madrasahjic.webp" alt="Logo JIC" class="kop-logo-kanan">
+            </div>
+            <div class="print-divider"></div>
+            
+            <h2 class="print-document-title">BIODATA PENDAFTARAN CALON SANTRI BARU</h2>
+            
+            <h3 class="print-section-title">A. DATA CALON SANTRI</h3>
+            <table class="print-data-table">
+                <tr>
+                    <td style="width: 30%;">No. Pendaftaran</td>
+                    <td style="width: 3%;">:</td>
+                    <td id="p_nomorPendaftaran" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>Tingkat Pendidikan</td>
+                    <td>:</td>
+                    <td id="p_tingkatPendidikan" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>Jalur Pendaftaran</td>
+                    <td>:</td>
+                    <td id="p_jalurPendaftaran"></td>
+                </tr>
+                <tr>
+                    <td>Email Pendaftar</td>
+                    <td>:</td>
+                    <td id="p_email"></td>
+                </tr>
+                <tr>
+                    <td>Nama Lengkap</td>
+                    <td>:</td>
+                    <td id="p_nama" style="font-weight: bold; text-transform: uppercase;"></td>
+                </tr>
+                <tr>
+                    <td>Nama Panggilan</td>
+                    <td>:</td>
+                    <td id="p_namaPanggilan"></td>
+                </tr>
+                <tr>
+                    <td>Jenis Kelamin</td>
+                    <td>:</td>
+                    <td id="p_jenisKelamin"></td>
+                </tr>
+                <tr>
+                    <td>Tempat / Tanggal Lahir</td>
+                    <td>:</td>
+                    <td id="p_ttl"></td>
+                </tr>
+                <tr>
+                    <td>Agama</td>
+                    <td>:</td>
+                    <td id="p_agama"></td>
+                </tr>
+                <tr>
+                    <td>Status dalam Keluarga</td>
+                    <td>:</td>
+                    <td id="p_statusKeluarga"></td>
+                </tr>
+                <tr>
+                    <td>Anak Ke</td>
+                    <td>:</td>
+                    <td><span id="p_anakKe"></span> dari <span id="p_dariBersaudara"></span> bersaudara</td>
+                </tr>
+                <tr>
+                    <td>Asal Sekolah</td>
+                    <td>:</td>
+                    <td id="p_asalSekolah"></td>
+                </tr>
+            </table>
+            
+            <h3 class="print-section-title">B. DATA ORANG TUA / WALI</h3>
+            <table class="print-data-table">
+                <tr>
+                    <td style="width: 30%;">Nama Ayah</td>
+                    <td style="width: 3%;">:</td>
+                    <td id="p_namaAyah" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>Pekerjaan Ayah</td>
+                    <td>:</td>
+                    <td id="p_pekerjaanAyah"></td>
+                </tr>
+                <tr>
+                    <td>No. Telepon Ayah</td>
+                    <td>:</td>
+                    <td id="p_teleponAyah"></td>
+                </tr>
+                <tr>
+                    <td>Nama Ibu</td>
+                    <td>:</td>
+                    <td id="p_namaIbu" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>Pekerjaan Ibu</td>
+                    <td>:</td>
+                    <td id="p_pekerjaanIbu"></td>
+                </tr>
+                <tr>
+                    <td>No. Telepon Ibu</td>
+                    <td>:</td>
+                    <td id="p_teleponIbu"></td>
+                </tr>
+                <tr>
+                    <td>Alamat Lengkap</td>
+                    <td>:</td>
+                    <td id="p_alamat"></td>
+                </tr>
+            </table>
+            
+            <div class="print-footer-signatures">
+                <div class="signature-box" style="float: left;">
+                    <p>Mengetahui,</p>
+                    <p>Orang Tua / Wali Santri</p>
+                    <br><br><br>
+                    <p style="font-weight: bold;">( ......................................... )</p>
+                </div>
+                <div class="signature-box" style="float: right;">
+                    <p>Jakarta, <span class="print-current-date"></span></p>
+                    <p>Panitia Pendaftaran</p>
+                    <br><br><br>
+                    <p style="font-weight: bold;">( ......................................... )</p>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+
         <%- include('partials/footer') %>
 <script src="/js/santri.js"></script>
