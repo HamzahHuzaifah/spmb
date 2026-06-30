@@ -1,0 +1,148 @@
+nohup: ignoring input
+◇ injected env (5) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+Server berjalan di http://localhost:5000
+Error: Unknown column 'docTitle' in 'SET'
+    at TransaksiModel.updateTransaksi (/home/mjir4837/spmb/backend/models/TransaksiModel.js:155:18)
+    at exports.editKwitansiDetail (/home/mjir4837/spmb/backend/controllers/admin/kwitansiController.js:189:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'docTitle' in 'SET'",
+  sql: '\n' +
+    '            UPDATE transaksi SET \n' +
+    '                tanggal = COALESCE(?, tanggal),\n' +
+    '                noTransaksi = COALESCE(?, noTransaksi),\n' +
+    '                namaSantri = COALESCE(?, namaSantri),\n' +
+    '                jenis = COALESCE(?, jenis),\n' +
+    '                nominal = COALESCE(?, nominal),\n' +
+    '                satuanPendidikan = COALESCE(?, satuanPendidikan),\n' +
+    '                metodePembayaran = COALESCE(?, metodePembayaran),\n' +
+    '                dibayarkanKepada = COALESCE(?, dibayarkanKepada),\n' +
+    '                kategoriDana = COALESCE(?, kategoriDana),\n' +
+    '                rincianNames = COALESCE(?, rincianNames),\n' +
+    '                rincianNominals = COALESCE(?, rincianNominals),\n' +
+    '                diterimaDari = COALESCE(?, diterimaDari),\n' +
+    '                namaPemberi = COALESCE(?, namaPemberi),\n' +
+    '                docTitle = COALESCE(?, docTitle),\n' +
+    '                diterimaDariPembayaran = COALESCE(?, diterimaDariPembayaran),\n' +
+    '                dibayarkanKepadaSign = COALESCE(?, dibayarkanKepadaSign),\n' +
+    '                layoutMarginTop = COALESCE(?, layoutMarginTop),\n' +
+    '                layoutMarginLeft = COALESCE(?, layoutMarginLeft),\n' +
+    '                ttdVisible = COALESCE(?, ttdVisible),\n' +
+    '                ttdWidth = COALESCE(?, ttdWidth),\n' +
+    '                ttdX = COALESCE(?, ttdX),\n' +
+    '                ttdY = COALESCE(?, ttdY),\n' +
+    '                rowOrder = COALESCE(?, rowOrder)\n' +
+    '            WHERE id = ?\n' +
+    '        '
+}
+Error: Unknown column 'docTitle' in 'SET'
+    at TransaksiModel.updateTransaksi (/home/mjir4837/spmb/backend/models/TransaksiModel.js:155:18)
+    at exports.editKwitansiDetail (/home/mjir4837/spmb/backend/controllers/admin/kwitansiController.js:189:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'docTitle' in 'SET'",
+  sql: '\n' +
+    '            UPDATE transaksi SET \n' +
+    '                tanggal = COALESCE(?, tanggal),\n' +
+    '                noTransaksi = COALESCE(?, noTransaksi),\n' +
+    '                namaSantri = COALESCE(?, namaSantri),\n' +
+    '                jenis = COALESCE(?, jenis),\n' +
+    '                nominal = COALESCE(?, nominal),\n' +
+    '                satuanPendidikan = COALESCE(?, satuanPendidikan),\n' +
+    '                metodePembayaran = COALESCE(?, metodePembayaran),\n' +
+    '                dibayarkanKepada = COALESCE(?, dibayarkanKepada),\n' +
+    '                kategoriDana = COALESCE(?, kategoriDana),\n' +
+    '                rincianNames = COALESCE(?, rincianNames),\n' +
+    '                rincianNominals = COALESCE(?, rincianNominals),\n' +
+    '                diterimaDari = COALESCE(?, diterimaDari),\n' +
+    '                namaPemberi = COALESCE(?, namaPemberi),\n' +
+    '                docTitle = COALESCE(?, docTitle),\n' +
+    '                diterimaDariPembayaran = COALESCE(?, diterimaDariPembayaran),\n' +
+    '                dibayarkanKepadaSign = COALESCE(?, dibayarkanKepadaSign),\n' +
+    '                layoutMarginTop = COALESCE(?, layoutMarginTop),\n' +
+    '                layoutMarginLeft = COALESCE(?, layoutMarginLeft),\n' +
+    '                ttdVisible = COALESCE(?, ttdVisible),\n' +
+    '                ttdWidth = COALESCE(?, ttdWidth),\n' +
+    '                ttdX = COALESCE(?, ttdX),\n' +
+    '                ttdY = COALESCE(?, ttdY),\n' +
+    '                rowOrder = COALESCE(?, rowOrder)\n' +
+    '            WHERE id = ?\n' +
+    '        '
+}
+Error: Unknown column 'docTitle' in 'SET'
+    at TransaksiModel.updateTransaksi (/home/mjir4837/spmb/backend/models/TransaksiModel.js:155:18)
+    at exports.editKwitansiDetail (/home/mjir4837/spmb/backend/controllers/admin/kwitansiController.js:189:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'docTitle' in 'SET'",
+  sql: '\n' +
+    '            UPDATE transaksi SET \n' +
+    '                tanggal = COALESCE(?, tanggal),\n' +
+    '                noTransaksi = COALESCE(?, noTransaksi),\n' +
+    '                namaSantri = COALESCE(?, namaSantri),\n' +
+    '                jenis = COALESCE(?, jenis),\n' +
+    '                nominal = COALESCE(?, nominal),\n' +
+    '                satuanPendidikan = COALESCE(?, satuanPendidikan),\n' +
+    '                metodePembayaran = COALESCE(?, metodePembayaran),\n' +
+    '                dibayarkanKepada = COALESCE(?, dibayarkanKepada),\n' +
+    '                kategoriDana = COALESCE(?, kategoriDana),\n' +
+    '                rincianNames = COALESCE(?, rincianNames),\n' +
+    '                rincianNominals = COALESCE(?, rincianNominals),\n' +
+    '                diterimaDari = COALESCE(?, diterimaDari),\n' +
+    '                namaPemberi = COALESCE(?, namaPemberi),\n' +
+    '                docTitle = COALESCE(?, docTitle),\n' +
+    '                diterimaDariPembayaran = COALESCE(?, diterimaDariPembayaran),\n' +
+    '                dibayarkanKepadaSign = COALESCE(?, dibayarkanKepadaSign),\n' +
+    '                layoutMarginTop = COALESCE(?, layoutMarginTop),\n' +
+    '                layoutMarginLeft = COALESCE(?, layoutMarginLeft),\n' +
+    '                ttdVisible = COALESCE(?, ttdVisible),\n' +
+    '                ttdWidth = COALESCE(?, ttdWidth),\n' +
+    '                ttdX = COALESCE(?, ttdX),\n' +
+    '                ttdY = COALESCE(?, ttdY),\n' +
+    '                rowOrder = COALESCE(?, rowOrder)\n' +
+    '            WHERE id = ?\n' +
+    '        '
+}
+Error: Unknown column 'docTitle' in 'SET'
+    at TransaksiModel.updateTransaksi (/home/mjir4837/spmb/backend/models/TransaksiModel.js:155:18)
+    at exports.editTransaksi (/home/mjir4837/spmb/backend/controllers/admin/transaksiController.js:264:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'docTitle' in 'SET'",
+  sql: '\n' +
+    '            UPDATE transaksi SET \n' +
+    '                tanggal = COALESCE(?, tanggal),\n' +
+    '                noTransaksi = COALESCE(?, noTransaksi),\n' +
+    '                namaSantri = COALESCE(?, namaSantri),\n' +
+    '                jenis = COALESCE(?, jenis),\n' +
+    '                nominal = COALESCE(?, nominal),\n' +
+    '                satuanPendidikan = COALESCE(?, satuanPendidikan),\n' +
+    '                metodePembayaran = COALESCE(?, metodePembayaran),\n' +
+    '                dibayarkanKepada = COALESCE(?, dibayarkanKepada),\n' +
+    '                kategoriDana = COALESCE(?, kategoriDana),\n' +
+    '                rincianNames = COALESCE(?, rincianNames),\n' +
+    '                rincianNominals = COALESCE(?, rincianNominals),\n' +
+    '                diterimaDari = COALESCE(?, diterimaDari),\n' +
+    '                namaPemberi = COALESCE(?, namaPemberi),\n' +
+    '                docTitle = COALESCE(?, docTitle),\n' +
+    '                diterimaDariPembayaran = COALESCE(?, diterimaDariPembayaran),\n' +
+    '                dibayarkanKepadaSign = COALESCE(?, dibayarkanKepadaSign),\n' +
+    '                layoutMarginTop = COALESCE(?, layoutMarginTop),\n' +
+    '                layoutMarginLeft = COALESCE(?, layoutMarginLeft),\n' +
+    '                ttdVisible = COALESCE(?, ttdVisible),\n' +
+    '                ttdWidth = COALESCE(?, ttdWidth),\n' +
+    '                ttdX = COALESCE(?, ttdX),\n' +
+    '                ttdY = COALESCE(?, ttdY),\n' +
+    '                rowOrder = COALESCE(?, rowOrder)\n' +
+    '            WHERE id = ?\n' +
+    '        '
+}
