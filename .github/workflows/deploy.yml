@@ -29,6 +29,7 @@ jobs:
           
           # 3. Masuk ke virtualenv Node.js cPanel & Install Dependencies
           source /home/mjir4837/nodevenv/repositories/22/activate
+          export PUPPETEER_SKIP_DOWNLOAD=true
           npm install --production
           
           # 4. Cari PID proses Node.js hantu yang sedang berjalan dan matikan
