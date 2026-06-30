@@ -1,0 +1,43 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          # 1. Masuk ke folder proyek cPanel
+          cd /home/mjir4837/repositories
+          
+          # 2. Tarik kode terbaru dari GitHub
+          git pull origin main
+          
+          # 3. Masuk ke virtualenv Node.js cPanel & Install Dependencies
+          source /home/mjir4837/nodevenv/repositories/22/bin/activate
+          npm install --production
+          
+          # 4. Cari PID proses Node.js hantu yang sedang berjalan dan matikan
+          PID=$(ps aux | grep "node app.js" | grep -v grep | awk '{print $2}')
+          if [ ! -z "$PID" ]; then
+            echo "Mematikan proses Node.js lama dengan PID: $PID"
+            kill -9 $PID
+          fi
+          
+          # 5. Jalankan kembali aplikasi Node.js menggunakan nohup di background
+          nohup node app.js > app.log 2>&1 &
+          echo "Aplikasi Node.js berhasil dimulai ulang di latar belakang."
