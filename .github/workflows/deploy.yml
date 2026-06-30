@@ -28,7 +28,7 @@ jobs:
           git pull origin main
           
           # 3. Masuk ke virtualenv Node.js cPanel & Install Dependencies
-          source /home/mjir4837/nodevenv/repositories/22/bin/activate
+          source /home/mjir4837/nodevenv/repositories/22/activate
           npm install --production
           
           # 4. Cari PID proses Node.js hantu yang sedang berjalan dan matikan
