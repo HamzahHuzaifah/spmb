@@ -15,6 +15,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views'));
 
 const { sanitizeInput } = require('./middlewares/sanitizeInput');
+const { checkMaintenance } = require('./middlewares/maintenance');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
 
@@ -35,6 +36,9 @@ app.use(sanitizeInput);
 
 // Arahkan static assets ke frontend/public
 app.use(express.static(path.join(__dirname, '../frontend/public')));
+
+// PENTING: Filter Maintenance Mode (Hanya aktif di produksi/cPanel, dilewati jika di lokal)
+app.use(checkMaintenance);
 
 // ==========================================
 // ROUTES
