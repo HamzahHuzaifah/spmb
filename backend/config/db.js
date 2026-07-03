@@ -29,7 +29,8 @@ async function runMigration() {
             { name: 'ttdWidth', definition: 'VARCHAR(50) NULL' },
             { name: 'ttdX', definition: 'INT DEFAULT 0' },
             { name: 'ttdY', definition: 'INT DEFAULT 0' },
-            { name: 'rowOrder', definition: 'TEXT NULL' }
+            { name: 'rowOrder', definition: 'TEXT NULL' },
+            { name: 'inputOleh', definition: 'VARCHAR(150) NULL' }
         ];
         
         for (const col of columnsToAdd) {

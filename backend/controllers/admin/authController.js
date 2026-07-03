@@ -2,6 +2,9 @@ const db = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Menyimpan daftar admin yang online/aktif secara realtime
+const activeAdmins = {};
+
 // Mengambil Secret Key dari .env (atau fallback default)
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_super_aman_spmb';
 
@@ -207,4 +210,36 @@ exports.deleteAdmin = async (req, res) => {
         console.error('Delete Admin Error:', error);
         return res.status(500).json({ success: false, message: 'Gagal menghapus admin.' });
     }
+};
+
+exports.postHeartbeat = (req, res) => {
+    const admin = req.admin;
+    if (!admin) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const now = Date.now();
+    activeAdmins[admin.username] = {
+        id: admin.id,
+        nama: admin.nama,
+        username: admin.username,
+        lastActive: now
+    };
+
+    // Bersihkan admin yang tidak kirim heartbeat lebih dari 15 detik
+    const threshold = now - 15000;
+    const onlineUsers = [];
+    for (const username in activeAdmins) {
+        if (activeAdmins[username].lastActive > threshold) {
+            onlineUsers.push({
+                id: activeAdmins[username].id,
+                nama: activeAdmins[username].nama,
+                username: activeAdmins[username].username
+            });
+        } else {
+            delete activeAdmins[username];
+        }
+    }
+
+    return res.json({ success: true, onlineUsers });
 };

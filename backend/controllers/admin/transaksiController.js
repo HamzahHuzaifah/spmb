@@ -170,7 +170,8 @@ exports.postInputTransaksi = async (req, res) => {
             dibayarkanKepada: dibayarkanKepada || '',
             kategoriDana: katDana || '',
             diterimaDari: diterimaDari || '',
-            namaPemberi: namaPemberi || ''
+            namaPemberi: namaPemberi || '',
+            inputOleh: req.admin ? req.admin.nama : 'System'
         });
 
         await TransaksiModel.addLaporan({

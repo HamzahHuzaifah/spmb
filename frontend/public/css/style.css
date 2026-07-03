@@ -409,6 +409,10 @@ tbody tr:hover {
     align-items: center;
 }
 
+.w-100 {
+    width: 100% !important;
+}
+
 .form-control {
     padding: 10px 15px;
     border: 1px solid var(--border);
@@ -1331,4 +1335,50 @@ input[type="date"].flatpickr-input {
 
 .swal2-container {
     z-index: 999999 !important;
+}
+
+/* Realtime Online Users Avatars */
+.online-users-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 15px;
+    border-right: 1px solid var(--border);
+    padding-right: 15px;
+}
+.online-users-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.online-users-list {
+    display: flex;
+    align-items: center;
+}
+.online-user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    border: 2px solid var(--surface);
+    margin-left: -8px;
+    box-shadow: var(--shadow-sm);
+    cursor: default;
+    transition: var(--transition);
+    user-select: none;
+    -webkit-user-select: none;
+}
+.online-user-avatar:first-child {
+    margin-left: 0;
+}
+.online-user-avatar:hover {
+    transform: translateY(-2px);
+    z-index: 10;
 }

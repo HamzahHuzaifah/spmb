@@ -1,5 +1,16 @@
 <%- include('partials/header', { title: 'Input Transaksi Keuangan' , activePage: 'input-transaksi' }) %>
 <link rel="stylesheet" href="/css/input-transaksi.css?v=2">
+<%
+function formatDateIndo(dateStr) {
+    if(!dateStr) return '';
+    let d = new Date(dateStr);
+    if(isNaN(d)) return dateStr;
+    let dd = String(d.getDate()).padStart(2, '0');
+    let mm = String(d.getMonth() + 1).padStart(2, '0');
+    let yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}
+%>
 
     <div class="table-container">
         <div class="table-header">
@@ -10,11 +21,11 @@
             <div class="row" style="margin-bottom: 10px;">
                 <div class="col-md-6 mb-3">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Transaksi</label>
-                    <input type="date" name="tanggal" id="tanggal" class="form-control" style="width: 100%;" required>
+                    <input type="date" name="tanggal" id="tanggal" class="form-control w-100" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600;">Jenis Transaksi</label>
-                    <select name="jenisTransaksi" id="jenisTransaksi" class="form-control" style="width: 100%;" required
+                    <select name="jenisTransaksi" id="jenisTransaksi" class="form-control w-100" required
                         onchange="handleJenisTransaksi()">
                         <option value="">-- Pilih Jenis Transaksi --</option>
                         <option value="Pembayaran Pendaftaran Baru">Pembayaran Pendaftaran Baru</option>
@@ -173,6 +184,7 @@
                     <th>Jenis</th>
                     <th>Nominal</th>
                     <th>Metode</th>
+                    <th>Operator</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -181,7 +193,7 @@
                     <% data.transaksiTerbaru.forEach(trx=> { %>
                         <tr>
                             <td>
-                                <%= trx.tanggal %>
+                                <%= formatDateIndo(trx.tanggal) %>
                             </td>
                             <td>
                                 <%= trx.noTransaksi %>
@@ -202,6 +214,9 @@
                                 </span>
                             </td>
                             <td>
+                                <%= trx.inputOleh || '-' %>
+                            </td>
+                            <td>
                                 <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px; cursor: pointer; border: none; border-radius: 4px;" onclick="openKwitansiModal(<%= trx.id %>)">Cetak</button>
                                 <button type="button" class="btn btn-warning" style="padding: 5px 10px; font-size: 12px; background-color: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openEditModal(<%= trx.id %>, '<%= trx.tanggal %>', <%= trx.nominal %>, '<%= trx.metodePembayaran %>')">Edit</button>
                                 <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;" onclick="openDeleteModal('/input-transaksi/delete/<%= trx.id %>')">Hapus</button>
@@ -210,7 +225,7 @@
                         <% }) %>
                             <% } else { %>
                                 <tr>
-                                    <td colspan="7" style="text-align: center;">Belum ada transaksi</td>
+                                    <td colspan="8" style="text-align: center;">Belum ada transaksi</td>
                                 </tr>
                                 <% } %>
             </tbody>
@@ -245,8 +260,7 @@
         <form id="editTransaksiForm" method="POST" action="" onsubmit="handleAjaxSubmitGlobal(event, this)">
             <div style="margin-bottom: 15px;">
                 <label>Tanggal Transaksi</label>
-                <input type="text" name="tanggal" id="editTanggal" class="form-control" required>
-                <small>Format: DD Bulan YYYY (contoh: 15 Juli 2026)</small>
+                <input type="date" name="tanggal" id="editTanggal" class="form-control" required>
             </div>
             <div style="margin-bottom: 15px;">
                 <label>Nominal (Rp)</label>

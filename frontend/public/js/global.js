@@ -246,6 +246,8 @@
             flatpickr("input[type='date']", {
                 locale: "id",
                 dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
                 allowInput: true,
                 disableMobile: true, // Memaksa popup HTML/CSS kustom di HP alih-alih UI kalender bawaan HP/Chrome
                 monthSelectorType: "dropdown", // Menggunakan dropdown agar pengguna bebas memilih bulan secara langsung

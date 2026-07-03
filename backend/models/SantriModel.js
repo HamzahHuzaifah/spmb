@@ -81,6 +81,31 @@ class SantriModel {
         return rows[0];
     }
 
+    static async getNextNomorPendaftaranBaru(year) {
+        const prefix = `SPMB-Daftar.Baru/${year}/MJIC/%`;
+        const query = `
+            SELECT nomorPendaftaran 
+            FROM santri 
+            WHERE nomorPendaftaran LIKE ?
+        `;
+        const [rows] = await db.execute(query, [prefix]);
+        
+        let maxSeq = 0;
+        for (const row of rows) {
+            if (row.nomorPendaftaran) {
+                const parts = row.nomorPendaftaran.split('/');
+                const seqStr = parts[parts.length - 1];
+                const seq = parseInt(seqStr, 10);
+                if (!isNaN(seq) && seq > maxSeq) {
+                    maxSeq = seq;
+                }
+            }
+        }
+        
+        const nextSeq = maxSeq + 1;
+        return `SPMB-Daftar.Baru/${year}/MJIC/${String(nextSeq).padStart(3, '0')}`;
+    }
+
     static async addSantri(data) {
         const query = `
             INSERT INTO santri (
@@ -238,6 +263,31 @@ class SantriModel {
     static async getSantriDaftarUlangByNomorPendaftaran(nomorPendaftaran) {
         const [rows] = await db.execute('SELECT * FROM santri_daftar_ulang WHERE nomorPendaftaran = ?', [nomorPendaftaran]);
         return rows[0];
+    }
+
+    static async getNextNomorPendaftaranUlang(year) {
+        const prefix = `SPMB-Daftar.Ulang/${year}/MJIC/%`;
+        const query = `
+            SELECT nomorPendaftaran 
+            FROM santri_daftar_ulang 
+            WHERE nomorPendaftaran LIKE ?
+        `;
+        const [rows] = await db.execute(query, [prefix]);
+        
+        let maxSeq = 0;
+        for (const row of rows) {
+            if (row.nomorPendaftaran) {
+                const parts = row.nomorPendaftaran.split('/');
+                const seqStr = parts[parts.length - 1];
+                const seq = parseInt(seqStr, 10);
+                if (!isNaN(seq) && seq > maxSeq) {
+                    maxSeq = seq;
+                }
+            }
+        }
+        
+        const nextSeq = maxSeq + 1;
+        return `SPMB-Daftar.Ulang/${year}/MJIC/${String(nextSeq).padStart(3, '0')}`;
     }
 
     static async addSantriDaftarUlang(data) {

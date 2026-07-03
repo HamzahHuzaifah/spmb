@@ -23,10 +23,7 @@ exports.postFormPendaftaran = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
         
-        const allSantri = await SantriModel.getAllSantri();
-        const relatedSantri = allSantri.filter(s => s.nomorPendaftaran && s.nomorPendaftaran.includes(`/${year}/MJIC/`));
-        const sequence = String(relatedSantri.length + 1).padStart(3, '0');
-        const nomorPendaftaran = `SPMB-Daftar.Baru/${year}/MJIC/${sequence}`;
+        const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranBaru(year);
 
         const newSantriData = {
             nomorPendaftaran,
@@ -138,10 +135,7 @@ exports.postFormDaftarUlang = async (req, res) => {
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
         
-        const allDaftarUlang = await SantriModel.getAllSantriDaftarUlang();
-        const relatedSantri = allDaftarUlang.filter(s => s.nomorPendaftaran && s.nomorPendaftaran.includes(`/${year}/MJIC/`));
-        const sequenceDaftarUlang = String(relatedSantri.length + 1).padStart(3, '0');
-        const nomorPendaftaran = `SPMB-Daftar.Ulang/${year}/MJIC/${sequenceDaftarUlang}`;
+        const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranUlang(year);
 
         await SantriModel.addSantriDaftarUlang({
             nomorPendaftaran,
@@ -252,10 +246,7 @@ exports.postFormBeasiswa = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
         
-        const allSantri = await SantriModel.getAllSantri();
-        const relatedSantri = allSantri.filter(s => s.nomorPendaftaran && s.nomorPendaftaran.includes(`/${year}/MJIC/`));
-        const sequence = String(relatedSantri.length + 1).padStart(3, '0');
-        const nomorPendaftaran = `SPMB-Daftar.Baru/${year}/MJIC/${sequence}`;
+        const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranBaru(year);
 
         await SantriModel.addSantri({
             nomorPendaftaran,

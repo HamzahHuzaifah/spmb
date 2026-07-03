@@ -1,5 +1,18 @@
 <%- include('partials/header', { title: 'Data Santri Baru' , activePage: 'santri' }) %><link rel="stylesheet" href="/css/santri.css">
-
+<%
+function formatTimestampIndo(isoStr) {
+    if (!isoStr) return '-';
+    let d = new Date(isoStr);
+    if (isNaN(d)) return isoStr;
+    let dd = String(d.getDate()).padStart(2, '0');
+    let mm = String(d.getMonth() + 1).padStart(2, '0');
+    let yyyy = d.getFullYear();
+    let hh = String(d.getHours()).padStart(2, '0');
+    let min = String(d.getMinutes()).padStart(2, '0');
+    let ss = String(d.getSeconds()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
+}
+%>
     <%- include('partials/filter-bar', {
         actionUrl: '/santri',
         searchQuery: typeof searchQuery !== 'undefined' ? searchQuery : '',
@@ -55,7 +68,7 @@
                                     <%= item.nomorPendaftaran || '-' %>
                                 </strong></td>
                             <td style="font-size: 12px; color: #666;">
-                                <%= item.timestamp || '-' %>
+                                <%= formatTimestampIndo(item.timestamp) %>
                             </td>
                             <td>
                                 <%= item.email || '-' %>

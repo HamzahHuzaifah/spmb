@@ -9,21 +9,27 @@
 
     <!-- Filter Bar -->
     <div class="filter-bar mb-4">
-        <form method="GET" action="/dashboard" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Dari Tanggal:</label>
-                <input type="date" name="startDate" id="startDateInput" class="form-control" style="width: 160px;" value="<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>">
+        <form method="GET" action="/dashboard" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; width: 100%;">
+            <!-- Filter Fields & Buttons -->
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Dari Tanggal:</label>
+                    <input type="date" name="startDate" id="startDateInput" class="form-control" style="width: 130px;" value="<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>">
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Sampai Tanggal:</label>
+                    <input type="date" name="endDate" id="endDateInput" class="form-control" style="width: 130px;" value="<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>">
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;"><i class="fas fa-sync"></i> Reset</a>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: 600; white-space: nowrap; margin-bottom: 0;">Sampai Tanggal:</label>
-                <input type="date" name="endDate" id="endDateInput" class="form-control" style="width: 160px;" value="<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>">
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
-            <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;"><i class="fas fa-sync"></i> Reset</a>
             
-            <a href="/dashboard/export-excel?startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>" class="btn btn-secondary btn-print" style="text-decoration: none; margin-left: auto;" download>
-                <i class="fas fa-file-excel"></i> Export Excel
-            </a>
+            <!-- Action Buttons -->
+            <div style="display: flex; align-items: center;">
+                <a href="/dashboard/export-excel?startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>" class="btn btn-secondary btn-print" style="text-decoration: none;" download>
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </a>
+            </div>
         </form>
     </div>
 

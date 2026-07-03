@@ -184,7 +184,12 @@ function handleJenisTransaksi() {
 
 function openEditModal(id, tanggal, nominal, metode) {
     document.getElementById('editTransaksiForm').action = '/input-transaksi/edit/' + id;
-    document.getElementById('editTanggal').value = tanggal;
+    const editTanggalEl = document.getElementById('editTanggal');
+    if (editTanggalEl._flatpickr) {
+        editTanggalEl._flatpickr.setDate(tanggal);
+    } else {
+        editTanggalEl.value = tanggal;
+    }
     document.getElementById('editNominal').value = nominal;
     document.getElementById('editMetode').value = metode || 'Cash';
     document.getElementById('editModal').style.display = 'block';

@@ -91,8 +91,8 @@ class TransaksiModel {
             INSERT INTO transaksi (
                 tanggal, noTransaksi, namaSantri, jenis, nominal, satuanPendidikan, 
                 metodePembayaran, dibayarkanKepada, kategoriDana, rincianNames, 
-                rincianNominals, diterimaDari, namaPemberi
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                rincianNominals, diterimaDari, namaPemberi, inputOleh
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [
             data.tanggal !== undefined ? data.tanggal : null,
@@ -107,7 +107,8 @@ class TransaksiModel {
             data.rincianNames ? JSON.stringify(data.rincianNames) : '[]',
             data.rincianNominals ? JSON.stringify(data.rincianNominals) : '[]',
             data.diterimaDari !== undefined ? data.diterimaDari : null,
-            data.namaPemberi !== undefined ? data.namaPemberi : null
+            data.namaPemberi !== undefined ? data.namaPemberi : null,
+            data.inputOleh !== undefined ? data.inputOleh : null
         ];
         const [result] = await db.execute(query, values);
         return result.insertId;
@@ -138,7 +139,8 @@ class TransaksiModel {
                 ttdWidth = COALESCE(?, ttdWidth),
                 ttdX = COALESCE(?, ttdX),
                 ttdY = COALESCE(?, ttdY),
-                rowOrder = COALESCE(?, rowOrder)
+                rowOrder = COALESCE(?, rowOrder),
+                inputOleh = COALESCE(?, inputOleh)
             WHERE id = ?
         `;
         const values = [
@@ -150,6 +152,7 @@ class TransaksiModel {
             data.docTitle !== undefined ? data.docTitle : null, data.diterimaDariPembayaran !== undefined ? data.diterimaDariPembayaran : null, data.dibayarkanKepadaSign !== undefined ? data.dibayarkanKepadaSign : null,
             data.layoutMarginTop !== undefined ? data.layoutMarginTop : null, data.layoutMarginLeft !== undefined ? data.layoutMarginLeft : null, data.ttdVisible !== undefined ? data.ttdVisible : null,
             data.ttdWidth !== undefined ? data.ttdWidth : null, data.ttdX !== undefined ? data.ttdX : null, data.ttdY !== undefined ? data.ttdY : null, data.rowOrder !== undefined ? data.rowOrder : null,
+            data.inputOleh !== undefined ? data.inputOleh : null,
             id
         ];
         await db.execute(query, values);

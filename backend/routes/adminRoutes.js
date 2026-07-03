@@ -68,6 +68,7 @@ router.post('/api/admin/add', authController.addAdmin);
 router.get('/api/admin/list', authController.getAdminList);
 router.put('/api/admin/edit/:id', authController.editAdmin);
 router.delete('/api/admin/delete/:id', authController.deleteAdmin);
+router.post('/api/admin/heartbeat', authController.postHeartbeat);
 
 // Kwitansi
 router.get('/kwitansi/:id', kwitansiController.getKwitansi);
