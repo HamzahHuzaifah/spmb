@@ -1,0 +1,39 @@
+<%
+  const showSantriValue = typeof showSantri !== 'undefined' ? showSantri : false;
+%>
+<div class="card h-100">
+    <div class="card-header"><%= title %></div>
+    <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="<%= groupId %>">
+        <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 450px; white-space: nowrap;">
+            <tr>
+                <% if(showSantriValue) { %>
+                    <th style="white-space: nowrap; text-align: center;">JML SANTRI</th>
+                    <th style="white-space: nowrap; text-align: center;">TOTAL TAGIHAN</th>
+                    <th colspan="2" style="white-space: nowrap; text-align: center;">TOTAL BAYAR</th>
+                <% } else { %>
+                    <th colspan="2" style="white-space: nowrap; text-align: center;">TOTAL TAGIHAN</th>
+                    <th colspan="2" style="white-space: nowrap; text-align: center;">TOTAL BAYAR</th>
+                <% } %>
+            </tr>
+            <tr>
+                <% if(showSantriValue) { %>
+                    <td class="text-center val-santri" data-original="<%= stats.jumlahSantri %>"><%= stats.jumlahSantri %></td>
+                    <td class="text-center val-tagihan" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
+                    <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
+                <% } else { %>
+                    <td class="text-center val-tagihan" colspan="2" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
+                    <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
+                    <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
+                <% } %>
+            </tr>
+            <tr>
+                <th colspan="4" style="text-align: center;">TUNGGAKAN</th>
+            </tr>
+            <tr>
+                <td class="text-center val-tunggakan" colspan="4" data-original="<%= stats.tunggakan %>">Rp <%= stats.tunggakan.toLocaleString('id-ID') %></td>
+                <td class="text-center text-danger val-persen-tunggakan" style="display: none;"><%= stats.persenTunggakan %></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -163,6 +163,36 @@ async function generateDashboardStats(startDate, endDate) {
 
     const pengeluaranRekap = await TransaksiModel.getPengeluaranRekap(filterTanggal);
 
+    // -- New Chart Data --
+    let currentYear = new Date().getFullYear();
+    if (startDate) {
+        currentYear = new Date(startDate).getFullYear();
+    }
+    const trendBulanan = await TransaksiModel.getPemasukanTrendBulanan(currentYear);
+    
+    // Format trend to array of 12 months (Jan-Dec)
+    const trendArray = new Array(12).fill(0);
+    trendBulanan.forEach(item => {
+        if (item.bulan >= 1 && item.bulan <= 12) {
+            trendArray[item.bulan - 1] = Number(item.total);
+        }
+    });
+
+    const pengeluaranKategori = await TransaksiModel.getPengeluaranKategori(filterTanggal);
+    
+    const countJalur = (dataArray) => {
+        let stats = {};
+        dataArray.forEach(s => {
+            let j = s.jalurPendaftaran || 'Reguler';
+            if (!stats[j]) stats[j] = 0;
+            stats[j]++;
+        });
+        return stats;
+    };
+    const jalurStatsBaru = countJalur(santriData);
+    const jalurStatsLama = countJalur(santriDaftarUlangData);
+    // -- End New Chart Data --
+
     return {
         tunggakanData,
         tunggakanDaftarUlangData,
@@ -178,6 +208,10 @@ async function generateDashboardStats(startDate, endDate) {
             rekapBaru,
             rekapLama,
             pengeluaranRekap,
+            trendArray,
+            pengeluaranKategori,
+            jalurStatsBaru,
+            jalurStatsLama,
             ziswafStats: {
                 santriBaru: countBeasiswaBaru,
                 santriLama: countBeasiswaLama,

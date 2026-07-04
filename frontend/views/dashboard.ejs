@@ -66,203 +66,81 @@
         </div>
     </div>
 
-    <% 
-      // Helper function to render table for any stats block
-      function renderStatsTable(stats, groupId, showSantri = true) { 
-    %>
-        <div class="table-responsive stat-group" data-group="<%= groupId %>">
-            <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
-                <tr>
-                    <% if(showSantri) { %>
-                        <th style="width: 22%; text-align: center;">JML SANTRI</th>
-                        <th style="width: 28%; text-align: center;">TOTAL TAGIHAN</th>
-                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL BAYAR</th>
-                    <% } else { %>
-                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL TAGIHAN</th>
-                        <th colspan="2" style="width: 50%; text-align: center;">TOTAL BAYAR</th>
-                    <% } %>
-                </tr>
-                <tr>
-                    <% if(showSantri) { %>
-                        <td class="text-center val-santri" data-original="<%= stats.jumlahSantri %>"><%= stats.jumlahSantri %></td>
-                        <td class="text-center val-tagihan" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
-                        <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
-                        <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
-                    <% } else { %>
-                        <td class="text-center val-tagihan" colspan="2" data-original="<%= stats.totalTagihan %>">Rp <%= stats.totalTagihan.toLocaleString('id-ID') %></td>
-                        <td class="text-center val-bayar" data-original="<%= stats.totalBayar %>">Rp <%= stats.totalBayar.toLocaleString('id-ID') %></td>
-                        <td class="text-center font-weight-bold val-persen-bayar" style="color: var(--primary);"><%= stats.persenBayar %></td>
-                    <% } %>
-                </tr>
-                <tr>
-                    <th colspan="2" style="width: 50%; text-align: center;">TUNGGAKAN</th>
-                    <th colspan="2" style="width: 50%; text-align: center;">PENGELUARAN</th>
-                </tr>
-                <tr>
-                    <td class="text-center val-tunggakan" colspan="2" data-original="<%= stats.tunggakan %>">Rp <%= stats.tunggakan.toLocaleString('id-ID') %></td>
-                    <td class="text-center text-danger val-persen-tunggakan" style="display: none;"><%= stats.persenTunggakan %></td>
-                    <td class="text-center val-pengeluaran" colspan="2" data-original="<%= stats.pengeluaran %>">Rp <%= stats.pengeluaran.toLocaleString('id-ID') %></td>
-                </tr>
-                <tr><th colspan="4" class="text-center">SALDO</th></tr>
-                <tr><td colspan="4" class="text-center font-weight-bold val-saldo" data-original="<%= stats.saldo %>">Rp <%= stats.saldo.toLocaleString('id-ID') %></td></tr>
-            </table>
-        </div>
-    <% } %>
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <%- include('partials/chart-card', { title: 'PERSENTASE REALISASI VS TUNGGAKAN GLOBAL', chartId: 'incomeOverviewChart', iconClass: 'fas fa-chart-pie', isHalfWidth: true, isDoughnut: true }) %>
+        <%- include('partials/chart-card', { title: 'PERBANDINGAN TAGIHAN & BAYAR PER UNIT', chartId: 'unitComparisonChart', iconClass: 'fas fa-chart-bar', isHalfWidth: true, isDoughnut: false }) %>
+    </div>
 
     <!-- Main Tables -->
     <div class="row mb-4">
         <!-- Madrasah Total -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">INFORMASI KEUANGAN MADRASAH</div>
-                <% renderStatsTable(dashboardStats.madrasahTotal, 'madrasah-total', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'INFORMASI KEUANGAN MADRASAH', groupId: 'madrasah-total', stats: dashboardStats.madrasahTotal, showSantri: true }) %>
         </div>
         <!-- Madrasah Baru -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">INFO KEUANGAN SANTRI BARU</div>
-                <% renderStatsTable(dashboardStats.madrasahBaru, 'madrasah-baru', false); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'INFO KEUANGAN SANTRI BARU', groupId: 'madrasah-baru', stats: dashboardStats.madrasahBaru, showSantri: false }) %>
         </div>
         <!-- Madrasah Lama -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">INFO KEUANGAN DAFTAR ULANG</div>
-                <% renderStatsTable(dashboardStats.madrasahLama, 'madrasah-lama', false); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'INFO KEUANGAN DAFTAR ULANG', groupId: 'madrasah-lama', stats: dashboardStats.madrasahLama, showSantri: false }) %>
         </div>
     </div>
 
     <!-- Unit Baru Tables -->
     <div class="row mb-4">
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN SANTRI BARU PAUDQu</div>
-                <% renderStatsTable(dashboardStats.baru.PAUDQu, 'baru-paudqu', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN SANTRI BARU PAUDQu', groupId: 'baru-paudqu', stats: dashboardStats.baru.PAUDQu, showSantri: true }) %>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN SANTRI BARU TPQ</div>
-                <% renderStatsTable(dashboardStats.baru.TPQ, 'baru-tpq', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN SANTRI BARU TPQ', groupId: 'baru-tpq', stats: dashboardStats.baru.TPQ, showSantri: true }) %>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN SANTRI BARU MDT</div>
-                <% renderStatsTable(dashboardStats.baru.MDT, 'baru-mdt', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN SANTRI BARU MDT', groupId: 'baru-mdt', stats: dashboardStats.baru.MDT, showSantri: true }) %>
         </div>
     </div>
 
     <!-- Unit Lama Tables -->
     <div class="row mb-4">
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN DAFTAR ULANG PAUDQu</div>
-                <% renderStatsTable(dashboardStats.lama.PAUDQu, 'lama-paudqu', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN DAFTAR ULANG PAUDQu', groupId: 'lama-paudqu', stats: dashboardStats.lama.PAUDQu, showSantri: true }) %>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN DAFTAR ULANG TPQ</div>
-                <% renderStatsTable(dashboardStats.lama.TPQ, 'lama-tpq', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN DAFTAR ULANG TPQ', groupId: 'lama-tpq', stats: dashboardStats.lama.TPQ, showSantri: true }) %>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">KEUANGAN DAFTAR ULANG MDT</div>
-                <% renderStatsTable(dashboardStats.lama.MDT, 'lama-mdt', true); %>
-            </div>
+            <%- include('partials/finance-card', { title: 'KEUANGAN DAFTAR ULANG MDT', groupId: 'lama-mdt', stats: dashboardStats.lama.MDT, showSantri: true }) %>
         </div>
     </div>
+
+    <!-- Santri Distribution Chart Row -->
+    <div class="row mb-4">
+        <%- include('partials/chart-card', { title: 'DISTRIBUSI PENDAFTAR SANTRI BARU & DAFTAR ULANG PER KELAS', chartId: 'santriDistributionChart', iconClass: 'fas fa-chart-bar', isHalfWidth: false, isDoughnut: false, height: '300px' }) %>
+    </div>
+
+    <!-- New Charts Row 1 -->
+    <div class="row mb-4">
+        <%- include('partials/chart-card', { title: 'TREN PEMASUKAN BULANAN (TAHUN INI)', chartId: 'trendPemasukanChart', iconClass: 'fas fa-chart-line', isHalfWidth: true, isDoughnut: false }) %>
+        <%- include('partials/chart-card', { title: 'RINCIAN PENGELUARAN PER KATEGORI', chartId: 'kategoriPengeluaranChart', iconClass: 'fas fa-chart-bar', isHalfWidth: true, isDoughnut: false }) %>
+    </div>
+    
+    <!-- New Charts Row 2 -->
+    <div class="row mb-4">
+        <%- include('partials/chart-card', { title: 'STATUS JALUR SANTRI BARU', chartId: 'jalurBaruChart', iconClass: 'fas fa-chart-pie', isHalfWidth: true, isDoughnut: true }) %>
+        <%- include('partials/chart-card', { title: 'STATUS JALUR DAFTAR ULANG', chartId: 'jalurLamaChart', iconClass: 'fas fa-chart-pie', isHalfWidth: true, isDoughnut: true }) %>
+    </div>
+
 
     <div class="row mb-4">
         <!-- Rekap Baru -->
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">REKAPITULASI PENDAFTAR SANTRI BARU</div>
-                <div style="overflow-x: auto;" class="rekap-group">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px;">
-                        <tr>
-                            <th>PAUDQu A</th>
-                            <th>PAUDQu B</th>
-                            <th>TPQ A</th>
-                            <th>TPQ B</th>
-                            <th>TOTAL PAUDQu</th>
-                            <th>TOTAL TPQ</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['PAUDQu A'] %>"><%= dashboardStats.rekapBaru['PAUDQu A'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['PAUDQu B'] %>"><%= dashboardStats.rekapBaru['PAUDQu B'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['TPQ A'] %>"><%= dashboardStats.rekapBaru['TPQ A'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['TPQ B'] %>"><%= dashboardStats.rekapBaru['TPQ B'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-paudqu" data-original="<%= dashboardStats.rekapBaru['PAUDQu A'] + dashboardStats.rekapBaru['PAUDQu B'] %>"><%= dashboardStats.rekapBaru['PAUDQu A'] + dashboardStats.rekapBaru['PAUDQu B'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-tpq" data-original="<%= dashboardStats.rekapBaru['TPQ A'] + dashboardStats.rekapBaru['TPQ B'] + dashboardStats.rekapBaru['TPQ C'] %>"><%= dashboardStats.rekapBaru['TPQ A'] + dashboardStats.rekapBaru['TPQ B'] + dashboardStats.rekapBaru['TPQ C'] %></td>
-                        </tr>
-                        <tr>
-                            <th>MDT 1</th>
-                            <th>MDT 2</th>
-                            <th>MDT 3</th>
-                            <th>MDT 4</th>
-                            <th>TOTAL MDT</th>
-                            <th>TOTAL PENDAFTAR</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['MDT 1'] %>"><%= dashboardStats.rekapBaru['MDT 1'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['MDT 2'] %>"><%= dashboardStats.rekapBaru['MDT 2'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['MDT 3'] %>"><%= dashboardStats.rekapBaru['MDT 3'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapBaru['MDT 4'] %>"><%= dashboardStats.rekapBaru['MDT 4'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-mdt" data-original="<%= dashboardStats.rekapBaru['MDT 1'] + dashboardStats.rekapBaru['MDT 2'] + dashboardStats.rekapBaru['MDT 3'] + dashboardStats.rekapBaru['MDT 4'] %>"><%= dashboardStats.rekapBaru['MDT 1'] + dashboardStats.rekapBaru['MDT 2'] + dashboardStats.rekapBaru['MDT 3'] + dashboardStats.rekapBaru['MDT 4'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-all" style="color: var(--primary); font-size: 16px;" data-original="<%= dashboardStats.madrasahBaru.jumlahSantri %>"><%= dashboardStats.madrasahBaru.jumlahSantri %></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            <%- include('partials/rekap-card', { title: 'REKAPITULASI PENDAFTAR SANTRI BARU', stats: dashboardStats.rekapBaru, totalStats: dashboardStats.madrasahBaru }) %>
         </div>
 
         <!-- Rekap Lama -->
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">REKAPITULASI DAFTAR ULANG SANTRI LAMA</div>
-                <div style="overflow-x: auto;" class="rekap-group">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px;">
-                        <tr>
-                            <th>PAUDQu A</th>
-                            <th>PAUDQu B</th>
-                            <th>TPQ A</th>
-                            <th>TPQ B</th>
-                            <th>TOTAL PAUDQu</th>
-                            <th>TOTAL TPQ</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['PAUDQu A'] %>"><%= dashboardStats.rekapLama['PAUDQu A'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['PAUDQu B'] %>"><%= dashboardStats.rekapLama['PAUDQu B'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['TPQ A'] %>"><%= dashboardStats.rekapLama['TPQ A'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['TPQ B'] %>"><%= dashboardStats.rekapLama['TPQ B'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-paudqu" data-original="<%= dashboardStats.rekapLama['PAUDQu A'] + dashboardStats.rekapLama['PAUDQu B'] %>"><%= dashboardStats.rekapLama['PAUDQu A'] + dashboardStats.rekapLama['PAUDQu B'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-tpq" data-original="<%= dashboardStats.rekapLama['TPQ A'] + dashboardStats.rekapLama['TPQ B'] + dashboardStats.rekapLama['TPQ C'] %>"><%= dashboardStats.rekapLama['TPQ A'] + dashboardStats.rekapLama['TPQ B'] + dashboardStats.rekapLama['TPQ C'] %></td>
-                        </tr>
-                        <tr>
-                            <th>MDT 1</th>
-                            <th>MDT 2</th>
-                            <th>MDT 3</th>
-                            <th>MDT 4</th>
-                            <th>TOTAL MDT</th>
-                            <th>TOTAL PENDAFTAR</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['MDT 1'] %>"><%= dashboardStats.rekapLama['MDT 1'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['MDT 2'] %>"><%= dashboardStats.rekapLama['MDT 2'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['MDT 3'] %>"><%= dashboardStats.rekapLama['MDT 3'] %></td>
-                            <td class="text-center val-rekap" data-original="<%= dashboardStats.rekapLama['MDT 4'] %>"><%= dashboardStats.rekapLama['MDT 4'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-mdt" data-original="<%= dashboardStats.rekapLama['MDT 1'] + dashboardStats.rekapLama['MDT 2'] + dashboardStats.rekapLama['MDT 3'] + dashboardStats.rekapLama['MDT 4'] %>"><%= dashboardStats.rekapLama['MDT 1'] + dashboardStats.rekapLama['MDT 2'] + dashboardStats.rekapLama['MDT 3'] + dashboardStats.rekapLama['MDT 4'] %></td>
-                            <td class="text-center font-weight-bold val-rekap-total-all" style="color: var(--primary); font-size: 16px;" data-original="<%= dashboardStats.madrasahLama.jumlahSantri %>"><%= dashboardStats.madrasahLama.jumlahSantri %></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            <%- include('partials/rekap-card', { title: 'REKAPITULASI DAFTAR ULANG SANTRI LAMA', stats: dashboardStats.rekapLama, totalStats: dashboardStats.madrasahLama }) %>
         </div>
     </div>
 
@@ -272,14 +150,14 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
-                <div class="table-responsive stat-group" data-group="pengeluaran-global">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
+                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="pengeluaran-global">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
                         <tr>
-                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">MADRASAH (UMUM)</th>
-                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">PAUDQu</th>
-                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TPQ</th>
-                            <th style="width: 17%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">MDT</th>
-                            <th style="width: 32%; text-align: center; color: var(--danger); white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MADRASAH (UMUM)</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">PAUDQu</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TPQ</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MDT</th>
+                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
                         </tr>
                         <tr>
                             <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
@@ -297,12 +175,12 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-header"><i class="fas fa-handshake mr-2"></i> STATUS SUBSIDI SPP BEASISWA (ZISWAF JIC)</div>
-                <div class="table-responsive stat-group" data-group="ziswaf-subsidy">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; table-layout: fixed; width: 100%;">
+                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="ziswaf-subsidy">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
                         <tr>
-                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">SANTRI BARU</th>
-                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">DAFTAR ULANG</th>
-                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TOTAL SANTRI</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">SANTRI BARU</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">DAFTAR ULANG</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TOTAL SANTRI</th>
                         </tr>
                         <tr>
                             <td class="text-center val-ziswaf-baru" data-original="<%= dashboardStats.ziswafStats.santriBaru %>"><%= dashboardStats.ziswafStats.santriBaru %></td>
@@ -310,9 +188,9 @@
                             <td class="text-center font-weight-bold val-ziswaf-total-santri" data-original="<%= dashboardStats.ziswafStats.totalSantri %>"><%= dashboardStats.ziswafStats.totalSantri %></td>
                         </tr>
                         <tr>
-                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">TARGET DANA</th>
-                            <th style="width: 33.33%; text-align: center; white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">REALISASI BAYAR</th>
-                            <th style="width: 33.33%; text-align: center; color: var(--danger); white-space: normal !important; word-wrap: break-word; font-size: 11px; padding: 10px 4px;">SISA TUNGGAKAN</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TARGET DANA</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">REALISASI BAYAR</th>
+                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">SISA TUNGGAKAN</th>
                         </tr>
                         <tr>
                             <td class="text-center val-ziswaf-target" data-original="<%= dashboardStats.ziswafStats.targetDana %>">Rp <%= dashboardStats.ziswafStats.targetDana.toLocaleString('id-ID') %></td>
@@ -394,4 +272,378 @@
 
 
 <%- include('partials/footer') %>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Doughnut Chart: Realisasi vs Tunggakan ---
+        const overallBayar = <%= dashboardStats.totalPemasukanGlobal %>;
+        const overallTunggakan = <%= dashboardStats.totalTunggakan %>;
+
+        const centerTextPlugin1 = {
+            id: 'centerText1',
+            beforeDraw: function(chart) {
+                if (chart.data.datasets[0].data.length === 0) return;
+                const ctx = chart.ctx;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta.data || meta.data.length === 0) return;
+                const centerX = meta.data[0].x;
+                const centerY = meta.data[0].y;
+                
+                const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const value = chart.data.datasets[0].data[0];
+                const percent = total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
+                
+                ctx.restore();
+                ctx.font = "bold 22px Inter, sans-serif";
+                ctx.fillStyle = "#059669"; 
+                ctx.textBaseline = "middle";
+                const textWidth = ctx.measureText(percent).width;
+                ctx.fillText(percent, centerX - textWidth / 2, centerY - 5);
+                
+                ctx.font = "12px Inter, sans-serif";
+                ctx.fillStyle = "#64748b";
+                const label = "Tercapai";
+                const labelWidth = ctx.measureText(label).width;
+                ctx.fillText(label, centerX - labelWidth / 2, centerY + 15);
+                ctx.save();
+            }
+        };
+
+        const ctx1 = document.getElementById('incomeOverviewChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'doughnut',
+            plugins: [centerTextPlugin1],
+            data: {
+                labels: ['Realisasi Bayar', 'Sisa Tunggakan'],
+                datasets: [{
+                    data: [overallBayar, overallTunggakan],
+                    backgroundColor: ['#059669', '#ef4444'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                cutout: '65%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: 'Inter', size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                return label + ': Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 2. Bar Chart: Perbandingan Unit ---
+        const units = ['PAUDQu', 'TPQ', 'MDT'];
+        
+        // Baru
+        const baruTagihan = [
+            <%= dashboardStats.baru.PAUDQu.totalTagihan %>,
+            <%= dashboardStats.baru.TPQ.totalTagihan %>,
+            <%= dashboardStats.baru.MDT.totalTagihan %>
+        ];
+        const baruBayar = [
+            <%= dashboardStats.baru.PAUDQu.totalBayar %>,
+            <%= dashboardStats.baru.TPQ.totalBayar %>,
+            <%= dashboardStats.baru.MDT.totalBayar %>
+        ];
+
+        // Lama
+        const lamaTagihan = [
+            <%= dashboardStats.lama.PAUDQu.totalTagihan %>,
+            <%= dashboardStats.lama.TPQ.totalTagihan %>,
+            <%= dashboardStats.lama.MDT.totalTagihan %>
+        ];
+        const lamaBayar = [
+            <%= dashboardStats.lama.PAUDQu.totalBayar %>,
+            <%= dashboardStats.lama.TPQ.totalBayar %>,
+            <%= dashboardStats.lama.MDT.totalBayar %>
+        ];
+
+        // Combine for overall unit Tagihan vs Bayar
+        const unitTagihan = units.map((_, i) => baruTagihan[i] + lamaTagihan[i]);
+        const unitBayar = units.map((_, i) => baruBayar[i] + lamaBayar[i]);
+
+        const ctx2 = document.getElementById('unitComparisonChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: units,
+                datasets: [
+                    {
+                        label: 'Total Tagihan',
+                        data: unitTagihan,
+                        backgroundColor: '#cbd5e1',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Realisasi Bayar',
+                        data: unitBayar,
+                        backgroundColor: '#059669',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Inter', size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                let value = context.raw || 0;
+                                return label + ': Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000000000) return 'Rp ' + (value / 1000000000) + ' M';
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000) + ' Jt';
+                                if (value >= 1000) return 'Rp ' + (value / 1000) + ' Rb';
+                                return 'Rp ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 3. Bar Chart: Distribusi Kelas ---
+        const kelasLabels = ['PAUDQu A', 'PAUDQu B', 'TPQ A', 'TPQ B', 'TPQ C', 'MDT 1', 'MDT 2', 'MDT 3', 'MDT 4'];
+        const rekapBaruData = [
+            <%= dashboardStats.rekapBaru['PAUDQu A'] || 0 %>,
+            <%= dashboardStats.rekapBaru['PAUDQu B'] || 0 %>,
+            <%= dashboardStats.rekapBaru['TPQ A'] || 0 %>,
+            <%= dashboardStats.rekapBaru['TPQ B'] || 0 %>,
+            <%= dashboardStats.rekapBaru['TPQ C'] || 0 %>,
+            <%= dashboardStats.rekapBaru['MDT 1'] || 0 %>,
+            <%= dashboardStats.rekapBaru['MDT 2'] || 0 %>,
+            <%= dashboardStats.rekapBaru['MDT 3'] || 0 %>,
+            <%= dashboardStats.rekapBaru['MDT 4'] || 0 %>
+        ];
+        const rekapLamaData = [
+            <%= dashboardStats.rekapLama['PAUDQu A'] || 0 %>,
+            <%= dashboardStats.rekapLama['PAUDQu B'] || 0 %>,
+            <%= dashboardStats.rekapLama['TPQ A'] || 0 %>,
+            <%= dashboardStats.rekapLama['TPQ B'] || 0 %>,
+            <%= dashboardStats.rekapLama['TPQ C'] || 0 %>,
+            <%= dashboardStats.rekapLama['MDT 1'] || 0 %>,
+            <%= dashboardStats.rekapLama['MDT 2'] || 0 %>,
+            <%= dashboardStats.rekapLama['MDT 3'] || 0 %>,
+            <%= dashboardStats.rekapLama['MDT 4'] || 0 %>
+        ];
+
+        const ctx3 = document.getElementById('santriDistributionChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: kelasLabels,
+                datasets: [
+                    {
+                        label: 'Santri Baru',
+                        data: rekapBaruData,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Daftar Ulang (Santri Lama)',
+                        data: rekapLamaData,
+                        backgroundColor: '#d97706',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Inter', size: 12 } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 4. Line Chart: Tren Pemasukan Bulanan ---
+        const trendData = <%- JSON.stringify(dashboardStats.trendArray || []) %>;
+        const bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        const ctx4 = document.getElementById('trendPemasukanChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'line',
+            data: {
+                labels: bulanLabels,
+                datasets: [{
+                    label: 'Total Pemasukan',
+                    data: trendData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000000000) return 'Rp ' + (value / 1000000000) + ' M';
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000) + ' Jt';
+                                if (value >= 1000) return 'Rp ' + (value / 1000) + ' Rb';
+                                return 'Rp ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 5. Horizontal Bar Chart: Kategori Pengeluaran ---
+        const pengeluaranKategoriData = <%- JSON.stringify(dashboardStats.pengeluaranKategori || []) %>;
+        const kategoriLabels = pengeluaranKategoriData.map(item => item.kategoriDana || 'Lainnya');
+        const kategoriValues = pengeluaranKategoriData.map(item => item.total);
+        const ctx5 = document.getElementById('kategoriPengeluaranChart').getContext('2d');
+        new Chart(ctx5, {
+            type: 'bar',
+            data: {
+                labels: kategoriLabels,
+                datasets: [{
+                    label: 'Total Pengeluaran',
+                    data: kategoriValues,
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Makes it horizontal
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000000000) return 'Rp ' + (value / 1000000000) + ' M';
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000) + ' Jt';
+                                if (value >= 1000) return 'Rp ' + (value / 1000) + ' Rb';
+                                return 'Rp ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 6. Pie Chart: Status Jalur Santri Baru ---
+        const jalurBaruData = <%- JSON.stringify(dashboardStats.jalurStatsBaru || {}) %>;
+        const ctx6 = document.getElementById('jalurBaruChart').getContext('2d');
+        new Chart(ctx6, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(jalurBaruData),
+                datasets: [{
+                    data: Object.values(jalurBaruData),
+                    backgroundColor: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#64748b'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Inter', size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                return label + ': ' + value + ' Santri';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 7. Pie Chart: Status Jalur Daftar Ulang ---
+        const jalurLamaData = <%- JSON.stringify(dashboardStats.jalurStatsLama || {}) %>;
+        const ctx7 = document.getElementById('jalurLamaChart').getContext('2d');
+        new Chart(ctx7, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(jalurLamaData),
+                datasets: [{
+                    data: Object.values(jalurLamaData),
+                    backgroundColor: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#64748b'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Inter', size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                return label + ': ' + value + ' Santri';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 <script src="/js/dashboard.js"></script>

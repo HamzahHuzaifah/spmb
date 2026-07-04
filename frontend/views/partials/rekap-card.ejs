@@ -1,0 +1,39 @@
+<div class="card h-100">
+    <div class="card-header"><%= title %></div>
+    <div style="overflow-x: auto;" class="rekap-group">
+        <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px;">
+            <tr>
+                <th style="white-space: nowrap;">PAUDQu A</th>
+                <th style="white-space: nowrap;">PAUDQu B</th>
+                <th style="white-space: nowrap;">TPQ A</th>
+                <th style="white-space: nowrap;">TPQ B</th>
+                <th style="white-space: nowrap;">TOTAL PAUDQu</th>
+                <th style="white-space: nowrap;">TOTAL TPQ</th>
+            </tr>
+            <tr>
+                <td class="text-center val-rekap" data-original="<%= stats['PAUDQu A'] %>"><%= stats['PAUDQu A'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['PAUDQu B'] %>"><%= stats['PAUDQu B'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['TPQ A'] %>"><%= stats['TPQ A'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['TPQ B'] %>"><%= stats['TPQ B'] %></td>
+                <td class="text-center font-weight-bold val-rekap-total-paudqu" data-original="<%= stats['PAUDQu A'] + stats['PAUDQu B'] %>"><%= stats['PAUDQu A'] + stats['PAUDQu B'] %></td>
+                <td class="text-center font-weight-bold val-rekap-total-tpq" data-original="<%= stats['TPQ A'] + stats['TPQ B'] + stats['TPQ C'] %>"><%= stats['TPQ A'] + stats['TPQ B'] + stats['TPQ C'] %></td>
+            </tr>
+            <tr>
+                <th style="white-space: nowrap;">MDT 1</th>
+                <th style="white-space: nowrap;">MDT 2</th>
+                <th style="white-space: nowrap;">MDT 3</th>
+                <th style="white-space: nowrap;">MDT 4</th>
+                <th style="white-space: nowrap;">TOTAL MDT</th>
+                <th style="white-space: nowrap;">TOTAL PENDAFTAR</th>
+            </tr>
+            <tr>
+                <td class="text-center val-rekap" data-original="<%= stats['MDT 1'] %>"><%= stats['MDT 1'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['MDT 2'] %>"><%= stats['MDT 2'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['MDT 3'] %>"><%= stats['MDT 3'] %></td>
+                <td class="text-center val-rekap" data-original="<%= stats['MDT 4'] %>"><%= stats['MDT 4'] %></td>
+                <td class="text-center font-weight-bold val-rekap-total-mdt" data-original="<%= stats['MDT 1'] + stats['MDT 2'] + stats['MDT 3'] + stats['MDT 4'] %>"><%= stats['MDT 1'] + stats['MDT 2'] + stats['MDT 3'] + stats['MDT 4'] %></td>
+                <td class="text-center font-weight-bold val-rekap-total-all" style="color: var(--primary); font-size: 16px;" data-original="<%= totalStats.jumlahSantri %>"><%= totalStats.jumlahSantri %></td>
+            </tr>
+        </table>
+    </div>
+</div>

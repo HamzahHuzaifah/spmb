@@ -1,0 +1,25 @@
+<%
+  const halfWidth = typeof isHalfWidth !== 'undefined' ? isHalfWidth : true;
+  const cardHeight = typeof height !== 'undefined' ? height : '320px';
+  const doughnut = typeof isDoughnut !== 'undefined' ? isDoughnut : false;
+%>
+<div class="<%= halfWidth ? 'col-md-6' : 'col-md-12' %> mb-4">
+    <div class="card h-100">
+        <div class="card-header">
+            <i class="<%= iconClass %> mr-2"></i> <%= title %>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <% if (doughnut) { %>
+                <div style="position: relative; height: <%= cardHeight %>; display: flex; align-items: center; justify-content: center; padding: 1.25rem;">
+                    <canvas id="<%= chartId %>" style="max-height: 280px; max-width: 280px;"></canvas>
+                </div>
+            <% } else { %>
+                <div style="overflow-x: auto; overflow-y: hidden; width: 100%; height: <%= cardHeight %>;">
+                    <div style="min-width: 650px; height: 100%; position: relative; padding: 1.25rem;">
+                        <canvas id="<%= chartId %>" style="height: 100%; width: 100%;"></canvas>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

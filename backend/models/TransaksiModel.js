@@ -376,6 +376,37 @@ class TransaksiModel {
         return parseInt(rows[0].total) || 0;
     }
 
+    // Mendapatkan Trend Pemasukan Bulanan
+    static async getPemasukanTrendBulanan(year) {
+        const query = `
+            SELECT MONTH(tanggal) as bulan, SUM(nominal) as total
+            FROM transaksi
+            WHERE jenis = 'Pemasukan' AND YEAR(tanggal) = ?
+            GROUP BY MONTH(tanggal)
+            ORDER BY bulan ASC
+        `;
+        const [rows] = await db.execute(query, [year]);
+        return rows;
+    }
+
+    // Mendapatkan Rincian Pengeluaran berdasarkan Kategori Dana
+    static async getPengeluaranKategori(filterTanggal) {
+        let query = `
+            SELECT kategoriDana, SUM(nominal) as total
+            FROM transaksi
+            WHERE jenis = 'Pengeluaran'
+        `;
+        let params = [];
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+        query += ' GROUP BY kategoriDana';
+        
+        const [rows] = await db.execute(query, params);
+        return rows;
+    }
+
     // Mendapatkan Pengeluaran per Unit (PAUDQu, TPQ, MDT, MADRASAH)
     static async getPengeluaranRekap(filterTanggal) {
         let query = `
