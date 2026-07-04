@@ -267,7 +267,14 @@ exports.editTransaksi = async (req, res) => {
             const laporanData = await TransaksiModel.getAllLaporan();
             const lap = laporanData.find(l => l.noTransaksi === trx.noTransaksi);
             if (lap) {
-                if (tanggal) lap.tanggal = tanggal;
+                if (tanggal) {
+                    lap.tanggal = tanggal;
+                    const dateParts = tanggal.split('-');
+                    if (dateParts.length >= 2) {
+                        lap.bulan = dateParts[1];
+                        lap.tahun = dateParts[0];
+                    }
+                }
                 if (trx.jenis === 'Pengeluaran') {
                     lap.pengeluaran = nominalBaru;
                 } else {

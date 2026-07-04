@@ -186,6 +186,11 @@ class SantriModel {
         await db.execute('DELETE FROM santri WHERE id = ?', [id]);
     }
 
+    static async getSantriCountByNamaAndPendidikan(nama, pendidikan) {
+        const [rows] = await db.execute('SELECT COUNT(*) as total FROM santri WHERE nama = ? AND pendidikan = ?', [nama, pendidikan]);
+        return rows[0].total;
+    }
+
     // ---- Santri Daftar Ulang ----
     static async getAllSantriDaftarUlang() {
         const [rows] = await db.execute('SELECT * FROM santri_daftar_ulang ORDER BY id DESC');
@@ -389,6 +394,11 @@ class SantriModel {
 
     static async deleteSantriDaftarUlang(id) {
         await db.execute('DELETE FROM santri_daftar_ulang WHERE id = ?', [id]);
+    }
+
+    static async getSantriDaftarUlangCountByNamaAndLanjutKe(nama, lanjutKe) {
+        const [rows] = await db.execute('SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE nama = ? AND lanjutKe = ?', [nama, lanjutKe]);
+        return rows[0].total;
     }
 }
 

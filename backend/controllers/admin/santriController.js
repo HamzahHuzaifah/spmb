@@ -223,14 +223,20 @@ exports.deleteSantri = async (req, res) => {
         const santri = await SantriModel.getSantriById(id);
         if (santri) {
             await SantriModel.deleteSantri(id);
-            // Delete related tagihan
-            await TagihanModel.deleteTagihanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+            
+            const count = await SantriModel.getSantriCountByNamaAndPendidikan(santri.nama, santri.pendidikan);
+            
+            // Hanya hapus jika tidak ada lagi santri dengan nama dan pendidikan yang sama (bukan duplicate)
+            if (count === 0) {
+                // Delete related tagihan
+                await TagihanModel.deleteTagihanByNamaAndPendidikan(santri.nama, santri.pendidikan);
 
-            // Delete related tunggakan
-            await TunggakanModel.deleteTunggakanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+                // Delete related tunggakan
+                await TunggakanModel.deleteTunggakanByNamaAndPendidikan(santri.nama, santri.pendidikan);
 
-            // Delete related transaksi & laporan
-            await TransaksiModel.deleteTransaksiAndLaporanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+                // Delete related transaksi & laporan
+                await TransaksiModel.deleteTransaksiAndLaporanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+            }
         }
         res.redirect('/santri');
     } catch (err) {
@@ -245,14 +251,19 @@ exports.deleteSantriDaftarUlang = async (req, res) => {
         const santri = await SantriModel.getSantriDaftarUlangById(id);
         if (santri) {
             await SantriModel.deleteSantriDaftarUlang(id);
-            // Delete related tagihan
-            await TagihanModel.deleteTagihanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+            
+            const count = await SantriModel.getSantriDaftarUlangCountByNamaAndLanjutKe(santri.nama, santri.lanjutKe);
+            
+            if (count === 0) {
+                // Delete related tagihan
+                await TagihanModel.deleteTagihanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
 
-            // Delete related tunggakan
-            await TunggakanModel.deleteTunggakanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+                // Delete related tunggakan
+                await TunggakanModel.deleteTunggakanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
 
-            // Delete related transaksi & laporan
-            await TransaksiModel.deleteTransaksiAndLaporanByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+                // Delete related transaksi & laporan
+                await TransaksiModel.deleteTransaksiAndLaporanByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+            }
         }
         res.redirect('/santri-daftar-ulang');
     } catch (err) {
