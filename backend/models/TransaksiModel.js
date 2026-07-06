@@ -164,13 +164,13 @@ class TransaksiModel {
 
     static async deleteTransaksiAndLaporanByNamaAndPendidikan(nama, satuanPendidikan) {
         // Ambil semua transaksi yang cocok (contoh: 'TPQ A' LIKE CONCAT('TPQ', '%'))
-        const [rows] = await db.execute('SELECT noTransaksi FROM transaksi WHERE namaSantri = ? AND ? LIKE CONCAT(satuanPendidikan, "%")', [nama, satuanPendidikan]);
+        const [rows] = await db.execute('SELECT noTransaksi FROM transaksi WHERE namaSantri = ? AND ? LIKE CONCAT(satuanPendidikan, "%") LIMIT 1', [nama, satuanPendidikan]);
         for (let row of rows) {
             // Hapus laporan berdasarkan noTransaksi
             await db.execute('DELETE FROM laporan WHERE noTransaksi = ?', [row.noTransaksi]);
         }
         // Hapus transaksinya
-        await db.execute('DELETE FROM transaksi WHERE namaSantri = ? AND ? LIKE CONCAT(satuanPendidikan, "%")', [nama, satuanPendidikan]);
+        await db.execute('DELETE FROM transaksi WHERE namaSantri = ? AND ? LIKE CONCAT(satuanPendidikan, "%") LIMIT 1', [nama, satuanPendidikan]);
     }
 
     // ---- Laporan ----

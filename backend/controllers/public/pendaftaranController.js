@@ -89,7 +89,8 @@ exports.postFormPendaftaran = async (req, res) => {
             perlengkapan,
             seragam,
             spp,
-            totalTagihan
+            totalTagihan,
+            nomorPendaftaran
         });
 
         await TunggakanModel.addTunggakan({
@@ -99,7 +100,8 @@ exports.postFormPendaftaran = async (req, res) => {
             totalTagihan,
             totalBayar: 0,
             sisaBayar: totalTagihan,
-            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas'
+            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas',
+            nomorPendaftaran
         });
 
         if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
@@ -194,7 +196,8 @@ exports.postFormDaftarUlang = async (req, res) => {
             perlengkapan,
             seragam,
             spp,
-            totalTagihan
+            totalTagihan,
+            nomorPendaftaran
         });
 
         await TunggakanModel.addTunggakanDaftarUlang({
@@ -204,7 +207,8 @@ exports.postFormDaftarUlang = async (req, res) => {
             totalTagihan,
             totalBayar: 0,
             sisaBayar: totalTagihan,
-            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas'
+            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas',
+            nomorPendaftaran
         });
 
         if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
@@ -321,7 +325,8 @@ exports.postFormBeasiswa = async (req, res) => {
             perlengkapan,
             seragam,
             spp,
-            totalTagihan
+            totalTagihan,
+            nomorPendaftaran
         });
 
         await TunggakanModel.addTunggakan({
@@ -331,7 +336,8 @@ exports.postFormBeasiswa = async (req, res) => {
             totalTagihan,
             totalBayar: 0,
             sisaBayar: totalTagihan,
-            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas'
+            status: totalTagihan <= 0 ? 'Lunas' : 'Belum Lunas',
+            nomorPendaftaran
         });
 
         if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {

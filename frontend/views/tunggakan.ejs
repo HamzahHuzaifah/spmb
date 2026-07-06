@@ -21,6 +21,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>No. Pendaftaran</th>
                 <th>Nama Lengkap</th>
                 <th>Satuan Pendidikan</th>
                 <th>No Telepon</th>
@@ -35,6 +36,7 @@
                 <% tunggakan.forEach((item, index) => { %>
                 <tr>
                     <td><%= index + 1 %></td>
+                    <td><%= item.nomorPendaftaran || '-' %></td>
                     <td style="font-weight: 600;"><%= item.nama %></td>
                     <td><%= item.satuanPendidikan %></td>
                     <td><%= item.noTelepon %></td>
@@ -50,7 +52,7 @@
                 <% }) %>
             <% } else { %>
                 <tr>
-                    <td colspan="8" style="text-align: center;">Tidak ada data tunggakan</td>
+                    <td colspan="9" style="text-align: center;">Tidak ada data tunggakan</td>
                 </tr>
             <% } %>
         </tbody>

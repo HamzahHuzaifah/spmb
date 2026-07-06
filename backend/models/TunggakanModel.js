@@ -101,12 +101,13 @@ class TunggakanModel {
     static async addTunggakan(data) {
         const query = `
             INSERT INTO tunggakan (
-                nama, satuanPendidikan, noTelepon, totalTagihan, totalBayar, sisaBayar, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                nama, satuanPendidikan, noTelepon, totalTagihan, totalBayar, sisaBayar, status, nomorPendaftaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [
             data.nama !== undefined ? data.nama : null, data.satuanPendidikan !== undefined ? data.satuanPendidikan : null, data.noTelepon !== undefined ? data.noTelepon : null, data.totalTagihan !== undefined ? data.totalTagihan : null, 
-            data.totalBayar !== undefined ? data.totalBayar : null, data.sisaBayar !== undefined ? data.sisaBayar : null, data.status !== undefined ? data.status : null
+            data.totalBayar !== undefined ? data.totalBayar : null, data.sisaBayar !== undefined ? data.sisaBayar : null, data.status !== undefined ? data.status : null,
+            data.nomorPendaftaran !== undefined ? data.nomorPendaftaran : null
         ];
         const [result] = await db.execute(query, values);
         return result.insertId;
@@ -157,7 +158,7 @@ class TunggakanModel {
     }
 
     static async deleteTunggakanByNamaAndPendidikan(nama, pendidikan) {
-        await db.execute('DELETE FROM tunggakan WHERE nama = ? AND satuanPendidikan = ?', [nama, pendidikan]);
+        await db.execute('DELETE FROM tunggakan WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
     }
 
     static async deleteTunggakan(id) {
@@ -264,12 +265,13 @@ class TunggakanModel {
     static async addTunggakanDaftarUlang(data) {
         const query = `
             INSERT INTO tunggakan_daftar_ulang (
-                nama, satuanPendidikan, noTelepon, totalTagihan, totalBayar, sisaBayar, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                nama, satuanPendidikan, noTelepon, totalTagihan, totalBayar, sisaBayar, status, nomorPendaftaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [
             data.nama !== undefined ? data.nama : null, data.satuanPendidikan !== undefined ? data.satuanPendidikan : null, data.noTelepon !== undefined ? data.noTelepon : null, data.totalTagihan !== undefined ? data.totalTagihan : null, 
-            data.totalBayar !== undefined ? data.totalBayar : null, data.sisaBayar !== undefined ? data.sisaBayar : null, data.status !== undefined ? data.status : null
+            data.totalBayar !== undefined ? data.totalBayar : null, data.sisaBayar !== undefined ? data.sisaBayar : null, data.status !== undefined ? data.status : null,
+            data.nomorPendaftaran !== undefined ? data.nomorPendaftaran : null
         ];
         const [result] = await db.execute(query, values);
         return result.insertId;
@@ -320,7 +322,7 @@ class TunggakanModel {
     }
 
     static async deleteTunggakanDaftarUlangByNamaAndPendidikan(nama, pendidikan) {
-        await db.execute('DELETE FROM tunggakan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ?', [nama, pendidikan]);
+        await db.execute('DELETE FROM tunggakan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
     }
 
     static async deleteTunggakanDaftarUlang(id) {

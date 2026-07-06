@@ -78,8 +78,8 @@ class TagihanModel {
     static async addTagihan(data) {
         const query = `
             INSERT INTO tagihan (
-                nama, jalur, satuanPendidikan, formulir, uangPangkal, perlengkapan, seragam, spp, totalTagihan
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                nama, jalur, satuanPendidikan, formulir, uangPangkal, perlengkapan, seragam, spp, totalTagihan, nomorPendaftaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [
             data.nama !== undefined ? data.nama : null,
@@ -90,7 +90,8 @@ class TagihanModel {
             data.perlengkapan !== undefined ? data.perlengkapan : 0,
             data.seragam !== undefined ? data.seragam : 0,
             data.spp !== undefined ? data.spp : 0,
-            data.totalTagihan !== undefined ? data.totalTagihan : 0
+            data.totalTagihan !== undefined ? data.totalTagihan : 0,
+            data.nomorPendaftaran !== undefined ? data.nomorPendaftaran : null
         ];
         const [result] = await db.execute(query, values);
         return result.insertId;
@@ -145,7 +146,7 @@ class TagihanModel {
     }
 
     static async deleteTagihanByNamaAndPendidikan(nama, pendidikan) {
-        await db.execute('DELETE FROM tagihan WHERE nama = ? AND satuanPendidikan = ?', [nama, pendidikan]);
+        await db.execute('DELETE FROM tagihan WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
     }
 
     static async deleteTagihan(id) {
@@ -230,8 +231,8 @@ class TagihanModel {
         const query = `
             INSERT INTO tagihan_daftar_ulang (
                 nama, jalur, satuanPendidikanSebelumnya, satuanPendidikan, formulir, 
-                uangPangkal, perlengkapan, seragam, spp, totalTagihan
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                uangPangkal, perlengkapan, seragam, spp, totalTagihan, nomorPendaftaran
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [
             data.nama !== undefined ? data.nama : null,
@@ -243,7 +244,8 @@ class TagihanModel {
             data.perlengkapan !== undefined ? data.perlengkapan : 0,
             data.seragam !== undefined ? data.seragam : 0,
             data.spp !== undefined ? data.spp : 0,
-            data.totalTagihan !== undefined ? data.totalTagihan : 0
+            data.totalTagihan !== undefined ? data.totalTagihan : 0,
+            data.nomorPendaftaran !== undefined ? data.nomorPendaftaran : null
         ];
         const [result] = await db.execute(query, values);
         return result.insertId;
@@ -300,7 +302,7 @@ class TagihanModel {
     }
 
     static async deleteTagihanDaftarUlangByNamaAndPendidikan(nama, pendidikan) {
-        await db.execute('DELETE FROM tagihan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ?', [nama, pendidikan]);
+        await db.execute('DELETE FROM tagihan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
     }
 
     static async deleteTagihanDaftarUlang(id) {

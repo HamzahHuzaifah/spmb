@@ -22,6 +22,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>No. Pendaftaran</th>
                 <th>Nama Santri</th>
                 <th>Jalur Pendaftaran</th>
                 <th>Satuan Pendidikan</th>
@@ -41,6 +42,7 @@
                 <% tagihan.forEach((item, index) => { %>
                 <tr>
                     <td><%= (typeof currentPage !== 'undefined' ? (currentPage - 1) * 10 : 0) + index + 1 %></td>
+                    <td><%= item.nomorPendaftaran || '-' %></td>
                     <td style="font-weight: 600;"><%= item.nama %></td>
                     <td>
                         <span class="badge <%= item.jalur === 'Regular' ? 'badge-info' : 'badge-warning' %>">
@@ -73,7 +75,7 @@
                 <% }) %>
             <% } else { %>
                 <tr>
-                    <td colspan="13" style="text-align: center;">Tidak ada data tagihan</td>
+                    <td colspan="14" style="text-align: center;">Tidak ada data tagihan</td>
                 </tr>
             <% } %>
         </tbody>
