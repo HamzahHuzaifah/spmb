@@ -709,3 +709,435 @@
             }
         });
     }
+
+// ==========================================
+// SPREADSHEET-LIKE TABLE FILTER & SORTING
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const tables = document.querySelectorAll('.table-container table, table#dataTable, table#tabelLaporan');
+    if (tables.length === 0) return;
+
+    // Injeksi CSS untuk UI Dropdown Filter
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = `
+        th.filterable {
+            position: relative;
+            padding-right: 28px !important;
+        }
+        .col-filter-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #a0aec0;
+            padding: 3px;
+            border-radius: 4px;
+            font-size: 11px;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .col-filter-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--primary, #10b981);
+        }
+        .col-filter-btn.active {
+            color: var(--primary, #10b981);
+            font-weight: bold;
+        }
+        .col-filter-dropdown {
+            position: absolute;
+            z-index: 99999;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 250px;
+            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px;
+            color: #2d3748;
+            box-sizing: border-box;
+        }
+        .col-filter-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+        .col-filter-menu-item:hover {
+            background: #f7fafc;
+            color: var(--primary, #10b981);
+        }
+        .col-filter-menu-item i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+            color: #718096;
+        }
+        .col-filter-menu-item:hover i {
+            color: var(--primary, #10b981);
+        }
+        .col-filter-divider {
+            height: 1px;
+            background: #edf2f7;
+            margin: 6px 0;
+        }
+        .col-filter-search-container {
+            margin-bottom: 6px;
+        }
+        .col-filter-search-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .col-filter-search-input:focus {
+            border-color: var(--primary, #10b981);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .col-filter-options-actions {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #718096;
+            margin-bottom: 4px;
+            padding: 0 2px;
+        }
+        .col-filter-action-all, .col-filter-action-clear {
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .col-filter-action-all:hover, .col-filter-action-clear:hover {
+            color: var(--primary, #10b981);
+            text-decoration: underline;
+        }
+        .col-filter-options-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #edf2f7;
+            border-radius: 6px;
+            padding: 4px;
+            background: #fdfdfd;
+            margin-bottom: 10px;
+        }
+        .col-filter-option-item {
+            display: flex;
+            align-items: center;
+            padding: 3px 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            user-select: none;
+        }
+        .col-filter-option-item:hover {
+            background: #f7fafc;
+        }
+        .col-filter-option-item input {
+            margin-right: 6px;
+            cursor: pointer;
+        }
+        .col-filter-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .col-filter-btn-ok {
+            background: var(--primary, #10b981);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .col-filter-btn-ok:hover {
+            opacity: 0.9;
+        }
+        .col-filter-btn-cancel {
+            background: #edf2f7;
+            color: #4a5568;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .col-filter-btn-cancel:hover {
+            background: #e2e8f0;
+        }
+    `;
+    document.head.appendChild(styleEl);
+
+    // Dynamic dropdown overlay
+    let filterDropdown = document.createElement('div');
+    filterDropdown.className = 'col-filter-dropdown';
+    filterDropdown.style.display = 'none';
+    document.body.appendChild(filterDropdown);
+
+    let activeTable = null;
+    let activeColIndex = null;
+    let activeBtn = null;
+
+    tables.forEach(table => {
+        if (table.getAttribute('data-spreadsheet-filters') === 'true') return;
+        table.setAttribute('data-spreadsheet-filters', 'true');
+        table._activeFilters = {};
+
+        // Ambil nilai indeks awal baris
+        const firstRow = table.querySelector('tbody tr');
+        if (firstRow && firstRow.cells[0]) {
+            table._startIndex = parseInt(firstRow.cells[0].textContent.trim()) || 1;
+        }
+
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((th, idx) => {
+            const txt = th.textContent.trim().toLowerCase();
+            // Skip kolom No, Aksi, Action, Detail, Print, dsb
+            if (txt === 'no' || txt === 'no.' || txt === 'aksi' || txt === 'action' || txt === 'detail' || txt === 'print' || txt === '') return;
+
+            th.classList.add('filterable');
+            const btn = document.createElement('span');
+            btn.className = 'col-filter-btn';
+            btn.innerHTML = '<i class="fas fa-caret-down"></i>';
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openFilterDropdown(table, idx, btn);
+            });
+            th.appendChild(btn);
+        });
+    });
+
+    function openFilterDropdown(table, colIndex, btn) {
+        activeTable = table;
+        activeColIndex = colIndex;
+        activeBtn = btn;
+
+        const rect = btn.getBoundingClientRect();
+        filterDropdown.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        const leftPos = rect.left + window.scrollX;
+        if (leftPos + 250 > window.innerWidth) {
+            filterDropdown.style.left = `${window.innerWidth - 270}px`;
+        } else {
+            filterDropdown.style.left = `${leftPos}px`;
+        }
+
+        // Get unique values
+        const rows = Array.from(table.querySelectorAll('tbody tr:not(.no-data-row)'));
+        const uniqueValues = new Set();
+        rows.forEach(row => {
+            if (row.cells[colIndex]) {
+                uniqueValues.add(row.cells[colIndex].textContent.trim());
+            }
+        });
+
+        const sortedValues = Array.from(uniqueValues).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
+        const activeFilters = table._activeFilters[colIndex] || null;
+
+        // Render Dropdown Content
+        filterDropdown.innerHTML = `
+            <div class="col-filter-menu-item" id="colSortAsc"><i class="fas fa-sort-alpha-down"></i> Urutkan A ke Z</div>
+            <div class="col-filter-menu-item" id="colSortDesc"><i class="fas fa-sort-alpha-up"></i> Urutkan Z ke A</div>
+            <div class="col-filter-divider"></div>
+            <div class="col-filter-search-container">
+                <input type="text" class="col-filter-search-input" id="colSearchInput" placeholder="Cari...">
+            </div>
+            <div class="col-filter-options-actions">
+                <span class="col-filter-action-all" id="colActionAll">Pilih Semua (${sortedValues.length})</span>
+                <span class="col-filter-action-clear" id="colActionClear">Kosongkan</span>
+            </div>
+            <div class="col-filter-options-list" id="colOptionsList">
+                ${sortedValues.map((val, i) => `
+                    <label class="col-filter-option-item">
+                        <input type="checkbox" value="${encodeURIComponent(val)}" ${(!activeFilters || activeFilters.includes(val)) ? 'checked' : ''}>
+                        <span>${val || '(Kosong)'}</span>
+                    </label>
+                `).join('')}
+            </div>
+            <div class="col-filter-footer">
+                <button class="col-filter-btn-cancel" id="colBtnCancel">Batal</button>
+                <button class="col-filter-btn-ok" id="colBtnOk">OK</button>
+            </div>
+        `;
+
+        filterDropdown.style.display = 'block';
+
+        // Handlers
+        document.getElementById('colSortAsc').addEventListener('click', () => {
+            sortTableColumn(table, colIndex, false);
+            filterDropdown.style.display = 'none';
+        });
+
+        document.getElementById('colSortDesc').addEventListener('click', () => {
+            sortTableColumn(table, colIndex, true);
+            filterDropdown.style.display = 'none';
+        });
+
+        const searchInput = document.getElementById('colSearchInput');
+        const optionsList = document.getElementById('colOptionsList');
+        searchInput.focus();
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const items = optionsList.querySelectorAll('.col-filter-option-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        });
+
+        document.getElementById('colActionAll').addEventListener('click', () => {
+            const checkboxes = optionsList.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.closest('.col-filter-option-item').style.display !== 'none') {
+                    cb.checked = true;
+                }
+            });
+        });
+
+        document.getElementById('colActionClear').addEventListener('click', () => {
+            const checkboxes = optionsList.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.closest('.col-filter-option-item').style.display !== 'none') {
+                    cb.checked = false;
+                }
+            });
+        });
+
+        document.getElementById('colBtnCancel').addEventListener('click', () => {
+            filterDropdown.style.display = 'none';
+        });
+
+        document.getElementById('colBtnOk').addEventListener('click', () => {
+            const checkboxes = optionsList.querySelectorAll('input[type="checkbox"]');
+            const selected = [];
+            const unselected = [];
+            checkboxes.forEach(cb => {
+                const val = decodeURIComponent(cb.value);
+                if (cb.checked) {
+                    selected.push(val);
+                } else {
+                    unselected.push(val);
+                }
+            });
+
+            if (unselected.length === 0) {
+                table._activeFilters[colIndex] = null;
+            } else {
+                table._activeFilters[colIndex] = selected;
+            }
+
+            applyFilters(table);
+            filterDropdown.style.display = 'none';
+        });
+    }
+
+    function applyFilters(table) {
+        const rows = Array.from(table.querySelectorAll('tbody tr:not(.no-data-row)'));
+        const activeFilters = table._activeFilters;
+
+        rows.forEach(row => {
+            let isVisible = true;
+            for (let idx in activeFilters) {
+                const allowed = activeFilters[idx];
+                if (allowed) {
+                    const cellVal = row.cells[idx] ? row.cells[idx].textContent.trim() : '';
+                    if (!allowed.includes(cellVal)) {
+                        isVisible = false;
+                        break;
+                    }
+                }
+            }
+            row.style.display = isVisible ? '' : 'none';
+        });
+
+        updateRowNumbers(table);
+
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((th, idx) => {
+            const btn = th.querySelector('.col-filter-btn');
+            if (btn) {
+                if (activeFilters[idx] && activeFilters[idx].length > 0) {
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fas fa-filter"></i>';
+                } else {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '<i class="fas fa-caret-down"></i>';
+                }
+            }
+        });
+    }
+
+    function updateRowNumbers(table) {
+        const th0 = table.querySelector('thead th');
+        if (th0 && (th0.textContent.trim().toLowerCase() === 'no' || th0.textContent.trim().toLowerCase() === 'no.')) {
+            const visibleRows = Array.from(table.querySelectorAll('tbody tr')).filter(r => r.style.display !== 'none' && !r.classList.contains('no-data-row'));
+            let currentNum = table._startIndex || 1;
+            visibleRows.forEach(row => {
+                if (row.cells[0]) {
+                    row.cells[0].textContent = currentNum++;
+                }
+            });
+        }
+    }
+
+    function sortTableColumn(table, colIndex, isDesc) {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr:not(.no-data-row)'));
+
+        rows.sort((a, b) => {
+            const cellA = a.cells[colIndex] ? a.cells[colIndex].textContent.trim() : '';
+            const cellB = b.cells[colIndex] ? b.cells[colIndex].textContent.trim() : '';
+
+            const valA = parseValueForSorting(cellA);
+            const valB = parseValueForSorting(cellB);
+
+            if (typeof valA === 'number' && typeof valB === 'number') {
+                return isDesc ? valB - valA : valA - valB;
+            }
+
+            const strA = String(valA);
+            const strB = String(valB);
+            return isDesc ? strB.localeCompare(strA) : strA.localeCompare(strB);
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+        updateRowNumbers(table);
+    }
+
+    function parseValueForSorting(val) {
+        val = val.trim();
+        if (val.startsWith('Rp')) {
+            const clean = val.replace(/[^0-9,-]/g, '').replace(',', '.');
+            const num = parseFloat(clean);
+            if (!isNaN(num)) return num;
+        }
+        const plainNum = Number(val.replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(plainNum) && val !== '') return plainNum;
+
+        const dateMatch = val.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+        if (dateMatch) {
+            return new Date(dateMatch[3], dateMatch[2] - 1, dateMatch[1]).getTime();
+        }
+        return val.toLowerCase();
+    }
+
+    document.addEventListener('click', (e) => {
+        if (filterDropdown.style.display !== 'none') {
+            const inside = filterDropdown.contains(e.target) || e.target.closest('.col-filter-btn');
+            if (!inside) {
+                filterDropdown.style.display = 'none';
+            }
+        }
+    });
+});
