@@ -14,6 +14,36 @@ const pool = mysql.createPool({
 const poolPromise = pool.promise();
 
 // Auto-migration untuk menambah kolom baru jika belum ada di cPanel / database
+async function backfillTable(table) {
+    try {
+        if (table === 'tagihan' || table === 'tunggakan') {
+            const [santri] = await poolPromise.query('SELECT nama, pendidikan, nomorPendaftaran FROM santri');
+            const [records] = await poolPromise.query(`SELECT id, nama, satuanPendidikan FROM ${table} WHERE nomorPendaftaran IS NULL`);
+            let usedSantri = new Set();
+            for (let r of records) {
+                let matchedSantri = santri.find(s => s.nama === r.nama && s.pendidikan === r.satuanPendidikan && !usedSantri.has(s.nomorPendaftaran));
+                if (matchedSantri) {
+                    await poolPromise.query(`UPDATE ${table} SET nomorPendaftaran = ? WHERE id = ?`, [matchedSantri.nomorPendaftaran, r.id]);
+                    usedSantri.add(matchedSantri.nomorPendaftaran);
+                }
+            }
+        } else if (table === 'tagihan_daftar_ulang' || table === 'tunggakan_daftar_ulang') {
+            const [santriDU] = await poolPromise.query('SELECT nama, lanjutKe, nomorPendaftaran FROM santri_daftar_ulang');
+            const [records] = await poolPromise.query(`SELECT id, nama, satuanPendidikan FROM ${table} WHERE nomorPendaftaran IS NULL`);
+            let usedSantriDU = new Set();
+            for (let r of records) {
+                let matchedSantri = santriDU.find(s => s.nama === r.nama && s.lanjutKe === r.satuanPendidikan && !usedSantriDU.has(s.nomorPendaftaran));
+                if (matchedSantri) {
+                    await poolPromise.query(`UPDATE ${table} SET nomorPendaftaran = ? WHERE id = ?`, [matchedSantri.nomorPendaftaran, r.id]);
+                    usedSantriDU.add(matchedSantri.nomorPendaftaran);
+                }
+            }
+        }
+    } catch (err) {
+        console.error(`[Migration] Gagal backfill tabel '${table}':`, err.message);
+    }
+}
+
 async function runMigration() {
     try {
         const [columns] = await poolPromise.query("SHOW COLUMNS FROM transaksi");
@@ -38,6 +68,19 @@ async function runMigration() {
                 console.log(`[Migration] Menambahkan kolom '${col.name}' ke tabel 'transaksi'...`);
                 await poolPromise.query(`ALTER TABLE transaksi ADD COLUMN ${col.name} ${col.definition}`);
             }
+        }
+
+        // Migration untuk nomorPendaftaran di tabel tagihan & tunggakan
+        const tables = ['tagihan', 'tagihan_daftar_ulang', 'tunggakan', 'tunggakan_daftar_ulang'];
+        for (const table of tables) {
+            const [cols] = await poolPromise.query(`SHOW COLUMNS FROM ${table}`);
+            const colNames = cols.map(c => c.Field);
+            if (!colNames.includes('nomorPendaftaran')) {
+                console.log(`[Migration] Menambahkan kolom 'nomorPendaftaran' ke tabel '${table}'...`);
+                await poolPromise.query(`ALTER TABLE ${table} ADD COLUMN nomorPendaftaran VARCHAR(100) AFTER id`);
+            }
+            // Selalu jalankan backfill untuk mengisi nilai NULL jika ada
+            await backfillTable(table);
         }
     } catch (err) {
         console.error('[Migration] Gagal menjalankan auto-migration:', err.message);
