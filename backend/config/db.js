@@ -82,6 +82,17 @@ async function runMigration() {
             // Selalu jalankan backfill untuk mengisi nilai NULL jika ada
             await backfillTable(table);
         }
+
+        // Buat tabel deleted_registrations jika belum ada
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS deleted_registrations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nomorPendaftaran VARCHAR(100) UNIQUE,
+                nama VARCHAR(150),
+                nomorPendaftaranAktif VARCHAR(100),
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
     } catch (err) {
         console.error('[Migration] Gagal menjalankan auto-migration:', err.message);
     }

@@ -400,6 +400,37 @@ class SantriModel {
         const [rows] = await db.execute('SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE nama = ? AND lanjutKe = ?', [nama, lanjutKe]);
         return rows[0].total;
     }
+
+    static async getSantriDuplicates(nama, pendidikan, excludeId) {
+        const [rows] = await db.execute(
+            'SELECT * FROM santri WHERE nama = ? AND pendidikan = ? AND id != ?',
+            [nama, pendidikan, excludeId]
+        );
+        return rows;
+    }
+
+    static async getSantriDaftarUlangDuplicates(nama, lanjutKe, excludeId) {
+        const [rows] = await db.execute(
+            'SELECT * FROM santri_daftar_ulang WHERE nama = ? AND lanjutKe = ? AND id != ?',
+            [nama, lanjutKe, excludeId]
+        );
+        return rows;
+    }
+
+    static async logDeletedRegistration(nomorPendaftaran, nama, nomorPendaftaranAktif) {
+        await db.execute(
+            'INSERT IGNORE INTO deleted_registrations (nomorPendaftaran, nama, nomorPendaftaranAktif) VALUES (?, ?, ?)',
+            [nomorPendaftaran, nama, nomorPendaftaranAktif]
+        );
+    }
+
+    static async getDeletedRegistration(nomorPendaftaran) {
+        const [rows] = await db.execute(
+            'SELECT * FROM deleted_registrations WHERE nomorPendaftaran = ?',
+            [nomorPendaftaran]
+        );
+        return rows[0];
+    }
 }
 
 module.exports = SantriModel;

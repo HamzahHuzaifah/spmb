@@ -222,6 +222,14 @@ exports.deleteSantri = async (req, res) => {
         const id = parseInt(req.params.id);
         const santri = await SantriModel.getSantriById(id);
         if (santri) {
+            // Cek apakah ada duplikat aktif sebelum dihapus
+            const duplicates = await SantriModel.getSantriDuplicates(santri.nama, santri.pendidikan, id);
+            if (duplicates && duplicates.length > 0) {
+                // Log nomor pendaftaran yang dihapus dan hubungkan dengan nomor pendaftaran aktif duplikatnya
+                const activeNomor = duplicates[0].nomorPendaftaran;
+                await SantriModel.logDeletedRegistration(santri.nomorPendaftaran, santri.nama, activeNomor);
+            }
+
             await SantriModel.deleteSantri(id);
             
             // Delete exactly 1 related tagihan, tunggakan, and transaksi
@@ -241,6 +249,14 @@ exports.deleteSantriDaftarUlang = async (req, res) => {
         const id = parseInt(req.params.id);
         const santri = await SantriModel.getSantriDaftarUlangById(id);
         if (santri) {
+            // Cek apakah ada duplikat aktif sebelum dihapus
+            const duplicates = await SantriModel.getSantriDaftarUlangDuplicates(santri.nama, santri.lanjutKe, id);
+            if (duplicates && duplicates.length > 0) {
+                // Log nomor pendaftaran yang dihapus dan hubungkan dengan nomor pendaftaran aktif duplikatnya
+                const activeNomor = duplicates[0].nomorPendaftaran;
+                await SantriModel.logDeletedRegistration(santri.nomorPendaftaran, santri.nama, activeNomor);
+            }
+
             await SantriModel.deleteSantriDaftarUlang(id);
             
             // Delete exactly 1 related tagihan, tunggakan, and transaksi

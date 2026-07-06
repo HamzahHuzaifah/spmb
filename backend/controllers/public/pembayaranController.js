@@ -36,6 +36,17 @@ exports.cekPembayaran = async (req, res) => {
 
         // 3. Jika tetap tidak ada
         if (!santri) {
+            const deletedReg = await SantriModel.getDeletedRegistration(nomorPendaftaran);
+            if (deletedReg) {
+                return res.render('public/layout', {
+                    title: 'Cek Info Pembayaran',
+                    bodyView: 'info-pembayaran',
+                    result: null,
+                    error: `Nomor Pendaftaran ${nomorPendaftaran} telah dihapus/digabungkan karena terdeteksi duplikat atas nama "${deletedReg.nama}". Silakan gunakan Nomor Pendaftaran aktif Anda: "${deletedReg.nomorPendaftaranAktif}".`,
+                    nomorPendaftaran
+                });
+            }
+
             return res.render('public/layout', {
                 title: 'Cek Info Pembayaran',
                 bodyView: 'info-pembayaran',
