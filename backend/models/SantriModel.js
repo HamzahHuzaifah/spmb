@@ -431,6 +431,22 @@ class SantriModel {
         );
         return rows[0];
     }
+
+    static async findExistingSantri(nama, tanggalLahir, namaAyah) {
+        const [rows] = await db.execute(
+            'SELECT nomorPendaftaran FROM santri WHERE LOWER(nama) = LOWER(?) AND tanggalLahir = ? AND LOWER(namaAyah) = LOWER(?)',
+            [nama.trim(), tanggalLahir, namaAyah.trim()]
+        );
+        return rows[0];
+    }
+
+    static async findExistingSantriDaftarUlang(nama, tanggalLahir, namaAyah) {
+        const [rows] = await db.execute(
+            'SELECT nomorPendaftaran FROM santri_daftar_ulang WHERE LOWER(nama) = LOWER(?) AND tanggalLahir = ? AND LOWER(namaAyah) = LOWER(?)',
+            [nama.trim(), tanggalLahir, namaAyah.trim()]
+        );
+        return rows[0];
+    }
 }
 
 module.exports = SantriModel;

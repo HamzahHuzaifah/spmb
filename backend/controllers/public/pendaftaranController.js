@@ -22,6 +22,17 @@ exports.postFormPendaftaran = async (req, res) => {
 
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
+
+        // Cek duplikasi sebelum menyimpan
+        const existing = await SantriModel.findExistingSantri(namaSantri, tanggalLahir, namaAyah);
+        if (existing) {
+            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            return res.render('public/layout', {
+                title: 'Form Pendaftaran Baru',
+                bodyView: 'pendaftaran',
+                error: errorMsg
+            });
+        }
         
         const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranBaru(year);
 
@@ -136,6 +147,17 @@ exports.postFormDaftarUlang = async (req, res) => {
 
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
+
+        // Cek duplikasi sebelum menyimpan
+        const existing = await SantriModel.findExistingSantriDaftarUlang(namaSantri, tanggalLahir, namaAyah);
+        if (existing) {
+            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            return res.render('public/layout', {
+                title: 'Form Daftar Ulang',
+                bodyView: 'pendaftaran-ulang',
+                error: errorMsg
+            });
+        }
         
         const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranUlang(year);
 
@@ -249,6 +271,17 @@ exports.postFormBeasiswa = async (req, res) => {
 
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
+
+        // Cek duplikasi sebelum menyimpan
+        const existing = await SantriModel.findExistingSantri(namaSantri, tanggalLahir, namaAyah);
+        if (existing) {
+            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            return res.render('public/layout', {
+                title: 'Form Beasiswa',
+                bodyView: 'beasiswa',
+                error: errorMsg
+            });
+        }
         
         const nomorPendaftaran = await SantriModel.getNextNomorPendaftaranBaru(year);
 
