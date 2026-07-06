@@ -93,8 +93,120 @@ async function runMigration() {
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+
+        // Jalankan cleanup billing ganda/yatim piatu akibat bug lama
+        await cleanupOrphanedBilling();
     } catch (err) {
         console.error('[Migration] Gagal menjalankan auto-migration:', err.message);
+    }
+}
+
+async function cleanupOrphanedBilling() {
+    try {
+        console.log('[Migration] Cleaning up duplicate orphaned billing records...');
+        
+        // 1. Clean up 'tagihan' and 'tunggakan' for Santri Baru
+        const [santriCounts] = await poolPromise.query(
+            'SELECT nama, pendidikan, COUNT(*) as count FROM santri GROUP BY nama, pendidikan'
+        );
+        
+        for (let s of santriCounts) {
+            // Tagihan
+            const [tagihans] = await poolPromise.query(
+                'SELECT id FROM tagihan WHERE nama = ? AND satuanPendidikan = ? ORDER BY id DESC',
+                [s.nama, s.pendidikan]
+            );
+            if (tagihans.length > s.count) {
+                const excess = tagihans.length - s.count;
+                const idsToDelete = tagihans.slice(0, excess).map(t => t.id);
+                console.log(`[Migration] Deleting ${excess} duplicate tagihan for ${s.nama} (${s.pendidikan})`);
+                await poolPromise.query('DELETE FROM tagihan WHERE id IN (?)', [idsToDelete]);
+            }
+            
+            // Tunggakan
+            const [tunggakans] = await poolPromise.query(
+                'SELECT id FROM tunggakan WHERE nama = ? AND satuanPendidikan = ? ORDER BY id DESC',
+                [s.nama, s.pendidikan]
+            );
+            if (tunggakans.length > s.count) {
+                const excess = tunggakans.length - s.count;
+                const idsToDelete = tunggakans.slice(0, excess).map(t => t.id);
+                console.log(`[Migration] Deleting ${excess} duplicate tunggakan for ${s.nama} (${s.pendidikan})`);
+                await poolPromise.query('DELETE FROM tunggakan WHERE id IN (?)', [idsToDelete]);
+            }
+        }
+        
+        // 2. Clean up 'tagihan_daftar_ulang' and 'tunggakan_daftar_ulang'
+        const [santriDUCounts] = await poolPromise.query(
+            'SELECT nama, lanjutKe, COUNT(*) as count FROM santri_daftar_ulang GROUP BY nama, lanjutKe'
+        );
+        
+        for (let s of santriDUCounts) {
+            // Tagihan DU
+            const [tagihans] = await poolPromise.query(
+                'SELECT id FROM tagihan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ? ORDER BY id DESC',
+                [s.nama, s.lanjutKe]
+            );
+            if (tagihans.length > s.count) {
+                const excess = tagihans.length - s.count;
+                const idsToDelete = tagihans.slice(0, excess).map(t => t.id);
+                console.log(`[Migration] Deleting ${excess} duplicate tagihan_daftar_ulang for ${s.nama} (${s.lanjutKe})`);
+                await poolPromise.query('DELETE FROM tagihan_daftar_ulang WHERE id IN (?)', [idsToDelete]);
+            }
+            
+            // Tunggakan DU
+            const [tunggakans] = await poolPromise.query(
+                'SELECT id FROM tunggakan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ? ORDER BY id DESC',
+                [s.nama, s.lanjutKe]
+            );
+            if (tunggakans.length > s.count) {
+                const excess = tunggakans.length - s.count;
+                const idsToDelete = tunggakans.slice(0, excess).map(t => t.id);
+                console.log(`[Migration] Deleting ${excess} duplicate tunggakan_daftar_ulang for ${s.nama} (${s.lanjutKe})`);
+                await poolPromise.query('DELETE FROM tunggakan_daftar_ulang WHERE id IN (?)', [idsToDelete]);
+            }
+        }
+
+        // 3. Clean up orphaned records with no active santri at all
+        const [allTagihan] = await poolPromise.query('SELECT DISTINCT nama, satuanPendidikan FROM tagihan');
+        for (let t of allTagihan) {
+            const [exists] = await poolPromise.query('SELECT COUNT(*) as count FROM santri WHERE nama = ? AND pendidikan = ?', [t.nama, t.satuanPendidikan]);
+            if (exists[0].count === 0) {
+                console.log(`[Migration] Deleting orphaned tagihan for ${t.nama} (no active santri)`);
+                await poolPromise.query('DELETE FROM tagihan WHERE nama = ? AND satuanPendidikan = ?', [t.nama, t.satuanPendidikan]);
+            }
+        }
+
+        const [allTunggakan] = await poolPromise.query('SELECT DISTINCT nama, satuanPendidikan FROM tunggakan');
+        for (let t of allTunggakan) {
+            const [exists] = await poolPromise.query('SELECT COUNT(*) as count FROM santri WHERE nama = ? AND pendidikan = ?', [t.nama, t.satuanPendidikan]);
+            if (exists[0].count === 0) {
+                console.log(`[Migration] Deleting orphaned tunggakan for ${t.nama} (no active santri)`);
+                await poolPromise.query('DELETE FROM tunggakan WHERE nama = ? AND satuanPendidikan = ?', [t.nama, t.satuanPendidikan]);
+            }
+        }
+
+        const [allTagihanDU] = await poolPromise.query('SELECT DISTINCT nama, satuanPendidikan FROM tagihan_daftar_ulang');
+        for (let t of allTagihanDU) {
+            const [exists] = await poolPromise.query('SELECT COUNT(*) as count FROM santri_daftar_ulang WHERE nama = ? AND lanjutKe = ?', [t.nama, t.satuanPendidikan]);
+            if (exists[0].count === 0) {
+                console.log(`[Migration] Deleting orphaned tagihan_daftar_ulang for ${t.nama} (no active santri_daftar_ulang)`);
+                await poolPromise.query('DELETE FROM tagihan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ?', [t.nama, t.satuanPendidikan]);
+            }
+        }
+
+        const [allTunggakanDU] = await poolPromise.query('SELECT DISTINCT nama, satuanPendidikan FROM tunggakan_daftar_ulang');
+        for (let t of allTunggakanDU) {
+            const [exists] = await poolPromise.query('SELECT COUNT(*) as count FROM santri_daftar_ulang WHERE nama = ? AND lanjutKe = ?', [t.nama, t.satuanPendidikan]);
+            if (exists[0].count === 0) {
+                console.log(`[Migration] Deleting orphaned tunggakan_daftar_ulang for ${t.nama} (no active santri_daftar_ulang)`);
+                await poolPromise.query('DELETE FROM tunggakan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ?', [t.nama, t.satuanPendidikan]);
+            }
+        }
+
+        console.log('[Migration] Cleanup complete!');
+    } catch (err) {
+        console.error('[Migration] Gagal melakukan cleanup:', err.message);
     }
 }
 
