@@ -1,4 +1,12 @@
 <%- include('partials/header', { title: 'Data Santri Baru' , activePage: 'santri' }) %><link rel="stylesheet" href="/css/santri.css">
+<style>
+    tr.row-duplicate, tr.row-duplicate td {
+        background-color: #fee2e2 !important;
+    }
+    tr.row-duplicate td:first-child {
+        border-left: 4px solid #ef4444 !important;
+    }
+</style>
 <%
 function formatTimestampIndo(isoStr) {
     if (!isoStr) return '-';
@@ -60,7 +68,7 @@ function formatTimestampIndo(isoStr) {
             <tbody>
                 <% if(santri && santri.length> 0) { %>
                     <% santri.forEach((item, index)=> { %>
-                        <tr>
+                        <tr class="<%= item.isDuplicate ? 'row-duplicate' : '' %>">
                             <td>
                                 <%= (typeof currentPage !== 'undefined' ? (currentPage - 1) * 10 : 0) + index + 1 %>
                             </td>
@@ -79,6 +87,9 @@ function formatTimestampIndo(isoStr) {
                                 </span></td>
                             <td style="font-weight: 600;">
                                 <%= item.nama %>
+                                <% if (item.isDuplicate) { %>
+                                    <span class="badge badge-danger" style="background-color: #ef4444; color: white; font-size: 10px; padding: 2px 6px; margin-left: 5px;" title="Terdeteksi Duplikat Data">Duplikat</span>
+                                <% } %>
                             </td>
                             <td>
                                 <%= item.jenisKelamin %>

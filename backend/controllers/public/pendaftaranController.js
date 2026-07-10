@@ -23,10 +23,16 @@ exports.postFormPendaftaran = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
-        // Cek duplikasi sebelum menyimpan
-        const existing = await SantriModel.findExistingSantri(namaSantri, tanggalLahir, namaAyah);
+        // Cek duplikasi sebelum menyimpan dengan fuzzy matching
+        const existing = await SantriModel.checkDuplicateFuzzy({
+            nama: namaSantri,
+            tanggalLahir,
+            namaAyah,
+            email,
+            teleponAyah
+        }, 'baru');
         if (existing) {
-            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Pendaftaran Baru',
                 bodyView: 'pendaftaran',
@@ -148,10 +154,16 @@ exports.postFormDaftarUlang = async (req, res) => {
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
-        // Cek duplikasi sebelum menyimpan
-        const existing = await SantriModel.findExistingSantriDaftarUlang(namaSantri, tanggalLahir, namaAyah);
+        // Cek duplikasi sebelum menyimpan dengan fuzzy matching
+        const existing = await SantriModel.checkDuplicateFuzzy({
+            nama: namaSantri,
+            tanggalLahir,
+            namaAyah,
+            email,
+            teleponAyah
+        }, 'daftar_ulang');
         if (existing) {
-            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Daftar Ulang',
                 bodyView: 'pendaftaran-ulang',
@@ -272,10 +284,16 @@ exports.postFormBeasiswa = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
-        // Cek duplikasi sebelum menyimpan
-        const existing = await SantriModel.findExistingSantri(namaSantri, tanggalLahir, namaAyah);
+        // Cek duplikasi sebelum menyimpan dengan fuzzy matching
+        const existing = await SantriModel.checkDuplicateFuzzy({
+            nama: namaSantri,
+            tanggalLahir,
+            namaAyah,
+            email,
+            teleponAyah
+        }, 'baru');
         if (existing) {
-            const errorMsg = `Pendaftaran gagal. Calon santri atas nama "${namaSantri}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin.`;
+            const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Beasiswa',
                 bodyView: 'beasiswa',

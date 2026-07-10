@@ -14,6 +14,9 @@ exports.getSantri = async (req, res) => {
         const pendidikan = req.query.pendidikan || '';
 
         const santriData = await SantriModel.getSantriPaginated(limit, offset, search, pendidikan);
+        for (const item of santriData) {
+            item.isDuplicate = await SantriModel.checkHasDuplicate(item, 'baru');
+        }
         const totalData = await SantriModel.getTotalSantri(search, pendidikan);
         const totalPages = Math.ceil(totalData / limit);
 
@@ -43,6 +46,9 @@ exports.getSantriDaftarUlang = async (req, res) => {
         const pendidikan = req.query.pendidikan || '';
 
         const santriDaftarUlangData = await SantriModel.getSantriDaftarUlangPaginated(limit, offset, search, pendidikan);
+        for (const item of santriDaftarUlangData) {
+            item.isDuplicate = await SantriModel.checkHasDuplicate(item, 'daftar_ulang');
+        }
         const totalData = await SantriModel.getTotalSantriDaftarUlang(search, pendidikan);
         const totalPages = Math.ceil(totalData / limit);
 

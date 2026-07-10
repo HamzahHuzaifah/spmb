@@ -447,6 +447,147 @@ class SantriModel {
         );
         return rows[0];
     }
+
+    static async checkDuplicateFuzzy(data, type = 'baru') {
+        const tableName = type === 'baru' ? 'santri' : 'santri_daftar_ulang';
+        const query = `
+            SELECT nama, nomorPendaftaran, tanggalLahir, namaAyah, email, teleponAyah 
+            FROM ${tableName} 
+            WHERE (namaAyah IS NOT NULL AND LOWER(namaAyah) = LOWER(?)) 
+               OR (email IS NOT NULL AND email = ?) 
+               OR (teleponAyah IS NOT NULL AND teleponAyah = ?) 
+               OR (noTelepon IS NOT NULL AND noTelepon = ?)
+        `;
+        const params = [
+            (data.namaAyah || '').trim(),
+            (data.email || '').trim(),
+            (data.teleponAyah || '').trim(),
+            (data.teleponAyah || '').trim()
+        ];
+        
+        const [candidates] = await db.execute(query, params);
+        
+        const inputNama = (data.nama || '').trim().toLowerCase();
+        const inputDOB = data.tanggalLahir;
+        
+        for (const cand of candidates) {
+            const candNama = (cand.nama || '').trim().toLowerCase();
+            const candDOB = cand.tanggalLahir;
+            
+            // Calculate similarity
+            const sim = getSimilarity(candNama, inputNama);
+            const isExactName = (candNama === inputNama);
+            
+            // Compare DOB
+            const isSameDOB = candDOB && inputDOB && 
+                (new Date(candDOB).toDateString() === new Date(inputDOB).toDateString());
+                
+            // 1. Exact name match (regardless of DOB, to prevent DOB bypass)
+            if (isExactName) {
+                return cand;
+            }
+            
+            // 2. High similarity (>= 85%) and different DOB (bypass attempt / typo)
+            if (sim >= 0.85 && !isSameDOB) {
+                return cand;
+            }
+        }
+        
+        return null;
+    }
+
+    static async checkHasDuplicate(santri, type = 'baru') {
+        const tableName = type === 'baru' ? 'santri' : 'santri_daftar_ulang';
+        const query = `
+            SELECT id, nama, tanggalLahir, namaAyah, email, teleponAyah 
+            FROM ${tableName} 
+            WHERE id != ? 
+              AND (
+                LOWER(nama) = LOWER(?) 
+                OR (namaAyah IS NOT NULL AND LOWER(namaAyah) = LOWER(?)) 
+                OR (email IS NOT NULL AND email = ?) 
+                OR (teleponAyah IS NOT NULL AND teleponAyah = ?)
+              )
+        `;
+        const params = [
+            santri.id,
+            (santri.nama || '').trim(),
+            (santri.namaAyah || '').trim(),
+            (santri.email || '').trim(),
+            (santri.teleponAyah || '').trim()
+        ];
+        const [rows] = await db.execute(query, params);
+        if (rows.length === 0) return false;
+        
+        const inputNama = (santri.nama || '').trim().toLowerCase();
+        const inputDOB = santri.tanggalLahir;
+        
+        for (const cand of rows) {
+            const candNama = (cand.nama || '').trim().toLowerCase();
+            const candDOB = cand.tanggalLahir;
+            
+            // Calculate similarity
+            const sim = getSimilarity(candNama, inputNama);
+            const isExactName = (candNama === inputNama);
+            
+            // Compare DOB
+            const isSameDOB = candDOB && inputDOB && 
+                (new Date(candDOB).toDateString() === new Date(inputDOB).toDateString());
+                
+            // 1. Exact name match (regardless of DOB)
+            if (isExactName) {
+                return true;
+            }
+            // 2. High similarity (>= 85%) and different DOB
+            if (sim >= 0.85 && !isSameDOB) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+}
+
+function getLevenshteinDistance(a, b) {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    Math.min(
+                        matrix[i][j - 1] + 1, // insertion
+                        matrix[i - 1][j] + 1  // deletion
+                    )
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+function getSimilarity(s1, s2) {
+    let longer = s1.toLowerCase().trim();
+    let shorter = s2.toLowerCase().trim();
+    if (longer.length < shorter.length) {
+        let temp = longer;
+        longer = shorter;
+        shorter = temp;
+    }
+    const longerLength = longer.length;
+    if (longerLength === 0) {
+        return 1.0;
+    }
+    return (longerLength - getLevenshteinDistance(longer, shorter)) / parseFloat(longerLength);
 }
 
 module.exports = SantriModel;
+
