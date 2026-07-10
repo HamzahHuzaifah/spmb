@@ -7,8 +7,8 @@ const TransaksiModel = require('../../models/TransaksiModel');
 exports.getSantri = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Menampilkan 10 baris per halaman
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
@@ -39,8 +39,8 @@ exports.getSantri = async (req, res) => {
 exports.getSantriDaftarUlang = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';

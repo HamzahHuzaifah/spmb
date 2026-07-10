@@ -717,168 +717,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tables = document.querySelectorAll('.table-container table, table#dataTable, table#tabelLaporan');
     if (tables.length === 0) return;
 
-    // Injeksi CSS untuk UI Dropdown Filter
-    const styleEl = document.createElement('style');
-    styleEl.innerHTML = `
-        th.filterable {
-            position: relative;
-            padding-right: 28px !important;
-        }
-        .col-filter-btn {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #a0aec0;
-            padding: 3px;
-            border-radius: 4px;
-            font-size: 11px;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-        .col-filter-btn:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--primary, #10b981);
-        }
-        .col-filter-btn.active {
-            color: var(--primary, #10b981);
-            font-weight: bold;
-        }
-        .col-filter-dropdown {
-            position: absolute;
-            z-index: 99999;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            width: 250px;
-            padding: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 13px;
-            color: #2d3748;
-            box-sizing: border-box;
-        }
-        .col-filter-menu-item {
-            display: flex;
-            align-items: center;
-            padding: 6px 8px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.2s;
-            font-weight: 500;
-        }
-        .col-filter-menu-item:hover {
-            background: #f7fafc;
-            color: var(--primary, #10b981);
-        }
-        .col-filter-menu-item i {
-            margin-right: 8px;
-            width: 16px;
-            text-align: center;
-            color: #718096;
-        }
-        .col-filter-menu-item:hover i {
-            color: var(--primary, #10b981);
-        }
-        .col-filter-divider {
-            height: 1px;
-            background: #edf2f7;
-            margin: 6px 0;
-        }
-        .col-filter-search-container {
-            margin-bottom: 6px;
-        }
-        .col-filter-search-input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            font-size: 12px;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .col-filter-search-input:focus {
-            border-color: var(--primary, #10b981);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-        }
-        .col-filter-options-actions {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #718096;
-            margin-bottom: 4px;
-            padding: 0 2px;
-        }
-        .col-filter-action-all, .col-filter-action-clear {
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .col-filter-action-all:hover, .col-filter-action-clear:hover {
-            color: var(--primary, #10b981);
-            text-decoration: underline;
-        }
-        .col-filter-options-list {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #edf2f7;
-            border-radius: 6px;
-            padding: 4px;
-            background: #fdfdfd;
-            margin-bottom: 10px;
-        }
-        .col-filter-option-item {
-            display: flex;
-            align-items: center;
-            padding: 3px 4px;
-            cursor: pointer;
-            border-radius: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            user-select: none;
-        }
-        .col-filter-option-item:hover {
-            background: #f7fafc;
-        }
-        .col-filter-option-item input {
-            margin-right: 6px;
-            cursor: pointer;
-        }
-        .col-filter-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 6px;
-        }
-        .col-filter-btn-ok {
-            background: var(--primary, #10b981);
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .col-filter-btn-ok:hover {
-            opacity: 0.9;
-        }
-        .col-filter-btn-cancel {
-            background: #edf2f7;
-            color: #4a5568;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .col-filter-btn-cancel:hover {
-            background: #e2e8f0;
-        }
-    `;
-    document.head.appendChild(styleEl);
-
     // Dynamic dropdown overlay
     let filterDropdown = document.createElement('div');
     filterDropdown.className = 'col-filter-dropdown';
@@ -893,6 +731,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (table.getAttribute('data-spreadsheet-filters') === 'true') return;
         table.setAttribute('data-spreadsheet-filters', 'true');
         table._activeFilters = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        table._currentPage = parseInt(urlParams.get('page')) || 1;
 
         // Ambil nilai indeks awal baris
         const firstRow = table.querySelector('tbody tr');
@@ -916,6 +756,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             th.appendChild(btn);
         });
+
+        // Initialize client-side pagination
+        updatePagination(table);
     });
 
     function openFilterDropdown(table, colIndex, btn) {
@@ -1058,10 +901,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-            row.style.display = isVisible ? '' : 'none';
+            row.classList.toggle('filter-hidden', !isVisible);
         });
 
-        updateRowNumbers(table);
+        updatePagination(table);
 
         const headers = table.querySelectorAll('thead th');
         headers.forEach((th, idx) => {
@@ -1076,19 +919,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-    }
-
-    function updateRowNumbers(table) {
-        const th0 = table.querySelector('thead th');
-        if (th0 && (th0.textContent.trim().toLowerCase() === 'no' || th0.textContent.trim().toLowerCase() === 'no.')) {
-            const visibleRows = Array.from(table.querySelectorAll('tbody tr')).filter(r => r.style.display !== 'none' && !r.classList.contains('no-data-row'));
-            let currentNum = table._startIndex || 1;
-            visibleRows.forEach(row => {
-                if (row.cells[0]) {
-                    row.cells[0].textContent = currentNum++;
-                }
-            });
-        }
     }
 
     function sortTableColumn(table, colIndex, isDesc) {
@@ -1112,7 +942,110 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         rows.forEach(row => tbody.appendChild(row));
-        updateRowNumbers(table);
+        updatePagination(table);
+    }
+
+    function updatePagination(table) {
+        const itemsPerPage = 10;
+        
+        // Skip pagination for dropdown autocomplete list tables or tables marked with no-pagination
+        if (table.id === 'tabelLaporanAutocomplete' || table.classList.contains('no-pagination')) {
+            return;
+        }
+
+        const visibleRows = Array.from(table.querySelectorAll('tbody tr:not(.no-data-row)'))
+            .filter(r => !r.classList.contains('filter-hidden'));
+            
+        const totalItems = visibleRows.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+        
+        let currentPage = table._currentPage || 1;
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+            table._currentPage = currentPage;
+        }
+        
+        const startIdx = (currentPage - 1) * itemsPerPage;
+        const endIdx = startIdx + itemsPerPage;
+        
+        let currentNum = table._startIndex || 1;
+        
+        const allRows = Array.from(table.querySelectorAll('tbody tr:not(.no-data-row)'));
+        allRows.forEach(row => {
+            if (row.classList.contains('filter-hidden')) {
+                row.style.display = 'none';
+            } else {
+                const idx = visibleRows.indexOf(row);
+                if (idx >= startIdx && idx < endIdx) {
+                    row.style.display = '';
+                    if (row.cells[0]) {
+                        const txt = row.cells[0].textContent.trim();
+                        if (!isNaN(parseInt(txt)) || txt === '') {
+                            row.cells[0].textContent = currentNum++;
+                        }
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+        
+        renderPaginationUI(table, currentPage, totalPages, totalItems);
+    }
+
+    function renderPaginationUI(table, currentPage, totalPages, totalItems) {
+        let pagContainer = table._pagContainer;
+        if (!pagContainer) {
+            pagContainer = document.createElement('div');
+            pagContainer.className = 'pagination-container client-pagination no-print';
+            pagContainer.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;';
+            table.parentNode.insertBefore(pagContainer, table.nextSibling);
+            table._pagContainer = pagContainer;
+        }
+        
+        if (totalPages <= 1) {
+            pagContainer.style.display = 'none';
+            return;
+        } else {
+            pagContainer.style.display = 'flex';
+        }
+        
+        const itemsPerPage = 10;
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        
+        let buttonsHtml = '';
+        if (currentPage > 1) {
+            buttonsHtml += `<button class="btn btn-secondary btn-pag" data-page="${currentPage - 1}" style="padding: 5px 12px; cursor: pointer;">&laquo; Prev</button>`;
+        }
+        
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+        for (let i = startPage; i <= endPage; i++) {
+            buttonsHtml += `<button class="btn ${currentPage === i ? 'btn-primary' : 'btn-secondary'} btn-pag" data-page="${i}" style="padding: 5px 12px; cursor: pointer; ${currentPage === i ? 'background: var(--primary, #10b981); color: white; border-color: var(--primary, #10b981);' : ''}">${i}</button>`;
+        }
+        
+        if (currentPage < totalPages) {
+            buttonsHtml += `<button class="btn btn-secondary btn-pag" data-page="${currentPage + 1}" style="padding: 5px 12px; cursor: pointer;">Next &raquo;</button>`;
+        }
+        
+        pagContainer.innerHTML = `
+            <div style="color: #666; font-size: 14px;">
+                Menampilkan Halaman <strong>${currentPage}</strong> dari <strong>${totalPages}</strong> (Total: ${totalItems} Data)
+            </div>
+            <div style="display: flex; gap: 5px;">
+                ${buttonsHtml}
+            </div>
+        `;
+        
+        pagContainer.querySelectorAll('.btn-pag').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = parseInt(btn.getAttribute('data-page'));
+                table._currentPage = targetPage;
+                updatePagination(table);
+            });
+        });
     }
 
     function parseValueForSorting(val) {

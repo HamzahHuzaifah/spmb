@@ -10,8 +10,8 @@ exports.getInputTransaksi = async (req, res) => {
         
         // Paginasi tabel transaksi terbaru
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const search = req.query.search || '';
         const filterTanggal = {

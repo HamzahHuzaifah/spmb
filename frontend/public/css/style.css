@@ -1382,3 +1382,163 @@ input[type="date"].flatpickr-input {
     transform: translateY(-2px);
     z-index: 10;
 }
+
+/* ==========================================================================
+   Spreadsheet-like Table Filter & Sorting Dropdown
+   ========================================================================== */
+th.filterable {
+    position: relative;
+    padding-right: 28px !important;
+}
+.col-filter-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #a0aec0;
+    padding: 3px;
+    border-radius: 4px;
+    font-size: 11px;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+.col-filter-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--primary, #10b981);
+}
+.col-filter-btn.active {
+    color: var(--primary, #10b981);
+    font-weight: bold;
+}
+.col-filter-dropdown {
+    position: absolute;
+    z-index: 99999;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 250px;
+    padding: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    color: #2d3748;
+    box-sizing: border-box;
+}
+.col-filter-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s;
+    font-weight: 500;
+}
+.col-filter-menu-item:hover {
+    background: #f7fafc;
+    color: var(--primary, #10b981);
+}
+.col-filter-menu-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+    color: #718096;
+}
+.col-filter-menu-item:hover i {
+    color: var(--primary, #10b981);
+}
+.col-filter-divider {
+    height: 1px;
+    background: #edf2f7;
+    margin: 6px 0;
+}
+.col-filter-search-container {
+    margin-bottom: 6px;
+}
+.col-filter-search-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+}
+.col-filter-search-input:focus {
+    border-color: var(--primary, #10b981);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+.col-filter-options-actions {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #718096;
+    margin-bottom: 4px;
+    padding: 0 2px;
+}
+.col-filter-action-all, .col-filter-action-clear {
+    cursor: pointer;
+    font-weight: 600;
+}
+.col-filter-action-all:hover, .col-filter-action-clear:hover {
+    color: var(--primary, #10b981);
+    text-decoration: underline;
+}
+.col-filter-options-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #edf2f7;
+    border-radius: 6px;
+    padding: 4px;
+    background: #fdfdfd;
+    margin-bottom: 10px;
+}
+.col-filter-option-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+.col-filter-option-item:hover {
+    background: #f7fafc;
+}
+.col-filter-option-item input {
+    margin-right: 6px;
+    cursor: pointer;
+}
+.col-filter-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.col-filter-btn-ok {
+    background: var(--primary, #10b981);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 12px;
+}
+.col-filter-btn-ok:hover {
+    opacity: 0.9;
+}
+.col-filter-btn-cancel {
+    background: #edf2f7;
+    color: #4a5568;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 12px;
+}
+.col-filter-btn-cancel:hover {
+    background: #e2e8f0;
+}

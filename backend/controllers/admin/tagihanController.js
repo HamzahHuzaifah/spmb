@@ -5,8 +5,8 @@ const xlsx = require('xlsx');
 exports.getTagihan = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
@@ -37,8 +37,8 @@ exports.getTagihan = async (req, res) => {
 exports.getTagihanDaftarUlang = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';

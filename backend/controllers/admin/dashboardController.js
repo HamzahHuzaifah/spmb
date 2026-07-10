@@ -227,8 +227,8 @@ async function generateDashboardStats(startDate, endDate) {
 exports.getDashboard = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
+        const limit = 1000000;
+        const offset = 0;
 
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
