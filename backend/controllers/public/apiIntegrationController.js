@@ -8,23 +8,21 @@ exports.getSantriBaru = async (req, res) => {
         
         // Fungsi helper untuk menormalkan nama lembaga dan menentukan kelas default
         const formatData = (nama, lembagaRaw) => {
-            let kelas = 'Pendaftaran Baru';
             let lembagaAsli = (lembagaRaw || 'Lainnya').toLowerCase();
             let lembagaNormal = 'Lainnya';
+            
+            // Nama kelas persis dengan apa yang diinput walisantri di SPMB (misal: "PAUDQu A")
+            let kelas = lembagaRaw || 'Pendaftaran Baru';
             
             // Normalisasi nama lembaga & set kelas default
             if (lembagaAsli.includes('madrasah')) {
                 lembagaNormal = 'Madrasah';
-                kelas = 'Kelas 1';
             } else if (lembagaAsli.includes('paudqu')) {
                 lembagaNormal = 'PAUDQu';
-                kelas = 'Arafah (A)';
             } else if (lembagaAsli.includes('tpq')) {
                 lembagaNormal = 'TPQ';
-                kelas = 'Jilid 1';
             } else if (lembagaAsli.includes('mdt')) {
                 lembagaNormal = 'MDT';
-                kelas = 'Kelas Awwal';
             }
 
             return {
