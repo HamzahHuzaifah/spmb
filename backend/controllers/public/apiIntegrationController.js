@@ -26,7 +26,7 @@ exports.getSantriBaru = async (req, res) => {
             }
 
             return {
-                nama: nama,
+                nama: nama ? nama.toUpperCase() : nama,
                 kelas: kelas,
                 lembaga: lembagaNormal
             };
