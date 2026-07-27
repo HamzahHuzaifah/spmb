@@ -13,10 +13,10 @@ source /home/mjir4837/nodevenv/repositories/spmb/22/bin/activate
 rm -rf node_modules
 npm install --production
 
-# 5. Bunuh proses hantu lama secara instan khusus SPMB
-pkill -f "node app.js --app=spmb"
+# 5. Bunuh proses hantu lama di port 5000 (khusus SPMB)
+kill -9 $(lsof -t -i:5000) 2>/dev/null || true
 
 # 6. Jalankan ulang di background
-nohup node app.js --app=spmb > app.log 2>&1 &
+nohup node app.js > app.log 2>&1 & disown
 
 echo "Server berhasil di-restart!"
