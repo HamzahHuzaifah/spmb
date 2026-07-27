@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const SSO_SECRET = process.env.SSO_SECRET_KEY || 'sikma_spmb_secret_sso_key_2026';
-const SIKMA_URL = process.env.SIKMA_URL || 'https://spmb.mjic.sch.id/dashboard';
+const SIKMA_URL = process.env.SIKMA_URL || 'https://sikma.mjic.sch.id/admin';
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_super_aman_spmb'; // Secret untuk login SPMB
 
 module.exports = {
