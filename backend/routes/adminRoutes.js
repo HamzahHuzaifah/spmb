@@ -11,6 +11,7 @@ const tunggakanController = require('../controllers/admin/tunggakanController');
 const santriController = require('../controllers/admin/santriController');
 const transaksiController = require('../controllers/admin/transaksiController');
 const kwitansiController = require('../controllers/admin/kwitansiController');
+const ssoController = require('../controllers/admin/ssoController');
 
 // --- Autentikasi Admin ---
 router.get('/login', authController.getLogin);
@@ -20,6 +21,9 @@ router.get('/logout', authController.getLogout);
 // --- GEMBOK KEAMANAN ---
 // Semua rute yang tertulis di bawah baris ini akan diperiksa oleh satpam 'cekAuth'
 router.use(cekAuth);
+
+// --- SSO Redirect SIKMA ---
+router.get('/sso/go-sikma', ssoController.goSikma);
 
 // Dashboard
 router.get('/dashboard/export-excel', dashboardController.exportDashboardExcel);

@@ -5,6 +5,7 @@ const landingController = require('../controllers/public/landingController');
 const pendaftaranController = require('../controllers/public/pendaftaranController');
 const pembayaranController = require('../controllers/public/pembayaranController');
 const apiIntegrationController = require('../controllers/public/apiIntegrationController');
+const ssoController = require('../controllers/admin/ssoController');
 const { pendaftaranLimiter } = require('../middlewares/rateLimiter');
 
 // Landing Page
@@ -31,5 +32,9 @@ router.post('/info-pembayaran', pendaftaranLimiter, pembayaranController.cekPemb
 
 // API Integrasi SIKMA
 router.get('/api/santri-baru', apiIntegrationController.getSantriBaru);
+router.get('/api/tunggakan', apiIntegrationController.getTunggakan);
+
+// SSO Integrasi SIKMA
+router.get('/api/sso/login', ssoController.loginFromSikma);
 
 module.exports = router;

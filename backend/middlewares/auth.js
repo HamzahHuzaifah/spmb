@@ -17,7 +17,8 @@ const cekAuth = (req, res, next) => {
         '/santri-daftar-ulang',
         '/input-transaksi',
         '/api',
-        '/kwitansi'
+        '/kwitansi',
+        '/sso'
     ];
 
     const path = req.path;

@@ -46,3 +46,40 @@ exports.getSantriBaru = async (req, res) => {
         res.status(500).json({ error: 'Terjadi kesalahan pada server saat mengambil data santri.' });
     }
 };
+
+const TunggakanModel = require('../../models/TunggakanModel');
+
+exports.getTunggakan = async (req, res) => {
+    try {
+        const tunggakanBaru = await TunggakanModel.getAllTunggakan();
+        const tunggakanDaftarUlang = await TunggakanModel.getAllTunggakanDaftarUlang();
+
+        const formatData = (item, isDaftarUlang) => {
+            let lembagaAsli = (item.satuanPendidikan || 'Lainnya').toLowerCase();
+            let lembagaNormal = 'Lainnya';
+            if (lembagaAsli.includes('madrasah')) lembagaNormal = 'Madrasah';
+            else if (lembagaAsli.includes('paudqu')) lembagaNormal = 'PAUDQu';
+            else if (lembagaAsli.includes('tpq')) lembagaNormal = 'TPQ';
+            else if (lembagaAsli.includes('mdt')) lembagaNormal = 'MDT';
+
+            return {
+                nama: item.nama ? item.nama.toUpperCase() : 'Tanpa Nama',
+                kelas: isDaftarUlang ? 'Daftar Ulang' : 'Pendaftar Baru',
+                lembaga: lembagaNormal,
+                nama_tagihan: isDaftarUlang ? 'Tagihan Daftar Ulang SPMB' : 'Tagihan Pendaftaran SPMB',
+                total: item.totalTagihan || 0,
+                dibayar: item.totalBayar || 0,
+                sisa: item.sisaBayar || 0
+            };
+        };
+
+        const dataBaru = tunggakanBaru.filter(t => t.sisaBayar > 0).map(t => formatData(t, false));
+        const dataDaftarUlang = tunggakanDaftarUlang.filter(t => t.sisaBayar > 0).map(t => formatData(t, true));
+
+        const semuaTunggakan = [...dataBaru, ...dataDaftarUlang];
+        res.status(200).json(semuaTunggakan);
+    } catch (error) {
+        console.error('API Error /api/tunggakan:', error);
+        res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data tunggakan.' });
+    }
+};
