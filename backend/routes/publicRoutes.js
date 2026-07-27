@@ -4,6 +4,7 @@ const router = express.Router();
 const landingController = require('../controllers/public/landingController');
 const pendaftaranController = require('../controllers/public/pendaftaranController');
 const pembayaranController = require('../controllers/public/pembayaranController');
+const apiIntegrationController = require('../controllers/public/apiIntegrationController');
 const { pendaftaranLimiter } = require('../middlewares/rateLimiter');
 
 // Landing Page
@@ -27,5 +28,8 @@ router.get('/daftar/sukses', landingController.getSukses);
 // Info Pembayaran
 router.get('/info-pembayaran', pembayaranController.getFormPembayaran);
 router.post('/info-pembayaran', pendaftaranLimiter, pembayaranController.cekPembayaran);
+
+// API Integrasi SIKMA
+router.get('/api/santri-baru', apiIntegrationController.getSantriBaru);
 
 module.exports = router;
