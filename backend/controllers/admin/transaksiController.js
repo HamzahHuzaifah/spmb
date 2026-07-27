@@ -306,14 +306,14 @@ exports.exportTransaksiExcel = async (req, res) => {
             'Tanggal': item.tanggal,
             'No. Transaksi': item.noTransaksi,
             'Jenis Transaksi': item.jenis,
-            'Nama Pendaftar / Santri': item.namaSantri,
+            'Nama Pendaftar / Santri': item.namaSantri ? item.namaSantri.toUpperCase() : '',
             'Satuan Pendidikan': item.satuanPendidikan,
             'Nominal': item.nominal,
             'Metode Pembayaran': item.metodePembayaran,
             'Kategori Dana': item.kategoriDana,
             'Diterima Dari': item.diterimaDari,
             'Dibayarkan Kepada': item.dibayarkanKepada,
-            'Nama Pemberi': item.namaPemberi
+            'Nama Pemberi': item.namaPemberi ? item.namaPemberi.toUpperCase() : ''
         }));
 
         const ws = xlsx.utils.json_to_sheet(dataToExport);

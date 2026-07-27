@@ -149,7 +149,7 @@ exports.exportTagihanExcel = async (req, res) => {
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,
-            'Nama Santri': item.nama,
+            'Nama Santri': item.nama ? item.nama.toUpperCase() : '',
             'Jalur': item.jalur,
             'Pendidikan': item.satuanPendidikan,
             'Formulir': item.formulir,
@@ -184,7 +184,7 @@ exports.exportTagihanDaftarUlangExcel = async (req, res) => {
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,
-            'Nama Santri': item.nama,
+            'Nama Santri': item.nama ? item.nama.toUpperCase() : '',
             'Jalur': item.jalur,
             'Pendidikan Sebelumnya': item.satuanPendidikanSebelumnya,
             'Pendidikan Lanjutan': item.satuanPendidikan,
