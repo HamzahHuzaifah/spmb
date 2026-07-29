@@ -3,7 +3,8 @@
 # 1. Masuk ke folder yang benar
 cd /home/mjir4837/repositories/spmb
 
-# 2. Tarik kode terbaru dari GitHub
+# 2. Paksa bersihkan file lokal yang konflik lalu tarik kode terbaru dari GitHub
+git reset --hard origin/main
 git pull origin main
 
 # 3. Masuk ke environment Node.js 22
