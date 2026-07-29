@@ -115,6 +115,40 @@
         </div>
     </div>
 
+    <!-- Tunggakan Per Unit Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-4">
+            <%- include('partials/stat-card', {
+                title: 'TUNGGAKAN PAUDQU',
+                id: 'valTunggakanPaudqu',
+                rawValue: dashboardStats.baru.PAUDQu.tunggakan + dashboardStats.lama.PAUDQu.tunggakan,
+                formattedValue: 'Rp ' + (dashboardStats.baru.PAUDQu.tunggakan + dashboardStats.lama.PAUDQu.tunggakan).toLocaleString('id-ID'),
+                iconClass: 'fas fa-file-invoice-dollar',
+                iconStyle: 'color: rgba(239, 68, 68, 0.1);'
+            }) %>
+        </div>
+        <div class="col-md-4 mb-4">
+            <%- include('partials/stat-card', {
+                title: 'TUNGGAKAN TPQ',
+                id: 'valTunggakanTpq',
+                rawValue: dashboardStats.baru.TPQ.tunggakan + dashboardStats.lama.TPQ.tunggakan,
+                formattedValue: 'Rp ' + (dashboardStats.baru.TPQ.tunggakan + dashboardStats.lama.TPQ.tunggakan).toLocaleString('id-ID'),
+                iconClass: 'fas fa-file-invoice-dollar',
+                iconStyle: 'color: rgba(239, 68, 68, 0.1);'
+            }) %>
+        </div>
+        <div class="col-md-4 mb-4">
+            <%- include('partials/stat-card', {
+                title: 'TUNGGAKAN MDT',
+                id: 'valTunggakanMdt',
+                rawValue: dashboardStats.baru.MDT.tunggakan + dashboardStats.lama.MDT.tunggakan,
+                formattedValue: 'Rp ' + (dashboardStats.baru.MDT.tunggakan + dashboardStats.lama.MDT.tunggakan).toLocaleString('id-ID'),
+                iconClass: 'fas fa-file-invoice-dollar',
+                iconStyle: 'color: rgba(239, 68, 68, 0.1);'
+            }) %>
+        </div>
+    </div>
+
     <!-- Pengeluaran & Ziswaf Table -->
     <div class="row mb-4">
         <!-- Pengeluaran -->
