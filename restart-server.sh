@@ -13,8 +13,8 @@ source /home/mjir4837/nodevenv/repositories/spmb/22/bin/activate
 rm -rf node_modules
 npm install --production
 
-# 5. Bunuh proses hantu lama di port 5000 (khusus SPMB)
-kill -9 $(lsof -t -i:5000) 2>/dev/null || true
+# 5. Bunuh proses hantu lama (karena lsof tidak tersedia di cPanel)
+fuser -k 5000/tcp 2>/dev/null || pkill -f "node app.js" 2>/dev/null || true
 
 # 6. Jalankan ulang di background
 nohup node app.js > app.log 2>&1 & disown
