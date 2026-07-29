@@ -15,6 +15,7 @@ echo "[2/2] Merestart server via Port 5000..."
 # Matikan secara spesifik proses SPMB di port 5000 (jangan sentuh SIKMA)
 fuser -k 5000/tcp 2>/dev/null || true
 pkill -9 -f "node backend/server.js" 2>/dev/null || true
+ps ux | grep 'node backend/server.js' | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null || true
 
 # Jalankan SPMB secara abadi di background
 PORT=5000 nohup node backend/server.js > app.log 2>&1 & disown
