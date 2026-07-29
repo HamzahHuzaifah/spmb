@@ -381,7 +381,7 @@ class TransaksiModel {
         const query = `
             SELECT MONTH(tanggal) as bulan, SUM(nominal) as total
             FROM transaksi
-            WHERE jenis = 'Pemasukan' AND YEAR(tanggal) = ?
+            WHERE jenis != 'Pengeluaran' AND YEAR(tanggal) = ?
             GROUP BY MONTH(tanggal)
             ORDER BY bulan ASC
         `;

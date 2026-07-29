@@ -33,6 +33,55 @@
         </form>
     </div>
 
+    <!-- Arus Kas Summary Cards (Top Section) -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="arus-kas-card pemasukan">
+                <div>
+                    <div class="arus-kas-title">TOTAL PEMASUKAN</div>
+                    <div class="arus-kas-value" id="valArusPemasukan" data-original="<%= dashboardStats.totalPemasukanGlobal %>">
+                        Rp <%= dashboardStats.totalPemasukanGlobal.toLocaleString('id-ID') %>
+                    </div>
+                </div>
+                <div class="arus-kas-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="17" y1="7" x2="7" y2="17"></line>
+                        <polyline points="17 17 7 17 7 7"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="arus-kas-card pengeluaran">
+                <div>
+                    <div class="arus-kas-title">TOTAL PENGELUARAN</div>
+                    <div class="arus-kas-value" id="valArusPengeluaran" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">
+                        Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %>
+                    </div>
+                </div>
+                <div class="arus-kas-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="arus-kas-card saldo">
+                <div>
+                    <div class="arus-kas-title">SALDO SPMB</div>
+                    <div class="arus-kas-value" id="valArusSaldo" data-original="<%= dashboardStats.totalPemasukanGlobal - dashboardStats.pengeluaranRekap.TOTAL %>">
+                        Rp <%= (dashboardStats.totalPemasukanGlobal - dashboardStats.pengeluaranRekap.TOTAL).toLocaleString('id-ID') %>
+                    </div>
+                </div>
+                <div class="arus-kas-icon-box">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Stats -->
     <div class="row mb-4">
         <div class="col-md-4 mb-4">
@@ -63,6 +112,65 @@
                 iconClass: 'fas fa-bullseye',
                 iconStyle: 'color: rgba(217, 119, 6, 0.1);'
             }) %>
+        </div>
+    </div>
+
+    <!-- Pengeluaran & Ziswaf Table -->
+    <div class="row mb-4">
+        <!-- Pengeluaran -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
+                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="pengeluaran-global">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
+                        <tr>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MADRASAH (UMUM)</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">PAUDQu</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TPQ</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MDT</th>
+                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranPAUDQu" data-original="<%= dashboardStats.pengeluaranRekap.PAUDQu %>">Rp <%= dashboardStats.pengeluaranRekap.PAUDQu.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranTPQ" data-original="<%= dashboardStats.pengeluaranRekap.TPQ %>">Rp <%= dashboardStats.pengeluaranRekap.TPQ.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMDT" data-original="<%= dashboardStats.pengeluaranRekap.MDT %>">Rp <%= dashboardStats.pengeluaranRekap.MDT.toLocaleString('id-ID') %></td>
+                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 14px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ziswaf JIC Subsidy -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header"><i class="fas fa-handshake mr-2"></i> STATUS SUBSIDI SPP BEASISWA (ZISWAF JIC)</div>
+                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="ziswaf-subsidy">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
+                        <tr>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">SANTRI BARU</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">DAFTAR ULANG</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TOTAL SANTRI</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-ziswaf-baru" data-original="<%= dashboardStats.ziswafStats.santriBaru %>"><%= dashboardStats.ziswafStats.santriBaru %></td>
+                            <td class="text-center val-ziswaf-lama" data-original="<%= dashboardStats.ziswafStats.santriLama %>"><%= dashboardStats.ziswafStats.santriLama %></td>
+                            <td class="text-center font-weight-bold val-ziswaf-total-santri" data-original="<%= dashboardStats.ziswafStats.totalSantri %>"><%= dashboardStats.ziswafStats.totalSantri %></td>
+                        </tr>
+                        <tr>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TARGET DANA</th>
+                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">REALISASI BAYAR</th>
+                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">SISA TUNGGAKAN</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center val-ziswaf-target" data-original="<%= dashboardStats.ziswafStats.targetDana %>">Rp <%= dashboardStats.ziswafStats.targetDana.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-ziswaf-bayar" data-original="<%= dashboardStats.ziswafStats.realisasiBayar %>">Rp <%= dashboardStats.ziswafStats.realisasiBayar.toLocaleString('id-ID') %></td>
+                            <td class="text-center font-weight-bold val-ziswaf-tunggakan" style="color: var(--danger);" data-original="<%= dashboardStats.ziswafStats.sisaTunggakan %>">Rp <%= dashboardStats.ziswafStats.sisaTunggakan.toLocaleString('id-ID') %></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -131,7 +239,6 @@
         <%- include('partials/chart-card', { title: 'STATUS JALUR DAFTAR ULANG', chartId: 'jalurLamaChart', iconClass: 'fas fa-chart-pie', isHalfWidth: true, isDoughnut: true }) %>
     </div>
 
-
     <div class="row mb-4">
         <!-- Rekap Baru -->
         <div class="col-md-6 mb-4">
@@ -141,65 +248,6 @@
         <!-- Rekap Lama -->
         <div class="col-md-6 mb-4">
             <%- include('partials/rekap-card', { title: 'REKAPITULASI DAFTAR ULANG SANTRI LAMA', stats: dashboardStats.rekapLama, totalStats: dashboardStats.madrasahLama }) %>
-        </div>
-    </div>
-
-    <!-- Pengeluaran & Ziswaf Table -->
-    <div class="row mb-4">
-        <!-- Pengeluaran -->
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
-                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="pengeluaran-global">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
-                        <tr>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MADRASAH (UMUM)</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">PAUDQu</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TPQ</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">MDT</th>
-                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranPAUDQu" data-original="<%= dashboardStats.pengeluaranRekap.PAUDQu %>">Rp <%= dashboardStats.pengeluaranRekap.PAUDQu.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranTPQ" data-original="<%= dashboardStats.pengeluaranRekap.TPQ %>">Rp <%= dashboardStats.pengeluaranRekap.TPQ.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMDT" data-original="<%= dashboardStats.pengeluaranRekap.MDT %>">Rp <%= dashboardStats.pengeluaranRekap.MDT.toLocaleString('id-ID') %></td>
-                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 14px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ziswaf JIC Subsidy -->
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header"><i class="fas fa-handshake mr-2"></i> STATUS SUBSIDI SPP BEASISWA (ZISWAF JIC)</div>
-                <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="ziswaf-subsidy">
-                    <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
-                        <tr>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">SANTRI BARU</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">DAFTAR ULANG</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TOTAL SANTRI</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-ziswaf-baru" data-original="<%= dashboardStats.ziswafStats.santriBaru %>"><%= dashboardStats.ziswafStats.santriBaru %></td>
-                            <td class="text-center val-ziswaf-lama" data-original="<%= dashboardStats.ziswafStats.santriLama %>"><%= dashboardStats.ziswafStats.santriLama %></td>
-                            <td class="text-center font-weight-bold val-ziswaf-total-santri" data-original="<%= dashboardStats.ziswafStats.totalSantri %>"><%= dashboardStats.ziswafStats.totalSantri %></td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">TARGET DANA</th>
-                            <th style="text-align: center; font-size: 11px; padding: 10px 4px;">REALISASI BAYAR</th>
-                            <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">SISA TUNGGAKAN</th>
-                        </tr>
-                        <tr>
-                            <td class="text-center val-ziswaf-target" data-original="<%= dashboardStats.ziswafStats.targetDana %>">Rp <%= dashboardStats.ziswafStats.targetDana.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-ziswaf-bayar" data-original="<%= dashboardStats.ziswafStats.realisasiBayar %>">Rp <%= dashboardStats.ziswafStats.realisasiBayar.toLocaleString('id-ID') %></td>
-                            <td class="text-center font-weight-bold val-ziswaf-tunggakan" style="color: var(--danger);" data-original="<%= dashboardStats.ziswafStats.sisaTunggakan %>">Rp <%= dashboardStats.ziswafStats.sisaTunggakan.toLocaleString('id-ID') %></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
