@@ -154,7 +154,10 @@
         <!-- Pengeluaran -->
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header"><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-hand-holding-usd mr-2"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</span>
+                    <small class="text-muted" style="font-size: 11px; font-weight: normal;"><i class="fas fa-mouse-pointer mr-1"></i> Klik nominal untuk detail</small>
+                </div>
                 <div class="table-responsive stat-group" style="overflow-x: auto;" data-group="pengeluaran-global">
                     <table class="table table-bordered table-striped" style="margin-bottom: 0; min-width: 500px; white-space: nowrap;">
                         <tr>
@@ -165,11 +168,11 @@
                             <th style="text-align: center; color: var(--danger); font-size: 11px; padding: 10px 4px;">TOTAL PENGELUARAN</th>
                         </tr>
                         <tr>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranPAUDQu" data-original="<%= dashboardStats.pengeluaranRekap.PAUDQu %>">Rp <%= dashboardStats.pengeluaranRekap.PAUDQu.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranTPQ" data-original="<%= dashboardStats.pengeluaranRekap.TPQ %>">Rp <%= dashboardStats.pengeluaranRekap.TPQ.toLocaleString('id-ID') %></td>
-                            <td class="text-center val-pengeluaran-unit" id="valPengeluaranMDT" data-original="<%= dashboardStats.pengeluaranRekap.MDT %>">Rp <%= dashboardStats.pengeluaranRekap.MDT.toLocaleString('id-ID') %></td>
-                            <td class="text-center font-weight-bold val-pengeluaran-total" id="valPengeluaranTotal" style="color: var(--danger); font-size: 14px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit clickable-pengeluaran" data-unit="MADRASAH" title="Klik untuk lihat rincian pengeluaran Madrasah (Umum)" id="valPengeluaranMadrasah" data-original="<%= dashboardStats.pengeluaranRekap.MADRASAH %>">Rp <%= dashboardStats.pengeluaranRekap.MADRASAH.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit clickable-pengeluaran" data-unit="PAUDQu" title="Klik untuk lihat rincian pengeluaran PAUDQu" id="valPengeluaranPAUDQu" data-original="<%= dashboardStats.pengeluaranRekap.PAUDQu %>">Rp <%= dashboardStats.pengeluaranRekap.PAUDQu.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit clickable-pengeluaran" data-unit="TPQ" title="Klik untuk lihat rincian pengeluaran TPQ" id="valPengeluaranTPQ" data-original="<%= dashboardStats.pengeluaranRekap.TPQ %>">Rp <%= dashboardStats.pengeluaranRekap.TPQ.toLocaleString('id-ID') %></td>
+                            <td class="text-center val-pengeluaran-unit clickable-pengeluaran" data-unit="MDT" title="Klik untuk lihat rincian pengeluaran MDT" id="valPengeluaranMDT" data-original="<%= dashboardStats.pengeluaranRekap.MDT %>">Rp <%= dashboardStats.pengeluaranRekap.MDT.toLocaleString('id-ID') %></td>
+                            <td class="text-center font-weight-bold val-pengeluaran-total clickable-pengeluaran" data-unit="TOTAL" title="Klik untuk lihat rincian seluruh pengeluaran" id="valPengeluaranTotal" style="color: var(--danger); font-size: 14px;" data-original="<%= dashboardStats.pengeluaranRekap.TOTAL %>">Rp <%= dashboardStats.pengeluaranRekap.TOTAL.toLocaleString('id-ID') %></td>
                         </tr>
                     </table>
                 </div>
@@ -727,5 +730,191 @@
             }
         });
     });
+</script>
+
+<style>
+.clickable-pengeluaran {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.clickable-pengeluaran:hover {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    text-decoration: underline;
+}
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+}
+.custom-modal-container {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 850px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalFadeIn 0.2s ease-out;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.custom-modal-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.custom-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+.custom-modal-footer {
+    padding: 12px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+
+<!-- Modal Detail Pengeluaran -->
+<div id="modalPengeluaranDetail" class="custom-modal-overlay">
+    <div class="custom-modal-container">
+        <div class="custom-modal-header">
+            <h5 class="m-0 font-weight-bold" id="modalPengeluaranTitle" style="font-size: 16px;">
+                <i class="fas fa-list-alt mr-2"></i> Rincian Pengeluaran
+            </h5>
+            <button type="button" onclick="closeModalPengeluaran()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <div id="loadingPengeluaranDetail" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin text-success fa-2x"></i>
+                <p class="mt-2 text-muted" style="font-size: 13px;">Memuat data rincian pengeluaran...</p>
+            </div>
+            <div id="contentPengeluaranDetail" style="display: none;">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" style="font-size: 13px;">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>No. Transaksi</th>
+                                <th>Tanggal</th>
+                                <th>Uraian / Rincian</th>
+                                <th>Kategori</th>
+                                <th>Dibayarkan Kepada</th>
+                                <th class="text-right">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPengeluaranDetail"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <div class="font-weight-bold text-dark" style="font-size: 14px;">
+                TOTAL PENGELUARAN: <span id="totalModalPengeluaran" class="text-danger font-weight-bold ml-1">Rp 0</span>
+            </div>
+            <button type="button" onclick="closeModalPengeluaran()" class="btn btn-secondary px-4" style="border-radius: 8px;">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function closeModalPengeluaran() {
+    $('#modalPengeluaranDetail').css('display', 'none');
+}
+
+$(document).ready(function() {
+    $('.clickable-pengeluaran').on('click', function() {
+        const unit = $(this).data('unit');
+        const unitNames = {
+            'MADRASAH': 'Madrasah (Umum)',
+            'PAUDQu': 'PAUDQu',
+            'TPQ': 'TPQ',
+            'MDT': 'MDT',
+            'TOTAL': 'Semua Unit (Total Pengeluaran)'
+        };
+        const titleName = unitNames[unit] || unit;
+        $('#modalPengeluaranTitle').html('<i class="fas fa-list-alt mr-2"></i> Rincian Pengeluaran - ' + titleName);
+
+        $('#loadingPengeluaranDetail').show();
+        $('#contentPengeluaranDetail').hide();
+        $('#modalPengeluaranDetail').css('display', 'flex');
+
+        const startDate = '<%= startDateQuery || "" %>';
+        const endDate = '<%= endDateQuery || "" %>';
+
+        $.ajax({
+            url: '/api/pengeluaran-detail',
+            method: 'GET',
+            data: { unit, startDate, endDate },
+            success: function(res) {
+                $('#loadingPengeluaranDetail').hide();
+                if (res.success && res.data && res.data.length > 0) {
+                    let html = '';
+                    let totalSum = 0;
+                    res.data.forEach(item => {
+                        let nominal = Number(item.nominal) || 0;
+                        totalSum += nominal;
+                        
+                        let rincianArr = [];
+                        if (item.rincianNames) {
+                            let names = item.rincianNames.split(';');
+                            let nominals = item.rincianNominals ? item.rincianNominals.split(';') : [];
+                            names.forEach((n, idx) => {
+                                let nom = nominals[idx] ? ' (Rp ' + Number(nominals[idx]).toLocaleString('id-ID') + ')' : '';
+                                if (n.trim()) rincianArr.push(n.trim() + nom);
+                            });
+                        }
+                        let uraianStr = rincianArr.length > 0 ? rincianArr.join('<br>') : (item.namaSantri || item.jenis || '-');
+                        let tgl = item.tanggal ? item.tanggal.substring(0, 10) : '-';
+
+                        html += `<tr>
+                            <td><span class="badge badge-info" style="font-size: 11px;">${item.noTransaksi || '-'}</span></td>
+                            <td>${tgl}</td>
+                            <td>${uraianStr}</td>
+                            <td><span class="badge badge-light">${item.kategoriDana || '-'}</span></td>
+                            <td>${item.dibayarkanKepada || '-'}</td>
+                            <td class="text-right font-weight-bold text-danger">Rp ${nominal.toLocaleString('id-ID')}</td>
+                        </tr>`;
+                    });
+                    $('#tbodyPengeluaranDetail').html(html);
+                    $('#totalModalPengeluaran').text('Rp ' + totalSum.toLocaleString('id-ID'));
+                    $('#contentPengeluaranDetail').show();
+                } else {
+                    $('#tbodyPengeluaranDetail').html('<tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-folder-open fa-2x mb-2 d-block text-gray-300"></i>Belum ada data pengeluaran untuk unit ini.</td></tr>');
+                    $('#totalModalPengeluaran').text('Rp 0');
+                    $('#contentPengeluaranDetail').show();
+                }
+            },
+            error: function(err) {
+                $('#loadingPengeluaranDetail').hide();
+                alert('Gagal mengambil data rincian pengeluaran.');
+            }
+        });
+    });
+
+    // Close on overlay click
+    $('#modalPengeluaranDetail').on('click', function(e) {
+        if (e.target === this) {
+            closeModalPengeluaran();
+        }
+    });
+});
 </script>
 <script src="/js/dashboard.js"></script>

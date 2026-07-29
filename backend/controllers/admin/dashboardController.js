@@ -257,6 +257,21 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
+exports.getPengeluaranDetailApi = async (req, res) => {
+    try {
+        const unit = req.query.unit || '';
+        const startDate = req.query.startDate || '';
+        const endDate = req.query.endDate || '';
+        const filterTanggal = { start: startDate, end: endDate };
+
+        const list = await TransaksiModel.getPengeluaranDetailByUnit(unit, filterTanggal);
+        res.json({ success: true, data: list, unit });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal mengambil detail pengeluaran' });
+    }
+};
+
 exports.exportDashboardExcel = async (req, res) => {
     try {
         const startDate = req.query.startDate || '';

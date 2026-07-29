@@ -455,6 +455,33 @@ class TransaksiModel {
         const [rows] = await db.execute(query, params);
         return parseInt(rows[0].total) || 0;
     }
+
+    // Mendapatkan Rincian Transaksi Pengeluaran per Unit / Total
+    static async getPengeluaranDetailByUnit(unit, filterTanggal) {
+        let query = `
+            SELECT id, tanggal, noTransaksi, jenis, nominal, satuanPendidikan, metodePembayaran, dibayarkanKepada, kategoriDana, rincianNames, rincianNominals, diterimaDari, namaPemberi, namaSantri
+            FROM transaksi
+            WHERE jenis = 'Pengeluaran'
+        `;
+        let params = [];
+
+        if (unit === 'PAUDQu' || unit === 'TPQ' || unit === 'MDT') {
+            query += ' AND satuanPendidikan = ?';
+            params.push(unit);
+        } else if (unit === 'MADRASAH') {
+            query += ' AND (satuanPendidikan IS NULL OR satuanPendidikan = "" OR satuanPendidikan NOT IN ("PAUDQu", "TPQ", "MDT"))';
+        }
+
+        if (filterTanggal && filterTanggal.start && filterTanggal.end) {
+            query += ' AND tanggal BETWEEN ? AND ?';
+            params.push(filterTanggal.start, filterTanggal.end);
+        }
+
+        query += ' ORDER BY tanggal DESC, id DESC';
+
+        const [rows] = await db.execute(query, params);
+        return rows;
+    }
 }
 
 module.exports = TransaksiModel;

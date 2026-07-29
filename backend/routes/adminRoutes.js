@@ -28,6 +28,7 @@ router.get('/sso/go-sikma', ssoController.goSikma);
 // Dashboard
 router.get('/dashboard/export-excel', dashboardController.exportDashboardExcel);
 router.get('/dashboard', dashboardController.getDashboard);
+router.get('/api/pengeluaran-detail', dashboardController.getPengeluaranDetailApi);
 
 // Laporan
 router.get('/laporan/export-excel', laporanController.exportLaporanExcel);
