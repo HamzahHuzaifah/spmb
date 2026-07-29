@@ -87,6 +87,9 @@ function formatTimestampIndo(isoStr) {
                                 </span></td>
                             <td style="font-weight: 600;">
                                 <%= item.nama %>
+                                <% if (item.status_santri === 'Mundur') { %>
+                                    <span class="badge badge-danger" style="background-color: #ef4444; color: white; font-size: 10px; padding: 2px 6px; margin-left: 5px;">Mundur</span>
+                                <% } %>
                                 <% if (item.isDuplicate) { %>
                                     <span class="badge badge-danger" style="background-color: #ef4444; color: white; font-size: 10px; padding: 2px 6px; margin-left: 5px;" title="Terdeteksi Duplikat Data">Duplikat</span>
                                 <% } %>
@@ -111,7 +114,8 @@ function formatTimestampIndo(isoStr) {
                                     type: 'santri',
                                     item: item,
                                     detailOnClick: 'openSantriModal(this)',
-                                    deleteUrl: '/santri/delete/' + item.id
+                                    deleteUrl: '/santri/delete/' + item.id,
+                                    mundurUrl: '/santri/mundur/' + item.id
                                 }) %>
                             </td>
 

@@ -17,6 +17,16 @@
                 style="padding: 5px 10px; font-size: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;"
                 onclick="confirmDelete('<%= deleteUrl %>')">Hapus</button>
         <% } %>
+        <% if (item.status_santri !== 'Mundur' && typeof mundurUrl !== 'undefined' && mundurUrl) { %>
+            <button type="button" class="btn btn-warning"
+                style="padding: 5px 10px; font-size: 12px; background-color: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;"
+                onclick="promptMundur('<%= mundurUrl %>', '<%= mundurUrl.includes('daftar-ulang') ? 'daftar_ulang' : 'baru' %>', '<%= item.nama %>', '<%= mundurUrl.includes('daftar-ulang') ? item.lanjutKe : item.pendidikan %>')">Mundur</button>
+        <% } %>
+        <% if (item.status_santri === 'Mundur' && typeof mundurUrl !== 'undefined' && mundurUrl) { %>
+            <button type="button" class="btn btn-info"
+                style="padding: 5px 10px; font-size: 12px; background-color: #0dcaf0; color: white; border: none; border-radius: 4px; cursor: pointer;"
+                onclick="promptUndoMundur('<%= mundurUrl.replace('/mundur/', '/undo-mundur/') %>')">Batal Mundur</button>
+        <% } %>
     <% } else if (type === 'tagihan') { %>
         <button class="btn btn-secondary" 
             style="padding: 5px 10px; font-size: 12px;" 

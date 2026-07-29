@@ -182,6 +182,10 @@ class SantriModel {
         await db.execute(query, values);
     }
 
+    static async setStatusSantri(id, status) {
+        await db.execute('UPDATE santri SET status_santri = ? WHERE id = ?', [status, id]);
+    }
+
     static async deleteSantri(id) {
         await db.execute('DELETE FROM santri WHERE id = ?', [id]);
     }

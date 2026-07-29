@@ -83,6 +83,17 @@ async function runMigration() {
             await backfillTable(table);
         }
 
+        // Migration untuk status_santri di tabel santri & santri_daftar_ulang
+        const santriTables = ['santri', 'santri_daftar_ulang'];
+        for (const table of santriTables) {
+            const [cols] = await poolPromise.query(`SHOW COLUMNS FROM ${table}`);
+            const colNames = cols.map(c => c.Field);
+            if (!colNames.includes('status_santri')) {
+                console.log(`[Migration] Menambahkan kolom 'status_santri' ke tabel '${table}'...`);
+                await poolPromise.query(`ALTER TABLE ${table} ADD COLUMN status_santri ENUM('Aktif', 'Mundur') DEFAULT 'Aktif'`);
+            }
+        }
+
         // Buat tabel deleted_registrations jika belum ada
         await poolPromise.query(`
             CREATE TABLE IF NOT EXISTS deleted_registrations (

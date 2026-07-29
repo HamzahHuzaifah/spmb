@@ -945,6 +945,151 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePagination(table);
     }
 
+let currentTotalBayar = 0;
+
+window.promptMundur = async function(url, tipe, nama, pendidikan) {
+    try {
+        Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+        
+        let totalBayar = 0;
+        const res = await fetch(`/api/search-santri?tipe=${tipe}&q=${encodeURIComponent(nama)}&satuanPendidikan=${encodeURIComponent(pendidikan)}`);
+        const json = await res.json();
+        if (json.success && json.data && json.data.length > 0) {
+            const match = json.data.find(d => d.nama === nama);
+            if (match) totalBayar = match.totalBayar || 0;
+        }
+        currentTotalBayar = totalBayar;
+
+        Swal.fire({
+            title: 'Proses Santri Mundur',
+            html: `
+                <div style="text-align: left; font-size: 14px;">
+                    <p style="margin-bottom: 10px; color: #dc3545;">Tindakan ini akan merubah status santri menjadi <strong>Mundur</strong> dan membatalkan sisa tunggakannya secara otomatis.</p>
+                    <p style="margin-bottom: 15px; color: #059669; font-weight: bold;">Total Pembayaran Saat Ini: Rp ${totalBayar.toLocaleString('id-ID')}</p>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Alasan Mundur:</label>
+                    <select id="alasanMundur" class="swal2-input select2-dropdown" style="width: 100%; margin: 0 0 15px 0;" onchange="updateRefundAmount()">
+                        <option value="">-- Pilih Alasan --</option>
+                        <option value="Meninggal Dunia">Meninggal Dunia (Refund 100%)</option>
+                        <option value="Pindah Tugas">Pindah Tugas Orang Tua (Refund 50%)</option>
+                        <option value="Diterima di Sekolah Lain">Diterima di Sekolah Lain (Hangus/0%)</option>
+                        <option value="Lainnya">Lainnya (Hangus/0%)</option>
+                    </select>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nominal Refund (Rp):</label>
+                    <input type="number" id="nominalRefund" class="swal2-input" style="width: 100%; max-width: 100%; margin: 0;" placeholder="Isi nominal refund (jika ada)">
+                    <small style="display: block; margin-top: 5px; color: #666;">Isi 0 jika tidak ada dana yang dikembalikan. Anda bisa merubah angkanya secara manual.</small>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Proses Mundur',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33',
+            didOpen: () => {
+                $('#alasanMundur').select2({
+                    dropdownParent: $('.swal2-container'),
+                    width: '100%'
+                });
+                $('#alasanMundur').on('change', function() {
+                    window.updateRefundAmount();
+                });
+            },
+            preConfirm: () => {
+                const alasan = document.getElementById('alasanMundur').value;
+                const refund = document.getElementById('nominalRefund').value;
+                if (!alasan) {
+                    Swal.showValidationMessage('Harap pilih alasan mundur');
+                    return false;
+                }
+                return { alasan, refund };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(result.value)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Gagal!', data.message || 'Terjadi kesalahan', 'error');
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error!', 'Koneksi ke server bermasalah', 'error');
+                });
+            }
+        });
+    } catch (err) {
+        Swal.fire('Error!', 'Gagal mengambil data tagihan', 'error');
+    }
+}
+
+window.updateRefundAmount = function() {
+    const alasan = document.getElementById('alasanMundur').value;
+    const refundInput = document.getElementById('nominalRefund');
+    if (alasan === 'Diterima di Sekolah Lain' || alasan === 'Lainnya') {
+        refundInput.value = 0;
+    } else if (alasan === 'Pindah Tugas') {
+        refundInput.value = Math.floor(currentTotalBayar * 0.5);
+    } else if (alasan === 'Meninggal Dunia') {
+        refundInput.value = currentTotalBayar;
+    } else {
+        refundInput.value = '';
+    }
+}
+
+window.promptUndoMundur = function(url) {
+    Swal.fire({
+        title: 'Batal Mundur',
+        html: `
+            <div style="text-align: left; font-size: 14px;">
+                <p style="margin-bottom: 15px;">Pilih bagaimana Anda ingin memulihkan tagihan santri ini:</p>
+                <div style="margin-bottom: 10px;">
+                    <input type="radio" id="opt_mulai_baru" name="undo_option" value="mulai_baru" checked>
+                    <label for="opt_mulai_baru" style="font-weight: bold; margin-left: 5px;">Mulai dari Awal</label>
+                    <p style="margin: 3px 0 0 20px; font-size: 12px; color: #666;">Tagihan direset menjadi penuh. Total yang pernah dibayarkan dianggap 0. (Transaksi lama tetap ada sebagai pemasukan lembaga)</p>
+                </div>
+                <div>
+                    <input type="radio" id="opt_lanjutkan" name="undo_option" value="lanjutkan">
+                    <label for="opt_lanjutkan" style="font-weight: bold; margin-left: 5px;">Lanjutkan Pembayaran Terakhir</label>
+                    <p style="margin: 3px 0 0 20px; font-size: 12px; color: #666;">Sisa cicilan diteruskan. Jika sebelumnya ada uang Refund yang keluar, total uang bayar santri akan otomatis dipotong sebesar refund tersebut agar pembukuan tidak kacau.</p>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Proses Batal Mundur',
+        cancelButtonText: 'Tutup',
+        confirmButtonColor: '#0dcaf0',
+        preConfirm: () => {
+            const option = document.querySelector('input[name="undo_option"]:checked').value;
+            return { option };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(result.value)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Berhasil!', data.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Gagal!', data.message || 'Terjadi kesalahan', 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error!', 'Koneksi ke server bermasalah', 'error');
+            });
+        }
+    });
+}
+
     function updatePagination(table) {
         const itemsPerPage = 10;
         

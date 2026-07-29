@@ -67,11 +67,12 @@ class TunggakanModel {
 
     static async searchTunggakanBaruAJAX(search = '', limit = 10, pendidikan = '') {
         let query = `
-            SELECT t.nama, t.sisaBayar, t.satuanPendidikan, s.nomorPendaftaran 
+            SELECT t.nama, t.sisaBayar, t.totalBayar, t.totalTagihan, t.satuanPendidikan, s.nomorPendaftaran 
             FROM tunggakan t 
             LEFT JOIN santri s ON t.nama = s.nama 
             WHERE (t.nama LIKE ? OR s.nomorPendaftaran LIKE ?)
             AND t.sisaBayar > 0
+            AND (s.status_santri IS NULL OR s.status_santri != 'Mundur')
         `;
         let params = [`%${search}%`, `%${search}%`];
         if (pendidikan) {
@@ -153,12 +154,44 @@ class TunggakanModel {
         await db.execute(query, values);
     }
 
+    static async voidTunggakanByNamaAndPendidikan(nama, pendidikan) {
+        const query = `
+            UPDATE tunggakan SET 
+                sisaBayar = 0,
+                status = 'Dibatalkan'
+            WHERE nama = ? AND satuanPendidikan = ? AND sisaBayar > 0
+        `;
+        await db.execute(query, [nama, pendidikan]);
+    }
+
     static async deleteTunggakanByName(nama) {
         await db.execute('DELETE FROM tunggakan WHERE nama = ?', [nama]);
     }
 
     static async deleteTunggakanByNamaAndPendidikan(nama, pendidikan) {
         await db.execute('DELETE FROM tunggakan WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
+    }
+
+    static async resetTunggakanByNamaAndPendidikan(nama, pendidikan) {
+        const query = `
+            UPDATE tunggakan SET 
+                totalBayar = 0,
+                sisaBayar = totalTagihan,
+                status = CASE WHEN totalTagihan <= 0 THEN 'Lunas' ELSE 'Belum Lunas' END
+            WHERE nama = ? AND satuanPendidikan = ? AND status = 'Dibatalkan'
+        `;
+        await db.execute(query, [nama, pendidikan]);
+    }
+
+    static async restoreTunggakanByNamaAndPendidikan(nama, pendidikan, nominalRefund) {
+        const query = `
+            UPDATE tunggakan SET 
+                totalBayar = GREATEST(0, totalBayar - ?),
+                sisaBayar = totalTagihan - totalBayar,
+                status = CASE WHEN (totalTagihan - totalBayar) <= 0 THEN 'Lunas' ELSE 'Belum Lunas' END
+            WHERE nama = ? AND satuanPendidikan = ? AND status = 'Dibatalkan'
+        `;
+        await db.execute(query, [nominalRefund, nama, pendidikan]);
     }
 
     static async deleteTunggakan(id) {
@@ -231,11 +264,12 @@ class TunggakanModel {
 
     static async searchTunggakanDaftarUlangAJAX(search = '', limit = 10, pendidikan = '') {
         let query = `
-            SELECT t.nama, t.sisaBayar, t.satuanPendidikan, s.nomorPendaftaran 
+            SELECT t.nama, t.sisaBayar, t.totalBayar, t.totalTagihan, t.satuanPendidikan, s.nomorPendaftaran 
             FROM tunggakan_daftar_ulang t 
             LEFT JOIN santri_daftar_ulang s ON t.nama = s.nama 
             WHERE (t.nama LIKE ? OR s.nomorPendaftaran LIKE ?)
             AND t.sisaBayar > 0
+            AND (s.status_santri IS NULL OR s.status_santri != 'Mundur')
         `;
         let params = [`%${search}%`, `%${search}%`];
         if (pendidikan) {
@@ -317,12 +351,44 @@ class TunggakanModel {
         await db.execute(query, values);
     }
 
+    static async voidTunggakanDaftarUlangByNamaAndPendidikan(nama, pendidikan) {
+        const query = `
+            UPDATE tunggakan_daftar_ulang SET 
+                sisaBayar = 0,
+                status = 'Dibatalkan'
+            WHERE nama = ? AND satuanPendidikan = ? AND sisaBayar > 0
+        `;
+        await db.execute(query, [nama, pendidikan]);
+    }
+
     static async deleteTunggakanDaftarUlangByName(nama) {
         await db.execute('DELETE FROM tunggakan_daftar_ulang WHERE nama = ?', [nama]);
     }
 
     static async deleteTunggakanDaftarUlangByNamaAndPendidikan(nama, pendidikan) {
         await db.execute('DELETE FROM tunggakan_daftar_ulang WHERE nama = ? AND satuanPendidikan = ? LIMIT 1', [nama, pendidikan]);
+    }
+
+    static async resetTunggakanDaftarUlangByNamaAndPendidikan(nama, pendidikan) {
+        const query = `
+            UPDATE tunggakan_daftar_ulang SET 
+                totalBayar = 0,
+                sisaBayar = totalTagihan,
+                status = CASE WHEN totalTagihan <= 0 THEN 'Lunas' ELSE 'Belum Lunas' END
+            WHERE nama = ? AND satuanPendidikan = ? AND status = 'Dibatalkan'
+        `;
+        await db.execute(query, [nama, pendidikan]);
+    }
+
+    static async restoreTunggakanDaftarUlangByNamaAndPendidikan(nama, pendidikan, nominalRefund) {
+        const query = `
+            UPDATE tunggakan_daftar_ulang SET 
+                totalBayar = GREATEST(0, totalBayar - ?),
+                sisaBayar = totalTagihan - totalBayar,
+                status = CASE WHEN (totalTagihan - totalBayar) <= 0 THEN 'Lunas' ELSE 'Belum Lunas' END
+            WHERE nama = ? AND satuanPendidikan = ? AND status = 'Dibatalkan'
+        `;
+        await db.execute(query, [nominalRefund, nama, pendidikan]);
     }
 
     static async deleteTunggakanDaftarUlang(id) {

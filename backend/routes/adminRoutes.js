@@ -58,6 +58,10 @@ router.post('/santri/edit/:id', santriController.editSantri);
 router.post('/santri-daftar-ulang/edit/:id', santriController.editSantriDaftarUlang);
 router.post('/santri/delete/:id', santriController.deleteSantri);
 router.post('/santri-daftar-ulang/delete/:id', santriController.deleteSantriDaftarUlang);
+router.post('/santri/mundur/:id', santriController.mundurSantri);
+router.post('/santri-daftar-ulang/mundur/:id', santriController.mundurSantriDaftarUlang);
+router.post('/santri/undo-mundur/:id', santriController.undoMundurSantri);
+router.post('/santri-daftar-ulang/undo-mundur/:id', santriController.undoMundurSantriDaftarUlang);
 
 // Input Transaksi
 router.get('/input-transaksi/export-excel', transaksiController.exportTransaksiExcel);

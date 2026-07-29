@@ -12,6 +12,17 @@ async function generateDashboardStats(startDate, endDate) {
     let tunggakanData = await TunggakanModel.getAllTunggakan();
     let tunggakanDaftarUlangData = await TunggakanModel.getAllTunggakanDaftarUlang();
     
+    // Filter out 'Mundur' students from global stats
+    const activeNamesBaru = new Set(santriData.filter(s => s.status_santri !== 'Mundur').map(s => s.nama));
+    const activeNamesLama = new Set(santriDaftarUlangData.filter(s => s.status_santri !== 'Mundur').map(s => s.nama));
+    
+    tagihanData = tagihanData.filter(t => activeNamesBaru.has(t.nama));
+    tunggakanData = tunggakanData.filter(t => activeNamesBaru.has(t.nama));
+    tagihanDaftarUlangData = tagihanDaftarUlangData.filter(t => activeNamesLama.has(t.nama));
+    tunggakanDaftarUlangData = tunggakanDaftarUlangData.filter(t => activeNamesLama.has(t.nama));
+    santriData = santriData.filter(s => s.status_santri !== 'Mundur');
+    santriDaftarUlangData = santriDaftarUlangData.filter(s => s.status_santri !== 'Mundur');
+
     const filterTanggal = { start: startDate, end: endDate };
 
     if (startDate && endDate) {

@@ -377,3 +377,167 @@ exports.exportSantriDaftarUlangExcel = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+exports.mundurSantri = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { alasan, refund } = req.body;
+        
+        const santri = await SantriModel.getSantriById(id);
+        if (!santri) return res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+
+        await SantriModel.setStatusSantri(id, 'Mundur');
+        
+        const tunggakan = await TunggakanModel.getTunggakanByNameAndPendidikan(santri.nama, santri.pendidikan);
+        if (tunggakan) {
+            await TunggakanModel.voidTunggakanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+            
+            const nominalRefund = parseInt(refund) || 0;
+            if (nominalRefund > 0) {
+                const currentDate = new Date();
+                const tanggalStr = currentDate.toISOString().split('T')[0];
+                const bulanStr = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const tahunStr = String(currentDate.getFullYear());
+                
+                const transaksiTerbaru = await TransaksiModel.getAllTransaksi();
+                const count = transaksiTerbaru.filter(t => t.noTransaksi.startsWith('KWI-OUT') && t.noTransaksi.includes(`/${bulanStr}/${tahunStr}`)).length + 1;
+                const noTransaksi = `KWI-OUT/${String(count).padStart(3, '0')}/${bulanStr}/${tahunStr}`;
+                
+                await TransaksiModel.addTransaksi({
+                    tanggal: tanggalStr,
+                    noTransaksi: noTransaksi,
+                    namaSantri: santri.nama,
+                    jenis: 'Pengeluaran',
+                    nominal: nominalRefund,
+                    satuanPendidikan: santri.pendidikan,
+                    kategoriDana: 'Pengembalian Dana (Refund Mundur)',
+                    diterimaDari: '',
+                    namaPemberi: santri.nama,
+                    inputOleh: req.session && req.session.user ? req.session.user.username : 'admin'
+                });
+                
+                await TransaksiModel.addLaporan({
+                    tanggal: tanggalStr,
+                    bulan: bulanStr,
+                    tahun: tahunStr,
+                    noTransaksi: noTransaksi,
+                    uraian: `Pengembalian dana untuk ${santri.nama} (${alasan})`,
+                    pemasukan: 0,
+                    pengeluaran: nominalRefund
+                });
+            }
+        }
+        
+        res.json({ success: true, message: 'Status berhasil diubah menjadi Mundur dan tagihan disesuaikan' });
+    } catch (err) {
+        console.error("Error mundurSantri:", err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+    }
+};
+
+exports.mundurSantriDaftarUlang = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { alasan, refund } = req.body;
+        
+        const santri = await SantriModel.getSantriDaftarUlangById(id);
+        if (!santri) return res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+
+        await SantriModel.setStatusSantriDaftarUlang(id, 'Mundur');
+        
+        const tunggakan = await TunggakanModel.getTunggakanDaftarUlangByNameAndPendidikan(santri.nama, santri.lanjutKe);
+        if (tunggakan) {
+            await TunggakanModel.voidTunggakanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+            
+            const nominalRefund = parseInt(refund) || 0;
+            if (nominalRefund > 0) {
+                const currentDate = new Date();
+                const tanggalStr = currentDate.toISOString().split('T')[0];
+                const bulanStr = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const tahunStr = String(currentDate.getFullYear());
+                
+                const transaksiTerbaru = await TransaksiModel.getAllTransaksi();
+                const count = transaksiTerbaru.filter(t => t.noTransaksi.startsWith('KWI-OUT') && t.noTransaksi.includes(`/${bulanStr}/${tahunStr}`)).length + 1;
+                const noTransaksi = `KWI-OUT/${String(count).padStart(3, '0')}/${bulanStr}/${tahunStr}`;
+                
+                await TransaksiModel.addTransaksi({
+                    tanggal: tanggalStr,
+                    noTransaksi: noTransaksi,
+                    namaSantri: santri.nama,
+                    jenis: 'Pengeluaran',
+                    nominal: nominalRefund,
+                    satuanPendidikan: santri.lanjutKe,
+                    kategoriDana: 'Pengembalian Dana (Refund Mundur)',
+                    diterimaDari: '',
+                    namaPemberi: santri.nama,
+                    inputOleh: req.session && req.session.user ? req.session.user.username : 'admin'
+                });
+                
+                await TransaksiModel.addLaporan({
+                    tanggal: tanggalStr,
+                    bulan: bulanStr,
+                    tahun: tahunStr,
+                    noTransaksi: noTransaksi,
+                    uraian: `Pengembalian dana untuk ${santri.nama} (${alasan})`,
+                    pemasukan: 0,
+                    pengeluaran: nominalRefund
+                });
+            }
+        }
+        
+        res.json({ success: true, message: 'Status berhasil diubah menjadi Mundur dan tagihan disesuaikan' });
+    } catch (err) {
+        console.error("Error mundurSantriDaftarUlang:", err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+    }
+};
+
+exports.undoMundurSantri = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { option } = req.body;
+        
+        const santri = await SantriModel.getSantriById(id);
+        if (!santri) return res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+
+        await SantriModel.setStatusSantri(id, 'Aktif');
+        
+        if (option === 'mulai_baru') {
+            await TunggakanModel.resetTunggakanByNamaAndPendidikan(santri.nama, santri.pendidikan);
+        } else if (option === 'lanjutkan') {
+            const refundTrx = await TransaksiModel.getRefundTransaksiByNamaAndPendidikan(santri.nama, santri.pendidikan);
+            const nominalRefund = refundTrx ? (Number(refundTrx.nominal) || 0) : 0;
+            await TunggakanModel.restoreTunggakanByNamaAndPendidikan(santri.nama, santri.pendidikan, nominalRefund);
+        }
+        
+        res.json({ success: true, message: 'Status berhasil dikembalikan menjadi Aktif dan tagihan disesuaikan' });
+    } catch (err) {
+        console.error("Error undoMundurSantri:", err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+    }
+};
+
+exports.undoMundurSantriDaftarUlang = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { option } = req.body;
+        
+        const santri = await SantriModel.getSantriDaftarUlangById(id);
+        if (!santri) return res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+
+        await SantriModel.setStatusSantriDaftarUlang(id, 'Aktif');
+        
+        if (option === 'mulai_baru') {
+            await TunggakanModel.resetTunggakanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+        } else if (option === 'lanjutkan') {
+            const refundTrx = await TransaksiModel.getRefundTransaksiByNamaAndPendidikan(santri.nama, santri.lanjutKe);
+            const nominalRefund = refundTrx ? (Number(refundTrx.nominal) || 0) : 0;
+            await TunggakanModel.restoreTunggakanDaftarUlangByNamaAndPendidikan(santri.nama, santri.lanjutKe, nominalRefund);
+        }
+        
+        res.json({ success: true, message: 'Status berhasil dikembalikan menjadi Aktif dan tagihan disesuaikan' });
+    } catch (err) {
+        console.error("Error undoMundurSantriDaftarUlang:", err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+    }
+};

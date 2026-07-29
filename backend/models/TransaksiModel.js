@@ -7,6 +7,12 @@ class TransaksiModel {
         return rows;
     }
 
+    static async getRefundTransaksiByNamaAndPendidikan(nama, pendidikan) {
+        const query = 'SELECT * FROM transaksi WHERE namaSantri = ? AND satuanPendidikan = ? AND kategoriDana = "Pengembalian Dana (Refund Mundur)" ORDER BY id DESC LIMIT 1';
+        const [rows] = await db.execute(query, [nama, pendidikan]);
+        return rows[0];
+    }
+
     static async getTransaksiPaginated(limit, offset, search, filterTanggal, filterJenis) {
         let query = 'SELECT * FROM transaksi WHERE 1=1';
         let params = [];
