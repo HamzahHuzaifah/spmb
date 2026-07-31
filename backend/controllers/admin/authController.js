@@ -25,9 +25,9 @@ exports.postLogin = async (req, res) => {
     const { username, password } = req.body;
     try {
         // Cari admin di database
-        const [rows] = await db.execute('SELECT * FROM admin WHERE username = ?', [username]);
+        const [rows] = await db.execute('SELECT * FROM admin WHERE username = ? AND is_active = 1', [username]);
         if (rows.length === 0) {
-            return res.render('admin-login', { error: 'Username atau Password salah!' });
+            return res.render('admin-login', { error: 'Username atau Password salah atau akun tidak aktif!' });
         }
 
         const admin = rows[0];
@@ -40,7 +40,7 @@ exports.postLogin = async (req, res) => {
 
         // Login Berhasil! Buat Token/Karcis
         const token = jwt.sign(
-            { id: admin.id, username: admin.username, nama: admin.nama_lengkap },
+            { id: admin.id, username: admin.username, nama: admin.nama_lengkap, role: admin.role || 'admin' },
             JWT_SECRET,
             { expiresIn: '8h' } // Token berlaku selama 8 jam
         );
@@ -52,8 +52,12 @@ exports.postLogin = async (req, res) => {
             maxAge: 8 * 60 * 60 * 1000 // Berlaku 8 jam
         });
 
-        // Redirect ke dashboard admin
-        res.redirect('/dashboard');
+        // Redirect ke dashboard super admin jika role adalah super_admin, jika tidak ke dashboard biasa
+        if (admin.role === 'super_admin') {
+            res.redirect('/superadmin/dashboard');
+        } else {
+            res.redirect('/dashboard');
+        }
     } catch (error) {
         console.error('Login Error:', error);
         res.render('admin-login', { error: 'Terjadi kesalahan sistem internal.' });
@@ -105,7 +109,7 @@ exports.updateProfile = async (req, res) => {
         );
 
         const token = jwt.sign(
-            { id: adminId, username: username, nama: nama_lengkap },
+            { id: adminId, username: username, nama: nama_lengkap, role: admin.role || 'admin' },
             JWT_SECRET,
             { expiresIn: '8h' }
         );
@@ -135,8 +139,8 @@ exports.addAdmin = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await db.execute(
-            'INSERT INTO admin (username, nama_lengkap, password) VALUES (?, ?, ?)',
-            [username, nama_lengkap, hashedPassword]
+            'INSERT INTO admin (username, nama_lengkap, password, role) VALUES (?, ?, ?, ?)',
+            [username, nama_lengkap, hashedPassword, req.body.role || 'admin']
         );
 
         return res.json({ success: true, message: 'Admin baru berhasil ditambahkan!' });
@@ -148,7 +152,7 @@ exports.addAdmin = async (req, res) => {
 
 exports.getAdminList = async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT id, username, nama_lengkap FROM admin ORDER BY id ASC');
+        const [rows] = await db.execute('SELECT id, username, nama_lengkap, role, is_active FROM admin ORDER BY id ASC');
         return res.json({ success: true, data: rows });
     } catch (error) {
         console.error('Get Admin List Error:', error);
@@ -180,9 +184,12 @@ exports.editAdmin = async (req, res) => {
             updatedPassword = await bcrypt.hash(password, 10);
         }
 
+        const updateRole = req.body.role || admin.role;
+        const updateIsActive = req.body.is_active !== undefined ? req.body.is_active : admin.is_active;
+
         await db.execute(
-            'UPDATE admin SET username = ?, nama_lengkap = ?, password = ? WHERE id = ?',
-            [username, nama_lengkap, updatedPassword, id]
+            'UPDATE admin SET username = ?, nama_lengkap = ?, password = ?, role = ?, is_active = ? WHERE id = ?',
+            [username, nama_lengkap, updatedPassword, updateRole, updateIsActive, id]
         );
 
         return res.json({ success: true, message: 'Data admin berhasil diperbarui!' });

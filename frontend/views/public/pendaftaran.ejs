@@ -1,7 +1,6 @@
-<div class="form-card">
+<div class="premium-form-card">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
-        <h2 style="margin: 0; border: none; padding: 0;">Form Pendaftaran Santri Baru</h2>
-        <!-- <button type="button" class="btn btn-warning" onclick="fillTestingDataPublic('baru')" style="font-size: 12px; padding: 5px 10px;">Isi Data Testing</button> -->
+        <h2 style="margin: 0; border: none; padding: 0;"><i class="fas fa-user-plus" style="margin-right: 10px; color: var(--primary);"></i> Form Pendaftaran Santri Baru</h2>
     </div>
     <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan lengkapi data diri calon santri dan orang tua dengan benar.</p>
 
@@ -16,7 +15,42 @@
 
     <form action="/daftar" method="POST">
         <!-- Data Santri -->
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">A. Data Calon Santri</h3>
+        <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;"><i class="fas fa-user-graduate" style="margin-right: 10px; color: var(--primary);"></i> A. Data Calon Santri</h3>
+
+        <!-- Pilihan Jalur Reguler -->
+        <div class="form-group" style="margin-bottom: 25px;">
+            <label class="required">Jalur Pendaftaran</label>
+            <div class="radio-group" style="flex-direction: column; gap: 15px; margin-top: 10px;">
+                <% if (typeof jalurList !== 'undefined' && jalurList.length > 0) {
+                    let hasReguler = false;
+                    jalurList.forEach((jalur, index) => {
+                        if (!jalur.nama.toLowerCase().includes('beasiswa')) {
+                            hasReguler = true;
+                %>
+                <label class="radio-label">
+                    <input type="radio" name="jalurPendaftaran" value="<%= jalur.nama %>" <%= index === 0 ? 'required checked' : '' %>>
+                    <div>
+                        <strong><%= jalur.nama %></strong>
+                        <% if (jalur.syarat_dokumen) { %>
+                            <div class="form-help"><%= jalur.syarat_dokumen %></div>
+                        <% } %>
+                    </div>
+                </label>
+                <%      }
+                    });
+                    if (!hasReguler) { %>
+                        <div style="color: #b91c1c; font-size: 14px;">Belum ada jalur pendaftaran reguler yang aktif.</div>
+                <%  }
+                } else { %>
+                    <label class="radio-label">
+                        <input type="radio" name="jalurPendaftaran" value="Reguler" required checked>
+                        <div>
+                            <strong>Reguler</strong>
+                        </div>
+                    </label>
+                <% } %>
+            </div>
+        </div>
 
         <div class="form-group">
             <label class="required">Tingkat Pendidikan yang Didaftar</label>
@@ -34,7 +68,7 @@
         <hr style="border: 0; border-top: 1px dashed var(--border); margin: 30px 0;">
 
         <!-- Data Orang Tua -->
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">B. Data Orang Tua / Wali</h3>
+        <h3 style="margin-bottom: 15px; color: var(--text-main);"><i class="fas fa-users" style="margin-right: 10px; color: var(--primary);"></i> B. Data Orang Tua / Wali</h3>
 
         <%- include('../partials/form-orang-tua', { 
             layout: 'stacked',

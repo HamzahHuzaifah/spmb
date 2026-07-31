@@ -38,12 +38,23 @@ function formatTimestampIndo(isoStr) {
         `
     }) %>
 
-    <div class="table-container">
-        <div class="table-header">
-            <div class="table-title">Master Data Santri Daftar Ulang</div>
+    <div class="premium-banner premium-banner-orange" style="margin-top: 20px;">
+        <div>
+            <h1>Master Data Daftar Ulang</h1>
+            <p>Kelola data santri lama yang melakukan pendaftaran ulang</p>
+        </div>
+        <div class="premium-banner-icon">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+    </div>
+
+    <div class="premium-table-container">
+        <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">
+            <div class="table-title" style="font-weight: 700; font-size: 18px; color: #1e293b;"><i class="fas fa-list mr-2"></i> Data Daftar Ulang</div>
         </div>
 
-        <table id="dataTable">
+        <div class="table-responsive" style="overflow-x: auto; width: 100%;">
+<table id="dataTable" class="premium-table">
             <thead>
                 <tr>
                     <th>No</th>
@@ -128,6 +139,7 @@ function formatTimestampIndo(isoStr) {
                                 <% } %>
             </tbody>
         </table>
+</div>
 
         <!-- Pagination UI -->
         <%- include('partials/pagination', { 

@@ -7,27 +7,18 @@
         <%
           const menuSections = [
             {
-              title: null,
+              title: 'Super Admin',
               items: [
-                { href: '/dashboard', page: 'dashboard', icon: 'fas fa-home', text: 'Dashboard' },
-                { href: '/input-transaksi', page: 'input-transaksi', icon: 'fas fa-plus-circle', text: 'Input Transaksi' },
-                { href: '/laporan', page: 'laporan', icon: 'fas fa-chart-bar', text: 'Laporan Utama' }
+                { href: '/superadmin/dashboard', page: 'dashboard', icon: 'fas fa-home', text: 'Dashboard Utama' },
+                { href: '/superadmin/users', page: 'users', icon: 'fas fa-users-cog', text: 'Manajemen Pengguna' },
+                { href: '/superadmin/master-data', page: 'master-data', icon: 'fas fa-database', text: 'Master Data & Jadwal' },
+                { href: '/superadmin/logs', page: 'logs', icon: 'fas fa-history', text: 'Log Aktivitas' }
               ]
             },
             {
-              title: 'Santri Baru',
+              title: 'Kembali Ke Admin',
               items: [
-                { href: '/santri', page: 'santri', icon: 'fas fa-user-graduate', text: 'Data Santri' },
-                { href: '/tagihan', page: 'tagihan', icon: 'fas fa-file-invoice-dollar', text: 'Tagihan' },
-                { href: '/tunggakan', page: 'tunggakan', icon: 'fas fa-exclamation-circle', text: 'Tunggakan' }
-              ]
-            },
-            {
-              title: 'Daftar Ulang',
-              items: [
-                { href: '/santri-daftar-ulang', page: 'santri-daftar-ulang', icon: 'fas fa-users', text: 'Data Santri' },
-                { href: '/tagihan-daftar-ulang', page: 'tagihan-daftar-ulang', icon: 'fas fa-file-invoice-dollar', text: 'Tagihan' },
-                { href: '/tunggakan-daftar-ulang', page: 'tunggakan-daftar-ulang', icon: 'fas fa-exclamation-circle', text: 'Tunggakan' }
+                { href: '/dashboard', page: 'admin-dashboard', icon: 'fas fa-arrow-left', text: 'Dashboard Admin Biasa' }
               ]
             }
           ];
@@ -48,13 +39,6 @@
         <a href="/sso/go-sikma" target="_blank" class="menu-item" style="color: #60a5fa; background: rgba(96, 165, 250, 0.1);">
             <i class="fas fa-external-link-alt"></i> Buka Web SIKMA
         </a>
-
-        <% if (typeof admin !== 'undefined' && admin.role === 'super_admin') { %>
-        <div style="padding: 15px 24px 5px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px;">Akses Super Admin</div>
-        <a href="/superadmin/dashboard" class="menu-item" style="color: #10b981; background: rgba(16, 185, 129, 0.1);">
-            <i class="fas fa-shield-alt"></i> Dashboard Super Admin
-        </a>
-        <% } %>
 
         <!-- Tombol Logout -->
         <div style="margin-top: 30px; padding: 0 24px 24px;">

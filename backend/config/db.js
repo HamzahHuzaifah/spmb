@@ -105,6 +105,92 @@ async function runMigration() {
             )
         `);
 
+        // ==========================================
+        // MIGRATION SUPER ADMIN & MASTER DATA
+        // ==========================================
+        
+        // 1. Tambah kolom role dan is_active ke tabel admin
+        const [adminCols] = await poolPromise.query("SHOW COLUMNS FROM admin");
+        const existingAdminCols = adminCols.map(c => c.Field);
+        
+        if (!existingAdminCols.includes('role')) {
+            console.log(`[Migration] Menambahkan kolom 'role' ke tabel 'admin'...`);
+            await poolPromise.query(`ALTER TABLE admin ADD COLUMN role ENUM('super_admin', 'admin', 'panitia') DEFAULT 'admin'`);
+            
+            // Set user admin pertama sebagai super_admin sebagai default
+            await poolPromise.query(`UPDATE admin SET role = 'super_admin' ORDER BY id ASC LIMIT 1`);
+        }
+        if (!existingAdminCols.includes('is_active')) {
+            console.log(`[Migration] Menambahkan kolom 'is_active' ke tabel 'admin'...`);
+            await poolPromise.query(`ALTER TABLE admin ADD COLUMN is_active TINYINT(1) DEFAULT 1`);
+        }
+
+        // 2. Buat tabel master_jenjang
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS master_jenjang (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nama VARCHAR(100),
+                kuota INT DEFAULT 0,
+                status ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif',
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // 3. Buat tabel master_gelombang
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS master_gelombang (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nama VARCHAR(100),
+                tanggal_mulai DATE,
+                tanggal_selesai DATE,
+                status ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif',
+                buka_pendaftaran_baru TINYINT(1) DEFAULT 1,
+                buka_pendaftaran_beasiswa TINYINT(1) DEFAULT 1,
+                buka_daftar_ulang TINYINT(1) DEFAULT 1,
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Migration untuk update kolom baru jika tabel sudah ada
+        const [gelombangCols] = await poolPromise.query("SHOW COLUMNS FROM master_gelombang");
+        const existingGelombangCols = gelombangCols.map(c => c.Field);
+        
+        if (!existingGelombangCols.includes('buka_pendaftaran_baru')) {
+            console.log(`[Migration] Menambahkan kolom 'buka_pendaftaran_baru' ke tabel 'master_gelombang'...`);
+            await poolPromise.query(`ALTER TABLE master_gelombang ADD COLUMN buka_pendaftaran_baru TINYINT(1) DEFAULT 1`);
+            await poolPromise.query(`ALTER TABLE master_gelombang ADD COLUMN buka_pendaftaran_beasiswa TINYINT(1) DEFAULT 1`);
+            await poolPromise.query(`ALTER TABLE master_gelombang ADD COLUMN buka_daftar_ulang TINYINT(1) DEFAULT 1`);
+        }
+
+        // 4. Buat tabel master_jalur
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS master_jalur (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nama VARCHAR(100),
+                biaya DECIMAL(15,2) DEFAULT 0,
+                syarat_dokumen TEXT,
+                status ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif',
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // 5. Buat tabel activity_logs
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS activity_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                username VARCHAR(100),
+                role VARCHAR(50),
+                action VARCHAR(255),
+                target_table VARCHAR(100),
+                target_id INT,
+                details TEXT,
+                ip_address VARCHAR(50),
+                user_agent TEXT,
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
         // Jalankan cleanup billing ganda/yatim piatu akibat bug lama
         await cleanupOrphanedBilling();
     } catch (err) {

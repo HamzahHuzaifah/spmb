@@ -1,9 +1,17 @@
 const SantriModel = require('../../models/SantriModel');
 const TagihanModel = require('../../models/TagihanModel');
 const TunggakanModel = require('../../models/TunggakanModel');
+const db = require('../../config/db');
 
-exports.getFormPendaftaran = (req, res) => {
-    res.render('public/layout', { title: 'Form Pendaftaran Baru', bodyView: 'pendaftaran' });
+exports.getFormPendaftaran = async (req, res) => {
+    try {
+        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
+        res.render('public/layout', { title: 'Form Pendaftaran Baru', bodyView: 'pendaftaran', jenjangList, jalurList });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
 };
 
 exports.postFormPendaftaran = async (req, res) => {
@@ -23,6 +31,26 @@ exports.postFormPendaftaran = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
+        // 1. Cek Kuota
+        const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
+        if (jenjangRow.length > 0) {
+            const kuotaMaksimal = jenjangRow[0].kuota;
+            // Hitung pendaftar di jenjang ini
+            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_baru WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `S-BARU-${year}-%`]);
+            const totalPendaftar = countRow[0].total;
+
+            if (totalPendaftar >= kuotaMaksimal) {
+                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+                const errorMsg = `Mohon maaf, kuota pendaftaran untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
+                return res.render('public/layout', {
+                    title: 'Form Pendaftaran Baru',
+                    bodyView: 'pendaftaran',
+                    error: errorMsg,
+                    jenjangList
+                });
+            }
+        }
+
         // Cek duplikasi sebelum menyimpan dengan fuzzy matching
         const existing = await SantriModel.checkDuplicateFuzzy({
             nama: namaSantri,
@@ -32,11 +60,13 @@ exports.postFormPendaftaran = async (req, res) => {
             teleponAyah
         }, 'baru');
         if (existing) {
+            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Pendaftaran Baru',
                 bodyView: 'pendaftaran',
-                error: errorMsg
+                error: errorMsg,
+                jenjangList
             });
         }
         
@@ -70,7 +100,12 @@ exports.postFormPendaftaran = async (req, res) => {
         };
         await SantriModel.addSantri(newSantriData);
 
-        let formulir = 100000;
+        let formulir = 100000; // default fallback
+        const [jalurRow] = await db.execute('SELECT biaya FROM master_jalur WHERE nama = ? AND status = "Aktif"', [jalurPendaftaran || 'Reguler']);
+        if (jalurRow.length > 0) {
+            formulir = parseInt(jalurRow[0].biaya) || 0;
+        }
+
         let uangPangkal = 250000;
         let spp = 150000;
         let seragam = 0;
@@ -90,7 +125,7 @@ exports.postFormPendaftaran = async (req, res) => {
             perlengkapan = 600000;
         }
 
-        if (jalurPendaftaran === 'Jalur Khusus (Pegawai/Komunitas JIC)') {
+        if (jalurPendaftaran === 'Jalur Khusus (Pegawai/Komunitas JIC)' || (jalurPendaftaran && jalurPendaftaran.includes('Khusus'))) {
             formulir = 0;
             uangPangkal = 0;
         }
@@ -132,8 +167,15 @@ exports.postFormPendaftaran = async (req, res) => {
     }
 };
 
-exports.getFormDaftarUlang = (req, res) => {
-    res.render('public/layout', { title: 'Form Daftar Ulang', bodyView: 'pendaftaran-ulang' });
+exports.getFormDaftarUlang = async (req, res) => {
+    try {
+        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
+        res.render('public/layout', { title: 'Form Daftar Ulang', bodyView: 'pendaftaran-ulang', jenjangList, jalurList });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
 };
 
 exports.postFormDaftarUlang = async (req, res) => {
@@ -154,6 +196,25 @@ exports.postFormDaftarUlang = async (req, res) => {
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
+        // 1. Cek Kuota
+        const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [lanjutKe]);
+        if (jenjangRow.length > 0) {
+            const kuotaMaksimal = jenjangRow[0].kuota;
+            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [lanjutKe, `S-ULANG-${year}-%`]);
+            const totalPendaftar = countRow[0].total;
+
+            if (totalPendaftar >= kuotaMaksimal) {
+                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+                const errorMsg = `Mohon maaf, kuota daftar ulang untuk jenjang ${lanjutKe} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
+                return res.render('public/layout', {
+                    title: 'Form Daftar Ulang',
+                    bodyView: 'pendaftaran-ulang',
+                    error: errorMsg,
+                    jenjangList
+                });
+            }
+        }
+
         // Cek duplikasi sebelum menyimpan dengan fuzzy matching
         const existing = await SantriModel.checkDuplicateFuzzy({
             nama: namaSantri,
@@ -163,11 +224,13 @@ exports.postFormDaftarUlang = async (req, res) => {
             teleponAyah
         }, 'daftar_ulang');
         if (existing) {
+            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Daftar Ulang',
                 bodyView: 'pendaftaran-ulang',
-                error: errorMsg
+                error: errorMsg,
+                jenjangList
             });
         }
         
@@ -202,15 +265,20 @@ exports.postFormDaftarUlang = async (req, res) => {
         });
 
         let formulir = 100000;
+        const [jalurRow] = await db.execute('SELECT biaya FROM master_jalur WHERE nama = ? AND status = "Aktif"', [jalurPendaftaran || 'Reguler']);
+        if (jalurRow.length > 0) {
+            formulir = parseInt(jalurRow[0].biaya) || 0;
+        }
+
         let perlengkapan = prefixDaftarUlang === 'PAUDQu' ? 700000 : 600000;
         let spp = 150000;
         let uangPangkal = 0;
         let seragam = 0;
 
-        if (jalurPendaftaran === 'Beasiswa Dhuafa') {
+        if (jalurPendaftaran === 'Beasiswa Dhuafa' || (jalurPendaftaran && jalurPendaftaran.includes('Dhuafa'))) {
             formulir = 0;
             spp = 0;
-        } else if (jalurPendaftaran === 'Beasiswa Yatim/Piatu') {
+        } else if (jalurPendaftaran === 'Beasiswa Yatim/Piatu' || (jalurPendaftaran && jalurPendaftaran.includes('Yatim'))) {
             formulir = 0;
             perlengkapan = 0;
             spp = 0;
@@ -259,7 +327,9 @@ exports.postFormDaftarUlang = async (req, res) => {
 exports.getFormBeasiswa = async (req, res) => {
     try {
         const santriData = await SantriModel.getAllSantri();
-        res.render('public/layout', { title: 'Form Beasiswa', bodyView: 'beasiswa', santri: santriData });
+        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
+        res.render('public/layout', { title: 'Form Beasiswa', bodyView: 'beasiswa', santri: santriData, jenjangList, jalurList });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -284,6 +354,25 @@ exports.postFormBeasiswa = async (req, res) => {
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
+        // 1. Cek Kuota
+        const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
+        if (jenjangRow.length > 0) {
+            const kuotaMaksimal = jenjangRow[0].kuota;
+            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_baru WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `S-BARU-${year}-%`]);
+            const totalPendaftar = countRow[0].total;
+
+            if (totalPendaftar >= kuotaMaksimal) {
+                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+                const errorMsg = `Mohon maaf, kuota beasiswa untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
+                return res.render('public/layout', {
+                    title: 'Form Beasiswa',
+                    bodyView: 'beasiswa',
+                    error: errorMsg,
+                    jenjangList
+                });
+            }
+        }
+
         // Cek duplikasi sebelum menyimpan dengan fuzzy matching
         const existing = await SantriModel.checkDuplicateFuzzy({
             nama: namaSantri,
@@ -293,11 +382,13 @@ exports.postFormBeasiswa = async (req, res) => {
             teleponAyah
         }, 'baru');
         if (existing) {
+            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Beasiswa',
                 bodyView: 'beasiswa',
-                error: errorMsg
+                error: errorMsg,
+                jenjangList
             });
         }
         
@@ -331,6 +422,11 @@ exports.postFormBeasiswa = async (req, res) => {
         });
 
         let formulir = 100000;
+        const [jalurRow] = await db.execute('SELECT biaya FROM master_jalur WHERE nama = ? AND status = "Aktif"', [jalurBeasiswa]);
+        if (jalurRow.length > 0) {
+            formulir = parseInt(jalurRow[0].biaya) || 0;
+        }
+
         let uangPangkal = 250000;
         let spp = 150000;
         let seragam = 0;
@@ -350,17 +446,17 @@ exports.postFormBeasiswa = async (req, res) => {
             perlengkapan = 600000;
         }
 
-        if (jalurBeasiswa === 'Beasiswa Dhuafa') {
+        if (jalurBeasiswa === 'Beasiswa Dhuafa' || (jalurBeasiswa && jalurBeasiswa.includes('Dhuafa'))) {
             formulir = 0;
             uangPangkal = 0;
             spp = 0;
-        } else if (jalurBeasiswa === 'Beasiswa Yatim/Piatu') {
+        } else if (jalurBeasiswa === 'Beasiswa Yatim/Piatu' || (jalurBeasiswa && jalurBeasiswa.includes('Yatim'))) {
             formulir = 0;
             uangPangkal = 0;
             spp = 0;
             seragam = 0;
             perlengkapan = 0;
-        } else if (jalurBeasiswa === 'Jalur Khusus (Pegawai/Komunitas JIC)' || jalurBeasiswa === 'Beasiswa Bersaudara') {
+        } else if (jalurBeasiswa === 'Jalur Khusus (Pegawai/Komunitas JIC)' || jalurBeasiswa === 'Beasiswa Bersaudara' || (jalurBeasiswa && jalurBeasiswa.includes('Khusus'))) {
             formulir = 0;
             uangPangkal = 0;
         }

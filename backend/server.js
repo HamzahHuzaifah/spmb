@@ -45,12 +45,14 @@ app.use(checkMaintenance);
 // ==========================================
 const adminRoutes = require('./routes/adminRoutes');
 const publicRoutes = require('./routes/publicRoutes');
+const superAdminRoutes = require('./routes/superAdminRoutes');
 
 // Mount routes
 // PENTING: publicRoutes harus ditaruh di atas adminRoutes
 // Agar halaman publik (landing page) tidak ikut tertangkap oleh gembok admin
 app.use('/', publicRoutes);
 app.use('/', adminRoutes);
+app.use('/superadmin', superAdminRoutes);
 
 // Middleware untuk menangkap rute yang tidak ditemukan (404 Page Not Found)
 app.use((req, res, next) => {

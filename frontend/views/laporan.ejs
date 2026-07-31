@@ -33,12 +33,23 @@
         </div>
     </div>
 
-    <div class="table-container">
-        <div class="table-header">
-            <div class="table-title">Laporan Keuangan SPMB JIC</div>
+    <div class="premium-banner premium-banner-purple" style="margin-top: 20px;">
+        <div>
+            <h1>Laporan Keuangan Global</h1>
+            <p>Rekapitulasi seluruh transaksi secara terperinci per bulan</p>
+        </div>
+        <div class="premium-banner-icon">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+    </div>
+
+    <div class="premium-table-container">
+        <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">
+            <div class="table-title" style="font-weight: 700; font-size: 18px; color: #1e293b;"><i class="fas fa-table mr-2"></i> Laporan Keuangan SPMB JIC</div>
         </div>
 
-        <table id="tabelLaporan">
+        <div class="table-responsive" style="overflow-x: auto; width: 100%;">
+<table id="tabelLaporan" class="premium-table">
             <thead>
                 <tr>
                     <th>No</th>
@@ -121,6 +132,7 @@
                 <% } %>
             </tbody>
         </table>
+</div>
 
         <!-- Pagination UI -->
         <%- include('partials/pagination', { 

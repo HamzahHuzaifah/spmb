@@ -1,0 +1,127 @@
+<%- include('partials/header', { title: 'Log Aktivitas', activePage: 'logs' }) %>
+
+<div class="content-area">
+    <div style="background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%); border-radius: var(--radius-md); padding: 30px 40px; margin-bottom: 30px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25);">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px;">Log Aktivitas Sistem</h1>
+            <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 15px;">Pantau secara real-time jejak digital dan seluruh riwayat operasional sistem.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.15); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+            <i class="fas fa-history" style="font-size: 28px; color: white;"></i>
+        </div>
+    </div>
+
+    <div class="table-container" style="border-radius: var(--radius-md); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+        <div class="table-header" style="margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 8px; height: 24px; background: #f59e0b; border-radius: 4px;"></div>
+                <h5 class="table-title" style="margin: 0; color: #1e293b; font-weight: 700;">Riwayat Aktivitas</h5>
+            </div>
+            <button onclick="location.reload()" style="background: #f1f5f9; color: #64748b; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b';">
+                <i class="fas fa-sync-alt" style="margin-right: 6px;"></i> Segarkan
+            </button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                <thead>
+                    <tr>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Waktu</th>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Pengguna</th>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Role</th>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Aktivitas</th>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Target Info</th>
+                        <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% logs.forEach((log) => { 
+                        const date = new Date(log.createdAt);
+                        const formattedDate = date.toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'});
+                        const formattedTime = date.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+                        
+                        let actionColor = '#3b82f6'; // default blue
+                        let actionBg = 'rgba(59, 130, 246, 0.1)';
+                        if(log.action.includes('TAMBAH') || log.action.includes('BUAT') || log.action.includes('LOGIN')) {
+                            actionColor = '#10b981'; actionBg = 'rgba(16, 185, 129, 0.1)';
+                        } else if (log.action.includes('HAPUS') || log.action.includes('LOGOUT')) {
+                            actionColor = '#ef4444'; actionBg = 'rgba(239, 68, 68, 0.1)';
+                        } else if (log.action.includes('UBAH') || log.action.includes('EDIT')) {
+                            actionColor = '#f59e0b'; actionBg = 'rgba(245, 158, 11, 0.1)';
+                        }
+                    %>
+                        <tr style="transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569; white-space: nowrap;">
+                                <div style="font-weight: 600; color: #1e293b;"><%= formattedDate %></div>
+                                <div style="font-size: 12px; color: #94a3b8;"><%= formattedTime %> WIB</div>
+                            </td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #1e293b;"><%= log.username %></td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
+                                <% if(log.role === 'super_admin') { %>
+                                    <span style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">SA</span>
+                                <% } else if(log.role === 'admin') { %>
+                                    <span style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">A</span>
+                                <% } else { %>
+                                    <span style="background: rgba(100, 116, 139, 0.1); color: #64748b; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;"><%= log.role.substring(0,2).toUpperCase() %></span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
+                                <span style="background: <%= actionBg %>; color: <%= actionColor %>; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;"><%= log.action %></span>
+                                <% if(log.details) { %>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 6px; max-width: 300px; white-space: normal;"><%= log.details %></div>
+                                <% } %>
+                            </td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;">
+                                <% if(log.target_table) { %>
+                                    <div style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: inline-block; color: #334155; font-size: 12px;">
+                                        <%= log.target_table %> #<%= log.target_id %>
+                                    </div>
+                                <% } else { %>
+                                    <span style="color: #cbd5e1;">-</span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-family: monospace; font-size: 12px;">
+                                <%= log.ip_address %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                    <% if(logs.length === 0) { %>
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #94a3b8;">
+                                <i class="fas fa-folder-open" style="font-size: 40px; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+                                Belum ada riwayat aktivitas.
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; background: #f8fafc; border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md);">
+            <div style="color: #64748b; font-size: 14px;">
+                Menampilkan halaman <strong style="color: #1e293b;"><%= currentPage %></strong> dari <strong style="color: #1e293b;"><%= totalPages %></strong>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <% if (currentPage > 1) { %>
+                    <a href="/superadmin/logs?page=<%= currentPage - 1 %>" style="padding: 8px 16px; border: 1px solid #cbd5e1; background: white; color: #475569; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">
+                        <i class="fas fa-chevron-left" style="margin-right: 5px;"></i> Prev
+                    </a>
+                <% } else { %>
+                    <span style="padding: 8px 16px; border: 1px solid #e2e8f0; background: #f1f5f9; color: #94a3b8; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: not-allowed;">
+                        <i class="fas fa-chevron-left" style="margin-right: 5px;"></i> Prev
+                    </span>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="/superadmin/logs?page=<%= currentPage + 1 %>" style="padding: 8px 16px; border: 1px solid #cbd5e1; background: white; color: #475569; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">
+                        Next <i class="fas fa-chevron-right" style="margin-left: 5px;"></i>
+                    </a>
+                <% } else { %>
+                    <span style="padding: 8px 16px; border: 1px solid #e2e8f0; background: #f1f5f9; color: #94a3b8; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: not-allowed;">
+                        Next <i class="fas fa-chevron-right" style="margin-left: 5px;"></i>
+                    </span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

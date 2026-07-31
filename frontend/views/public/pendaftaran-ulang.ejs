@@ -1,7 +1,6 @@
-<div class="form-card">
+<div class="premium-form-card">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
-        <h2 style="margin: 0; border: none; padding: 0;">Form Pendaftaran Ulang</h2>
-        <!--<button type="button" class="btn btn-warning" onclick="fillTestingDataPublic('daftar-ulang')" style="font-size: 12px; padding: 5px 10px;">Isi Data Testing</button>-->
+        <h2 style="margin: 0; border: none; padding: 0;"><i class="fas fa-sync-alt" style="margin-right: 10px; color: var(--primary);"></i> Form Pendaftaran Ulang</h2>
     </div>
     <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan lengkapi data diri santri yang akan mendaftar ulang (naik tingkat).</p>
 
@@ -16,13 +15,27 @@
 
     <form action="/daftar-ulang" method="POST">
         <!-- Data Santri -->
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">A. Data Calon Santri</h3>
+        <h3 style="margin-bottom: 15px; color: var(--text-main);"><i class="fas fa-user-graduate" style="margin-right: 10px; color: var(--primary);"></i> A. Data Calon Santri</h3>
 
         <div class="form-group">
             <label class="required">Jalur Pendaftaran Daftar Ulang</label>
             <div class="radio-group" style="flex-direction: column; gap: 10px;">
+                <% if (typeof jalurList !== 'undefined' && jalurList.length > 0) {
+                    jalurList.forEach((jalur, index) => {
+                %>
                 <label class="radio-label">
-                    <input type="radio" name="jalurPendaftaran" value="Reguler" required> Reguler
+                    <input type="radio" name="jalurPendaftaran" value="<%= jalur.nama %>" <%= index === 0 ? 'required checked' : '' %>>
+                    <div>
+                        <strong><%= jalur.nama %></strong>
+                        <% if (jalur.syarat_dokumen) { %>
+                            <div class="form-help" style="margin-top: 5px;"><%= jalur.syarat_dokumen %></div>
+                        <% } %>
+                    </div>
+                </label>
+                <%  });
+                } else { %>
+                <label class="radio-label">
+                    <input type="radio" name="jalurPendaftaran" value="Reguler" required checked> Reguler
                 </label>
                 <label class="radio-label">
                     <input type="radio" name="jalurPendaftaran" value="Beasiswa Dhuafa"> Beasiswa Dhuafa
@@ -30,6 +43,7 @@
                 <label class="radio-label">
                     <input type="radio" name="jalurPendaftaran" value="Beasiswa Yatim/Piatu"> Beasiswa Yatim/Piatu
                 </label>
+                <% } %>
             </div>
         </div>
 
@@ -60,7 +74,7 @@
         <hr style="border: 0; border-top: 1px dashed var(--border); margin: 30px 0;">
 
         <!-- Data Orang Tua -->
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">B. Data Orang Tua / Wali</h3>
+        <h3 style="margin-bottom: 15px; color: var(--text-main);"><i class="fas fa-users" style="margin-right: 10px; color: var(--primary);"></i> B. Data Orang Tua / Wali</h3>
 
         <%- include('../partials/form-orang-tua', { 
             layout: 'stacked',
