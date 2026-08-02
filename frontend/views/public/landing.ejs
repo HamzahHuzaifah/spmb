@@ -1,6 +1,8 @@
 
 <div class="hero-section">
-    <h1 class="hero-title">Madrasah Jakarta Islamic Centre</h1>
+    <img src="/images/Logo%20Madrasah.webp" alt="Logo Madrasah JIC" style="height: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));">
+    <h3 class="hero-title" style="margin-bottom: 0;">Sistem Penerimaan Murid Baru</h3>
+    <h1 class="hero-title" style="margin-top: 5px;">Madrasah Jakarta Islamic Centre</h1>
     <p class="hero-subtitle">
         Pusat pendidikan usia dini dan dasar yang membentuk generasi rabbani, berakhlak mulia, dan berprestasi. Sistem Penerimaan Murid Baru Terpadu Tahun Ajaran 2026/2027.
     </p>
@@ -11,6 +13,25 @@
 </div>
 
 <div class="services-container" id="layanan">
+    <h2 class="section-title">Informasi Kuota Pendaftaran</h2>
+    <style>
+        .kuota-grid { display: flex; flex-wrap: nowrap; justify-content: center; gap: 12px; margin-bottom: 50px; width: 100%; }
+        .kuota-grid .kuota-item { background: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; flex: 0 1 auto; white-space: nowrap; }
+        @media (max-width: 768px) { .kuota-grid { flex-wrap: wrap; } }
+    </style>
+    <div class="kuota-grid">
+        <% if (typeof jenjangList !== 'undefined' && jenjangList.length > 0) { %>
+            <% jenjangList.forEach(j => { %>
+                <div class="kuota-item" style="border-bottom: 4px solid <%= j.sisaKuota > 0 ? '#10b981' : '#ef4444' %>;">
+                    <div style="font-weight: bold; color: var(--text-main); font-size: 15px; margin-bottom: 5px;"><%= j.nama %></div>
+                    <div style="color: <%= j.sisaKuota > 0 ? '#10b981' : '#ef4444' %>; font-size: 13px; font-weight: 600;">
+                        <%= j.sisaKuota > 0 ? `Sisa Kuota: ${j.sisaKuota}` : 'Kuota Penuh' %>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
     <h2 class="section-title">Layanan Wali Santri</h2>
     
     <div class="services-grid">
@@ -42,9 +63,16 @@
                 <i class="fas fa-sync-alt"></i>
             </div>
             <h3 class="service-title">Daftar Ulang</h3>
-            <p class="service-desc">
-                Pendaftaran ulang bagi santri lama yang naik tingkat (misal dari PAUDQu A ke PAUDQu B).
+            <p class="service-desc" style="margin-bottom: 10px;">
+                Pendaftaran ulang bagi santri lama yang naik tingkat:
             </p>
+            <ul style="text-align: left; padding-left: 20px; list-style-type: disc; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 auto; display: table;">
+                <li>PAUDQu A &rarr; PAUDQu B</li>
+                <li>PAUDQu B &rarr; TPQ A</li>
+                <li>TPQ A &rarr; TPQ B</li>
+                <li>TPQ B &rarr; MDT 1</li>
+                <li>MDT 1 &rarr; MDT 2-4</li>
+            </ul>
         </a>
 
 

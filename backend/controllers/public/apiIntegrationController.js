@@ -67,6 +67,8 @@ exports.getTunggakan = async (req, res) => {
                 kelas: isDaftarUlang ? 'Daftar Ulang' : 'Pendaftar Baru',
                 lembaga: lembagaNormal,
                 nama_tagihan: isDaftarUlang ? 'Tagihan Daftar Ulang SPMB' : 'Tagihan Pendaftaran SPMB',
+                satuan_pendidikan_asli: item.satuanPendidikan,
+                is_daftar_ulang: isDaftarUlang,
                 total: item.totalTagihan || 0,
                 dibayar: item.totalBayar || 0,
                 sisa: item.sisaBayar || 0
@@ -81,5 +83,45 @@ exports.getTunggakan = async (req, res) => {
     } catch (error) {
         console.error('API Error /api/tunggakan:', error);
         res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data tunggakan.' });
+    }
+};
+
+exports.postBayarTunggakan = async (req, res) => {
+    try {
+        const { nama, satuan_pendidikan_asli, is_daftar_ulang, nominal } = req.body;
+
+        if (!nama || !satuan_pendidikan_asli || !nominal) {
+            return res.status(400).json({ error: 'Data tidak lengkap. Harap kirimkan nama, satuan_pendidikan_asli, dan nominal.' });
+        }
+
+        const bayar = parseInt(nominal);
+        let tgg = null;
+
+        if (is_daftar_ulang) {
+            tgg = await TunggakanModel.getTunggakanDaftarUlangByNameAndPendidikan(nama, satuan_pendidikan_asli);
+            if (tgg) {
+                tgg.totalBayar += bayar;
+                tgg.sisaBayar = tgg.totalTagihan - tgg.totalBayar;
+                tgg.status = tgg.sisaBayar <= 0 ? 'Lunas' : 'Belum Lunas';
+                await TunggakanModel.updateTunggakanDaftarUlang(tgg.id, tgg);
+            }
+        } else {
+            tgg = await TunggakanModel.getTunggakanByNameAndPendidikan(nama, satuan_pendidikan_asli);
+            if (tgg) {
+                tgg.totalBayar += bayar;
+                tgg.sisaBayar = tgg.totalTagihan - tgg.totalBayar;
+                tgg.status = tgg.sisaBayar <= 0 ? 'Lunas' : 'Belum Lunas';
+                await TunggakanModel.updateTunggakan(tgg.id, tgg);
+            }
+        }
+
+        if (!tgg) {
+            return res.status(404).json({ error: 'Tunggakan tidak ditemukan.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Pembayaran tunggakan berhasil diproses.', data: tgg });
+    } catch (error) {
+        console.error('API Error /api/bayar-tunggakan:', error);
+        res.status(500).json({ error: 'Terjadi kesalahan saat memproses pembayaran.' });
     }
 };

@@ -49,7 +49,10 @@
                         <tr style="transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
                             <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;"><%= idx + 1 %></td>
                             <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; font-weight: 500; color: #1e293b;"><%= j.nama %></td>
-                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;"><%= j.kuota %> Santri</td>
+                            <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;">
+                                <div style="font-weight: 600; color: <%= j.sisaKuota > 0 ? '#10b981' : '#ef4444' %>;"><%= j.sisaKuota %> Sisa</div>
+                                <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Terisi <%= j.terisi %> dari <%= j.kuota %></div>
+                            </td>
                             <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
                                 <% if(j.status === 'Aktif') { %>
                                     <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Aktif</span>

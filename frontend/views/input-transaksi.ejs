@@ -23,6 +23,13 @@ function formatDateIndo(dateStr) {
     </div>
 
     <div class="premium-table-container" style="padding: 24px;">
+        <% if (typeof isTutupBuku !== 'undefined' && isTutupBuku) { %>
+            <div style="background-color: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px;">
+                <i class="fas fa-lock" style="font-size: 32px; color: #ef4444; margin-bottom: 10px;"></i>
+                <h3 style="color: #991b1b; margin-top: 0;">SPMB Telah Tutup Buku</h3>
+                <p style="color: #b91c1c; margin-bottom: 0;">Seluruh form input dan perubahan transaksi pada web SPMB telah <b>dinonaktifkan</b>. <br>Silakan lakukan input pembayaran/transaksi melalui web Keuangan SIKMA JIC.</p>
+            </div>
+        <% } else { %>
         <form action="/input-transaksi" method="POST" id="formTransaksi" onsubmit="handleAjaxSubmitGlobal(event, this)">
             <div class="row" style="margin-bottom: 10px;">
                 <div class="col-md-6 mb-3">
@@ -150,6 +157,7 @@ function formatDateIndo(dateStr) {
                 </button>
             </div>
         </form>
+        <% } %>
     </div>
 
     
@@ -225,8 +233,10 @@ function formatDateIndo(dateStr) {
                             </td>
                             <td>
                                 <button type="button" class="btn-action-primary" style="padding: 5px 10px; font-size: 12px;" onclick="openKwitansiModal(<%= trx.id %>)"><i class="fas fa-print"></i> Cetak</button>
+                                <% if (typeof isTutupBuku === 'undefined' || !isTutupBuku) { %>
                                 <button type="button" class="btn-action-edit" onclick="openEditModal(<%= trx.id %>, '<%= trx.tanggal %>', <%= trx.nominal %>, '<%= trx.metodePembayaran %>')"><i class="fas fa-edit"></i> Edit</button>
                                 <button type="button" class="btn-action-delete" onclick="openDeleteModal('/input-transaksi/delete/<%= trx.id %>')"><i class="fas fa-trash"></i> Hapus</button>
+                                <% } %>
                             </td>
                         </tr>
                         <% }) %>

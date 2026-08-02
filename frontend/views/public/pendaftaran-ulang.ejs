@@ -1,6 +1,7 @@
 <div class="premium-form-card">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
         <h2 style="margin: 0; border: none; padding: 0;"><i class="fas fa-sync-alt" style="margin-right: 10px; color: var(--primary);"></i> Form Pendaftaran Ulang</h2>
+        <button type="button" onclick="fillTestingDataPublic('daftar-ulang')" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; border: none; background: #f59e0b; color: white; cursor: pointer; font-weight: 600;"><i class="fas fa-magic" style="margin-right: 5px;"></i> Isi Data Testing</button>
     </div>
     <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan lengkapi data diri santri yang akan mendaftar ulang (naik tingkat).</p>
 
@@ -54,7 +55,8 @@
                 name: 'pendidikanSebelumnya',
                 className: 'form-input',
                 required: true,
-                placeholder: '-- Pilih Tingkat Sebelumnya --'
+                placeholder: '-- Pilih Tingkat Sebelumnya --',
+                isDaftarUlang: true
             }) %>
         </div>
 
@@ -65,7 +67,8 @@
                 name: 'lanjutKe',
                 className: 'form-input',
                 required: true,
-                placeholder: '-- Pilih Tujuan Tingkat --'
+                placeholder: '-- Pilih Tujuan Tingkat --',
+                isDaftarUlang: true
             }) %>
         </div>
 

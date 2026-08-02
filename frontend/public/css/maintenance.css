@@ -1,10 +1,10 @@
 :root {
-    --brand-green: #059669;
-    --brand-green-dark: #064e3b;
+    --brand-primary: #059669;
+    --brand-primary-dark: #064e3b;
     --brand-gold: #d97706;
     --brand-gold-light: #f59e0b;
     --bg-dark: #04241b; /* Deep forest green/almost black */
-    --primary-glow: rgba(5, 150, 105, 0.4);
+    --primary-glow: rgba(99, 102, 241, 0.4);
     --gold-glow: rgba(217, 119, 6, 0.3);
     --card-bg: rgba(6, 78, 59, 0.45); /* Glassmorphic dark green card */
     --card-border: rgba(255, 255, 255, 0.08);
@@ -96,9 +96,9 @@ body {
 
 .gear-large {
     font-size: 70px;
-    color: var(--brand-green);
+    color: var(--brand-primary);
     animation: rotate-cw 20s linear infinite;
-    filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.5));
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
 }
 
 .gear-small {
@@ -123,7 +123,7 @@ body {
 
 .tag {
     display: inline-block;
-    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -133,7 +133,7 @@ body {
     border-radius: 20px;
     margin-bottom: 20px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 h1 {
@@ -175,7 +175,7 @@ p.desc {
 .info-box-title {
     font-size: 13px;
     font-weight: 700;
-    color: var(--brand-green);
+    color: var(--brand-primary);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;

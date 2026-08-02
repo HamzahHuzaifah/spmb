@@ -50,7 +50,7 @@ module.exports = {
 
       // Buat token login untuk SPMB
       const adminToken = jwt.sign(
-        { id: admin.id, username: admin.username, nama: admin.nama_lengkap }, 
+        { id: admin.id, username: admin.username, nama: admin.nama_lengkap, role: admin.role || 'admin' }, 
         JWT_SECRET, 
         { expiresIn: '1d' }
       );
@@ -62,7 +62,11 @@ module.exports = {
       });
 
       // Redirect ke Dashboard SPMB
-      res.redirect('/dashboard');
+      if (admin.role === 'super_admin') {
+          res.redirect('/superadmin/dashboard');
+      } else {
+          res.redirect('/dashboard');
+      }
     } catch (error) {
       console.error('SSO Login Error:', error.message);
       return res.status(401).send('SSO Token tidak valid atau sudah kadaluarsa.');

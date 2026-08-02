@@ -1,4 +1,6 @@
 :root {
+    --brand-primary: #3b82f6; /* Blue 500 */
+    --brand-primary-dark: #1d4ed8; /* Blue 700 */
     --brand-green: #059669;
     --brand-green-dark: #064e3b;
     --brand-gold: #d97706;
@@ -7,9 +9,9 @@
     --text-dark: #1e293b;
     --text-muted: #64748b;
 
-    --primary: var(--brand-green);
-    --primary-light: #10b981;
-    --primary-dark: var(--brand-green-dark);
+    --primary: var(--brand-primary);
+    --primary-light: #60a5fa; /* Blue 400 */
+    --primary-dark: var(--brand-primary-dark);
     --secondary: var(--brand-gold);
     --background: var(--bg-light);
     --surface: #ffffff;
@@ -253,7 +255,7 @@ body {
 }
 
 .arus-kas-card.saldo {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
 }
 
 .arus-kas-title {

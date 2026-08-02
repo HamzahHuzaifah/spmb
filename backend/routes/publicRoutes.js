@@ -34,6 +34,7 @@ router.post('/info-pembayaran', pendaftaranLimiter, pembayaranController.cekPemb
 // API Integrasi SIKMA
 router.get('/api/santri-baru', apiIntegrationController.getSantriBaru);
 router.get('/api/tunggakan', apiIntegrationController.getTunggakan);
+router.post('/api/bayar-tunggakan', apiIntegrationController.postBayarTunggakan);
 
 // SSO Integrasi SIKMA
 router.get('/api/sso/login', ssoController.loginFromSikma);

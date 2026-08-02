@@ -12,7 +12,10 @@ exports.getLogin = (req, res) => {
     // Jika admin sudah punya token yang valid, lewati login langsung ke dashboard
     if (req.cookies && req.cookies.admin_token) {
         try {
-            jwt.verify(req.cookies.admin_token, JWT_SECRET);
+            const decoded = jwt.verify(req.cookies.admin_token, JWT_SECRET);
+            if (decoded.role === 'super_admin') {
+                return res.redirect('/superadmin/dashboard');
+            }
             return res.redirect('/dashboard');
         } catch (err) {
             // Abaikan jika token palsu/kadaluarsa, biarkan halaman login dirender

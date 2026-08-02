@@ -7,7 +7,7 @@
 }
 
 .public-header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
     color: white;
     padding: 60px 20px;
     text-align: center;
@@ -26,7 +26,7 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(255,255,255,0) 60%);
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(255,255,255,0) 60%);
     pointer-events: none;
     animation: slowPulse 10s ease-in-out infinite alternate;
 }
@@ -91,7 +91,7 @@
 }
 
 .form-card h2 {
-    color: var(--brand-green-dark);
+    color: var(--brand-primary-dark);
     margin-bottom: 15px;
     font-size: 24px;
     font-weight: 700;
@@ -131,7 +131,7 @@
     border-color: var(--primary);
     background-color: #ffffff;
     outline: none;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
     transform: translateY(-1px);
 }
 
@@ -175,7 +175,7 @@ textarea.form-input {
     display: block;
     text-align: center;
     text-decoration: none;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -190,7 +190,7 @@ textarea.form-input {
 
 .btn-submit:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
 
 .btn-submit:hover::after {
@@ -238,9 +238,9 @@ textarea.form-input {
    ========================================================================== */
 
 .hero-section {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #059669 100%);
     color: white;
-    padding: 120px 20px 140px;
+    padding: 60px 20px 140px;
     text-align: center;
     border-bottom-left-radius: 50% 10%;
     border-bottom-right-radius: 50% 10%;
@@ -256,7 +256,7 @@ textarea.form-input {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(255,255,255,0) 70%);
     animation: heroPulse 12s infinite alternate ease-in-out;
     pointer-events: none;
 }
@@ -364,7 +364,7 @@ textarea.form-input {
     left: 0;
     width: 100%;
     height: 4px;
-    background: var(--brand-green);
+    background: var(--brand-primary);
     transform: scaleX(0);
     transition: transform 0.4s ease;
     transform-origin: right;
@@ -383,8 +383,8 @@ textarea.form-input {
 .service-icon {
     width: 80px;
     height: 80px;
-    background: rgba(5, 150, 105, 0.1);
-    color: var(--brand-green);
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--brand-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -395,7 +395,7 @@ textarea.form-input {
 }
 
 .service-card:hover .service-icon {
-    background: var(--brand-green);
+    background: var(--brand-primary);
     color: white;
 }
 
@@ -440,13 +440,13 @@ textarea.form-input {
 }
 
 .disabled-card:hover .service-icon {
-    background: rgba(5, 150, 105, 0.1);
-    color: var(--brand-green);
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--brand-primary);
 }
 
 footer {
-    background: var(--text-dark);
-    color: rgba(255,255,255,0.7);
+    background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    color: white;
     text-align: center;
     padding: 40px 20px;
     font-size: 0.9rem;
@@ -534,7 +534,7 @@ footer {
 }
 
 .public-nav-btn-primary:hover {
-    background-color: rgba(5, 150, 105, 0.05);
+    background-color: rgba(99, 102, 241, 0.05);
     border-color: var(--primary-dark);
     color: var(--primary-dark);
 }

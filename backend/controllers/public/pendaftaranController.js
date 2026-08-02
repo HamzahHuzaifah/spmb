@@ -3,9 +3,22 @@ const TagihanModel = require('../../models/TagihanModel');
 const TunggakanModel = require('../../models/TunggakanModel');
 const db = require('../../config/db');
 
+async function getJenjangListWithQuota() {
+    const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif" ORDER BY id ASC');
+    const year = new Date().getFullYear();
+    for (let j of jenjangList) {
+        const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Baru/${year}/%`]);
+        const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Ulang/${year}/%`]);
+        const totalPendaftar = countBaru[0].total + countUlang[0].total;
+        j.sisaKuota = j.kuota - totalPendaftar;
+        if (j.sisaKuota < 0) j.sisaKuota = 0;
+    }
+    return jenjangList;
+}
+
 exports.getFormPendaftaran = async (req, res) => {
     try {
-        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const jenjangList = await getJenjangListWithQuota();
         const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
         res.render('public/layout', { title: 'Form Pendaftaran Baru', bodyView: 'pendaftaran', jenjangList, jalurList });
     } catch (err) {
@@ -35,12 +48,13 @@ exports.postFormPendaftaran = async (req, res) => {
         const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
         if (jenjangRow.length > 0) {
             const kuotaMaksimal = jenjangRow[0].kuota;
-            // Hitung pendaftar di jenjang ini
-            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_baru WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `S-BARU-${year}-%`]);
-            const totalPendaftar = countRow[0].total;
+            // Hitung pendaftar di jenjang ini secara akumulasi (Baru + Daftar Ulang)
+            const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `SPMB-Daftar.Baru/${year}/%`]);
+            const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `SPMB-Daftar.Ulang/${year}/%`]);
+            const totalPendaftar = countBaru[0].total + countUlang[0].total;
 
             if (totalPendaftar >= kuotaMaksimal) {
-                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+                const jenjangList = await getJenjangListWithQuota();
                 const errorMsg = `Mohon maaf, kuota pendaftaran untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
                 return res.render('public/layout', {
                     title: 'Form Pendaftaran Baru',
@@ -60,7 +74,7 @@ exports.postFormPendaftaran = async (req, res) => {
             teleponAyah
         }, 'baru');
         if (existing) {
-            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+            const jenjangList = await getJenjangListWithQuota();
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Pendaftaran Baru',
@@ -169,7 +183,7 @@ exports.postFormPendaftaran = async (req, res) => {
 
 exports.getFormDaftarUlang = async (req, res) => {
     try {
-        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const jenjangList = await getJenjangListWithQuota();
         const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
         res.render('public/layout', { title: 'Form Daftar Ulang', bodyView: 'pendaftaran-ulang', jenjangList, jalurList });
     } catch (err) {
@@ -196,24 +210,7 @@ exports.postFormDaftarUlang = async (req, res) => {
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
         const year = new Date().getFullYear();
 
-        // 1. Cek Kuota
-        const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [lanjutKe]);
-        if (jenjangRow.length > 0) {
-            const kuotaMaksimal = jenjangRow[0].kuota;
-            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [lanjutKe, `S-ULANG-${year}-%`]);
-            const totalPendaftar = countRow[0].total;
-
-            if (totalPendaftar >= kuotaMaksimal) {
-                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
-                const errorMsg = `Mohon maaf, kuota daftar ulang untuk jenjang ${lanjutKe} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
-                return res.render('public/layout', {
-                    title: 'Form Daftar Ulang',
-                    bodyView: 'pendaftaran-ulang',
-                    error: errorMsg,
-                    jenjangList
-                });
-            }
-        }
+        // 1. (Dihapus) Cek Kuota - Santri Daftar Ulang tidak lagi dibatasi oleh kuota santri baru
 
         // Cek duplikasi sebelum menyimpan dengan fuzzy matching
         const existing = await SantriModel.checkDuplicateFuzzy({
@@ -224,7 +221,7 @@ exports.postFormDaftarUlang = async (req, res) => {
             teleponAyah
         }, 'daftar_ulang');
         if (existing) {
-            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+            const jenjangList = await getJenjangListWithQuota();
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Daftar Ulang',
@@ -326,10 +323,9 @@ exports.postFormDaftarUlang = async (req, res) => {
 
 exports.getFormBeasiswa = async (req, res) => {
     try {
-        const santriData = await SantriModel.getAllSantri();
-        const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+        const jenjangList = await getJenjangListWithQuota();
         const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
-        res.render('public/layout', { title: 'Form Beasiswa', bodyView: 'beasiswa', santri: santriData, jenjangList, jalurList });
+        res.render('public/layout', { title: 'Form Beasiswa', bodyView: 'beasiswa', jenjangList, jalurList });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -358,11 +354,13 @@ exports.postFormBeasiswa = async (req, res) => {
         const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
         if (jenjangRow.length > 0) {
             const kuotaMaksimal = jenjangRow[0].kuota;
-            const [countRow] = await db.execute(`SELECT COUNT(*) as total FROM santri_baru WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `S-BARU-${year}-%`]);
-            const totalPendaftar = countRow[0].total;
+            // Hitung pendaftar di jenjang ini secara akumulasi (Baru + Daftar Ulang)
+            const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `SPMB-Daftar.Baru/${year}/%`]);
+            const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [pendidikan, `SPMB-Daftar.Ulang/${year}/%`]);
+            const totalPendaftar = countBaru[0].total + countUlang[0].total;
 
             if (totalPendaftar >= kuotaMaksimal) {
-                const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+                const jenjangList = await getJenjangListWithQuota();
                 const errorMsg = `Mohon maaf, kuota beasiswa untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
                 return res.render('public/layout', {
                     title: 'Form Beasiswa',
@@ -382,7 +380,7 @@ exports.postFormBeasiswa = async (req, res) => {
             teleponAyah
         }, 'baru');
         if (existing) {
-            const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif"');
+            const jenjangList = await getJenjangListWithQuota();
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Beasiswa',

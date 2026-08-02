@@ -34,7 +34,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            corePlugins: { preflight: false }
+            corePlugins: { preflight: false },
+            theme: { extend: { colors: { brand: { 50: '#f5f3ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' } } } }
         }
     </script>
     <link rel="stylesheet" href="/css/style.css">
@@ -58,7 +59,7 @@
     <script src="/js/global.js?v=3"></script>
     <script>
         function fillTestingDataPublic(type) {
-            const formCard = document.querySelector('.form-card');
+            const formCard = document.querySelector('.premium-form-card') || document.querySelector('.form-card');
             if (!formCard) return;
 
             const prefix = type === 'beasiswa' ? 'Beasiswa' : (type === 'daftar-ulang' ? 'Daftar Ulang' : 'Baru');

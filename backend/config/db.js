@@ -191,6 +191,17 @@ async function runMigration() {
             )
         `);
 
+        // Migration untuk tabel system_settings
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS system_settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                \`key\` VARCHAR(50) NOT NULL UNIQUE,
+                \`value\` TEXT
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+        // Seed default value for TUTUP_BUKU
+        await poolPromise.query(`INSERT IGNORE INTO system_settings (\`key\`, \`value\`) VALUES ('TUTUP_BUKU', 'false')`);
+
         // Jalankan cleanup billing ganda/yatim piatu akibat bug lama
         await cleanupOrphanedBilling();
     } catch (err) {

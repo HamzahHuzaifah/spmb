@@ -2,8 +2,6 @@ const db = require('../config/db');
 
 exports.checkRegistrationOpen = async (req, res, next) => {
     try {
-        const currentDate = new Date().toISOString().split('T')[0];
-        
         // Tentukan kolom mana yang harus di cek berdasarkan route
         let columnToCheck = 'buka_pendaftaran_baru'; // default
         if (req.path.includes('beasiswa')) {
@@ -17,11 +15,10 @@ exports.checkRegistrationOpen = async (req, res, next) => {
         const [rows] = await db.execute(
             `SELECT * FROM master_gelombang 
              WHERE status = 'Aktif' 
-             AND tanggal_mulai <= ? 
-             AND tanggal_selesai >= ? 
+             AND tanggal_mulai <= CURDATE() 
+             AND tanggal_selesai >= CURDATE() 
              AND ${columnToCheck} = 1
-             LIMIT 1`,
-            [currentDate, currentDate]
+             LIMIT 1`
         );
 
         if (rows.length > 0) {

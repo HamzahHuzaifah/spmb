@@ -34,7 +34,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            corePlugins: { preflight: false }
+            corePlugins: { preflight: false },
+            theme: { extend: { colors: { brand: { 50: '#f5f3ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' } } } }
         }
     </script>
     <link rel="stylesheet" href="/css/style.css?v=2">
@@ -81,9 +82,9 @@
                             </div>
                             <!-- Dropdown Menu -->
                             <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); width: 200px; z-index: 1000; overflow: hidden;">
-                                <a href="#" id="openAccountSettings" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 14px; transition: background 0.15s; border-bottom: 1px solid #f1f5f9;">
+                                <!-- <a href="#" id="openAccountSettings" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 14px; transition: background 0.15s; border-bottom: 1px solid #f1f5f9;">
                                     <i class="fas fa-cog" style="color: #64748b;"></i> Pengaturan Akun
-                                </a>
+                                </a> -->
                                 <a href="/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #ef4444; text-decoration: none; font-size: 14px; transition: background 0.15s;">
                                     <i class="fas fa-sign-out-alt"></i> Keluar
                                 </a>

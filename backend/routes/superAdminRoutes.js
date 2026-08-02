@@ -6,15 +6,22 @@ const { checkRole } = require('../middlewares/checkRole');
 const userManagementController = require('../controllers/superadmin/userManagementController');
 const masterDataController = require('../controllers/superadmin/masterDataController');
 const logController = require('../controllers/superadmin/logController');
+const settingController = require('../controllers/superadmin/settingController');
 
 // --- GEMBOK KEAMANAN SUPER ADMIN ---
 // Hanya role 'super_admin' yang bisa mengakses rute ini
 router.use(checkRole(['super_admin']));
 
 // Dashboard (Simpel saja, mungkin cuma redirect ke users atau ada summary khusus)
-router.get('/dashboard', (req, res) => {
-    res.render('superadmin/dashboard', { title: 'Dashboard Super Admin', bodyView: 'dashboard' });
+router.get('/dashboard', async (req, res) => {
+    const SystemSettingModel = require('../models/SystemSetting');
+    let isTutupBukuStr = await SystemSettingModel.getSetting('TUTUP_BUKU');
+    let isTutupBuku = isTutupBukuStr === 'true';
+    res.render('superadmin/dashboard', { title: 'Dashboard Super Admin', bodyView: 'dashboard', isTutupBuku });
 });
+
+// Settings
+router.post('/settings/toggle-tutup-buku', settingController.toggleTutupBuku);
 
 // Manajemen Pengguna
 router.get('/users', userManagementController.getUsers);

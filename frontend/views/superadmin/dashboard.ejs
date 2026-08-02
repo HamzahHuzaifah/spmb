@@ -17,6 +17,33 @@
         <div style="position: absolute; left: 30%; bottom: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); border-radius: 50%;"></div>
     </div>
 
+    <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px;">
+        <!-- Status Sistem SPMB -->
+        <div class="stat-card" style="border-top: none; background: white; padding: 30px; grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="width: 50px; height: 50px; border-radius: 14px; background: <%= isTutupBuku ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)' %>; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas <%= isTutupBuku ? 'fa-lock' : 'fa-lock-open' %>" style="color: <%= isTutupBuku ? '#ef4444' : '#10b981' %>; font-size: 24px;"></i>
+                </div>
+                <div>
+                    <div class="stat-title" style="color: #64748b; margin-bottom: 4px;">Status Pendaftaran SPMB</div>
+                    <div class="stat-value" style="font-size: 22px; color: #1e293b;"><%= isTutupBuku ? 'Tutup Buku (Dikunci)' : 'Buka Buku (Aktif)' %></div>
+                    <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Jika ditutup, admin tidak dapat menginput transaksi pendaftaran SPMB lagi.</div>
+                </div>
+            </div>
+            <div>
+                <label class="switch" style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                    <input type="checkbox" id="toggleTutupBuku" <%= isTutupBuku ? 'checked' : '' %> onchange="toggleBukuStatus(this)" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <style>
+                    .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+                    input:checked + .slider { background-color: #ef4444; }
+                    input:checked + .slider:before { transform: translateX(26px); }
+                </style>
+            </div>
+        </div>
+    </div>
+
     <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
         <div class="stat-card" style="border-top: none; background: white; padding: 30px;">
             <div style="width: 50px; height: 50px; border-radius: 14px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
@@ -45,6 +72,62 @@
             <a href="/superadmin/logs" class="btn" style="background: #f1f5f9; color: #d97706; width: 100%; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#f59e0b'; this.style.color='white';" onmouseout="this.style.background='#f1f5f9'; this.style.color='#d97706';">Buka Log Sistem <i class="fas fa-arrow-right"></i></a>
         </div>
     </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+async function toggleBukuStatus(checkbox) {
+    const isChecked = checkbox.checked;
+    
+    // Konfirmasi dulu
+    const result = await Swal.fire({
+        title: isChecked ? 'Tutup Buku SPMB?' : 'Buka Buku SPMB?',
+        text: isChecked 
+            ? 'Jika ditutup, seluruh form input dan aksi pada halaman admin akan diblokir. Admin harus menginput di web SIKMA.' 
+            : 'Jika dibuka, form input di halaman admin SPMB akan diaktifkan kembali.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isChecked ? '#ef4444' : '#10b981',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: isChecked ? 'Ya, Tutup Buku' : 'Ya, Buka Buku',
+        cancelButtonText: 'Batal'
+    });
+
+    if (!result.isConfirmed) {
+        checkbox.checked = !isChecked; // revert
+        return;
+    }
+
+    try {
+        const response = await fetch('/superadmin/settings/toggle-tutup-buku', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: isChecked })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: data.message,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            throw new Error(data.message || 'Gagal mengubah status');
+        }
+    } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+        checkbox.checked = !isChecked; // revert
+    }
+}
+</script>
 
 <%- include('partials/footer') %>

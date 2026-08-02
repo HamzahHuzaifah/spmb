@@ -1,6 +1,7 @@
 const TransaksiModel = require('../../models/TransaksiModel');
 const SantriModel = require('../../models/SantriModel');
 const TunggakanModel = require('../../models/TunggakanModel');
+const SystemSettingModel = require('../../models/SystemSetting');
 const xlsx = require('xlsx');
 
 exports.getInputTransaksi = async (req, res) => {
@@ -27,11 +28,15 @@ exports.getInputTransaksi = async (req, res) => {
         // KITA HAPUS getAllSantri dan getAllTunggakan agar memori aman
         // Data akan diload melalui AJAX di view input-transaksi.ejs
 
+        let isTutupBukuStr = await SystemSettingModel.getSetting('TUTUP_BUKU');
+        let isTutupBuku = isTutupBukuStr === 'true';
+
         res.render('input-transaksi', {
             title: 'Input Transaksi',
             activePage: 'input-transaksi',
             success,
             error,
+            isTutupBuku,
             data: { transaksiTerbaru },
             currentPage: page,
             totalPages: totalPages,
@@ -73,6 +78,11 @@ exports.apiSearchTunggakan = async (req, res) => {
 
 exports.postInputTransaksi = async (req, res) => {
     try {
+        let isTutupBukuStr = await SystemSettingModel.getSetting('TUTUP_BUKU');
+        if (isTutupBukuStr === 'true') {
+            return res.json({ success: false, message: 'SPMB telah Tutup Buku. Input dinonaktifkan.' });
+        }
+
         const {
             jenisTransaksi, tanggal,
             satuanPendidikan, namaSantriBaru,
@@ -193,6 +203,11 @@ exports.postInputTransaksi = async (req, res) => {
 
 exports.deleteTransaksi = async (req, res) => {
     try {
+        let isTutupBukuStr = await SystemSettingModel.getSetting('TUTUP_BUKU');
+        if (isTutupBukuStr === 'true') {
+            return res.redirect('/input-transaksi?error=Aksi+ditolak:+SPMB+telah+Tutup+Buku.');
+        }
+
         const id = parseInt(req.params.id);
         const trx = await TransaksiModel.getTransaksiById(id);
 
@@ -232,6 +247,11 @@ exports.deleteTransaksi = async (req, res) => {
 
 exports.editTransaksi = async (req, res) => {
     try {
+        let isTutupBukuStr = await SystemSettingModel.getSetting('TUTUP_BUKU');
+        if (isTutupBukuStr === 'true') {
+            return res.redirect('/input-transaksi?error=Aksi+ditolak:+SPMB+telah+Tutup+Buku.');
+        }
+
         const id = parseInt(req.params.id);
         const { tanggal, nominal, metodePembayaran } = req.body;
         

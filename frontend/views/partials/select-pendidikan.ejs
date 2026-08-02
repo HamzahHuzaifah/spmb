@@ -66,7 +66,19 @@ const selectedVal = typeof selectedValue !== 'undefined' ? selectedValue : '';
 let finalOptions = [];
 if (typeof jenjangList !== 'undefined' && jenjangList.length > 0) {
     // Mapping dari jenjangList ke format selectOptions
-    finalOptions = jenjangList.map(j => ({ value: j.nama, label: j.nama }));
+    finalOptions = jenjangList.map(j => {
+        let labelText = j.nama;
+        let isDisabled = false;
+        if (typeof j.sisaKuota !== 'undefined' && !(typeof isDaftarUlang !== 'undefined' && isDaftarUlang)) {
+            if (j.sisaKuota <= 0) {
+                labelText = `${j.nama} (Kuota Penuh)`;
+                isDisabled = true;
+            } else {
+                labelText = `${j.nama} (Sisa Kuota: ${j.sisaKuota})`;
+            }
+        }
+        return { value: j.nama, label: labelText, disabled: isDisabled };
+    });
 } else {
     // Fallback ke data statis (berguna untuk form Admin seperti pengeluaran/pemasukan)
     finalOptions = selectOptions;
@@ -77,6 +89,6 @@ if (typeof jenjangList !== 'undefined' && jenjangList.length > 0) {
         <option value=""><%= placeholderText %></option>
     <% } %>
     <% finalOptions.forEach(opt => { %>
-        <option value="<%= opt.value %>" <%= selectedVal === opt.value ? 'selected' : '' %>><%= opt.label %></option>
+        <option value="<%= opt.value %>" <%= selectedVal === opt.value ? 'selected' : '' %> <%= opt.disabled ? 'disabled' : '' %>><%= opt.label %></option>
     <% }) %>
 </select>

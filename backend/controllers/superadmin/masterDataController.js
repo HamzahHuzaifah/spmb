@@ -7,6 +7,16 @@ exports.getMasterData = async (req, res) => {
         const [jalur] = await db.execute('SELECT * FROM master_jalur ORDER BY id ASC');
         const [gelombang] = await db.execute('SELECT * FROM master_gelombang ORDER BY id ASC');
 
+        const year = new Date().getFullYear();
+        for (let j of jenjang) {
+            const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Baru/${year}/%`]);
+            const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Ulang/${year}/%`]);
+            const totalPendaftar = countBaru[0].total + countUlang[0].total;
+            j.terisi = totalPendaftar;
+            j.sisaKuota = j.kuota - totalPendaftar;
+            if(j.sisaKuota < 0) j.sisaKuota = 0;
+        }
+
         res.render('superadmin/master-data', {
             title: 'Master Data & Konfigurasi',
             jenjang,
@@ -40,6 +50,17 @@ exports.editJenjang = async (req, res) => {
     const { id } = req.params;
     const { nama, kuota, status } = req.body;
     try {
+        const [oldRows] = await db.execute('SELECT nama FROM master_jenjang WHERE id = ?', [id]);
+        if (oldRows.length > 0) {
+            const oldName = oldRows[0].nama;
+            const corePrefixes = ['PAUDQu', 'TPQ', 'MDT'];
+            for (let prefix of corePrefixes) {
+                if (oldName.startsWith(prefix) && !nama.startsWith(prefix)) {
+                    return res.status(400).json({ success: false, message: `Tidak dapat mengubah awalan '${prefix}'. Nama baru harus tetap berawalan '${prefix}' untuk menjaga struktur pelaporan keuangan.` });
+                }
+            }
+        }
+
         await db.execute(
             'UPDATE master_jenjang SET nama = ?, kuota = ?, status = ? WHERE id = ?',
             [nama, kuota, status, id]
@@ -55,9 +76,10 @@ exports.editJenjang = async (req, res) => {
 exports.deleteJenjang = async (req, res) => {
     const { id } = req.params;
     try {
-        await db.execute('DELETE FROM master_jenjang WHERE id = ?', [id]);
-        await logActivity(req, 'Hapus Master Jenjang', 'master_jenjang', id, '');
-        res.json({ success: true, message: 'Jenjang berhasil dihapus' });
+        // Soft Delete to prevent orphan data
+        await db.execute('UPDATE master_jenjang SET status = "Tidak Aktif" WHERE id = ?', [id]);
+        await logActivity(req, 'Arsip Master Jenjang (Soft Delete)', 'master_jenjang', id, 'Status diubah ke Tidak Aktif');
+        res.json({ success: true, message: 'Jenjang berhasil diarsipkan (Tidak Aktif)' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Gagal menghapus jenjang' });
