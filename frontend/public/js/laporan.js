@@ -45,3 +45,26 @@ function filterData() {
         }
     }
 }
+
+function switchTab(tabId) {
+    // Hide all tab contents
+    document.getElementById('spmb-tab-content').style.display = 'none';
+    document.getElementById('sikma-tab-content').style.display = 'none';
+    
+    // Show target tab content
+    document.getElementById(tabId + '-content').style.display = 'block';
+    
+    // Reset button styles
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+        btn.style.color = 'var(--text-muted)';
+        btn.style.borderBottom = '3px solid transparent';
+    });
+    
+    // Set active button style
+    const activeBtn = document.getElementById('btn-' + tabId);
+    if (activeBtn) {
+        activeBtn.style.color = 'var(--primary)';
+        activeBtn.style.borderBottom = '3px solid var(--primary)';
+    }
+}

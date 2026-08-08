@@ -151,6 +151,15 @@ async function runMigration() {
             )
         `);
 
+        // 4. Buat tabel system_settings
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS system_settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                \`key\` VARCHAR(255) NOT NULL UNIQUE,
+                \`value\` TEXT NOT NULL
+            )
+        `);
+
         // Migration untuk update kolom baru jika tabel sudah ada
         const [gelombangCols] = await poolPromise.query("SHOW COLUMNS FROM master_gelombang");
         const existingGelombangCols = gelombangCols.map(c => c.Field);

@@ -1,5 +1,15 @@
 <%- include('partials/header', { title: 'Tunggakan Santri Baru', activePage: 'tunggakan' }) %>
 
+    <div class="premium-banner premium-banner-red" style="margin-top: 20px;">
+        <div>
+            <h1>Data Tunggakan Santri Baru</h1>
+            <p>Pantau santri baru yang memiliki sisa tagihan pembayaran</p>
+        </div>
+        <div class="premium-banner-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+    </div>
+
 <%- include('partials/filter-bar', {
     actionUrl: '/tunggakan',
     searchQuery: typeof searchQuery !== 'undefined' ? searchQuery : '',
@@ -11,16 +21,6 @@
         </a>
     `
 }) %>
-
-    <div class="premium-banner premium-banner-red" style="margin-top: 20px;">
-        <div>
-            <h1>Data Tunggakan Santri Baru</h1>
-            <p>Pantau santri baru yang memiliki sisa tagihan pembayaran</p>
-        </div>
-        <div class="premium-banner-icon">
-            <i class="fas fa-exclamation-circle"></i>
-        </div>
-    </div>
 
 <div class="premium-table-container">
     <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">

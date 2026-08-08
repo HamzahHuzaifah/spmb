@@ -236,10 +236,36 @@ class TransaksiModel {
 
     static async getSaldoAwalLaporan(filterBulan, filterTahun) {
         const query = `
-            SELECT SUM(pemasukan - pengeluaran) as saldoAwal 
+            SELECT SUM(pemasukan) - SUM(pengeluaran) as saldoAwal 
             FROM laporan 
             WHERE (tahun < ?) OR (tahun = ? AND bulan < ?)
         `;
+        const [rows] = await db.execute(query, [filterTahun, filterTahun, filterBulan]);
+        return Number(rows[0].saldoAwal) || 0;
+    }
+
+    static async getSikmaNoTransaksi() {
+        const [rows] = await db.execute('SELECT noTransaksi FROM transaksi WHERE inputOleh = "SIKMA"');
+        return rows.map(r => r.noTransaksi);
+    }
+
+    static async getSaldoAwalLaporanBySource(filterBulan, filterTahun, isSikma) {
+        let query;
+        if (isSikma) {
+            query = `
+                SELECT SUM(l.pemasukan) - SUM(l.pengeluaran) as saldoAwal 
+                FROM laporan l
+                INNER JOIN transaksi t ON l.noTransaksi = t.noTransaksi
+                WHERE t.inputOleh = 'SIKMA' AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
+            `;
+        } else {
+            query = `
+                SELECT SUM(l.pemasukan) - SUM(l.pengeluaran) as saldoAwal 
+                FROM laporan l
+                LEFT JOIN transaksi t ON l.noTransaksi = t.noTransaksi
+                WHERE (t.inputOleh IS NULL OR t.inputOleh != 'SIKMA') AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
+            `;
+        }
         const [rows] = await db.execute(query, [filterTahun, filterTahun, filterBulan]);
         return Number(rows[0].saldoAwal) || 0;
     }
@@ -314,8 +340,8 @@ class TransaksiModel {
         let query = `
             SELECT SUM(nominal) as total 
             FROM transaksi 
-            WHERE jenis = 'Pemasukan' 
-            AND LOWER(namaSantri) LIKE '%ziswaf%'
+            WHERE jenis IN ('Pemasukan', 'Pembayaran Pendaftaran Baru', 'Pembayaran Daftar Ulang') 
+            AND (LOWER(namaSantri) LIKE '%ziswaf%' OR LOWER(kategoriDana) LIKE '%ziswaf%')
         `;
         let params = [];
         if (filterTanggal && filterTanggal.start && filterTanggal.end) {
@@ -331,9 +357,9 @@ class TransaksiModel {
         let query = `
             SELECT SUM(nominal) as total 
             FROM transaksi 
-            WHERE jenis = 'Pemasukan' 
+            WHERE jenis IN ('Pemasukan', 'Pembayaran Pendaftaran Baru', 'Pembayaran Daftar Ulang') 
             AND satuanPendidikan = ? 
-            AND LOWER(namaSantri) LIKE '%ziswaf%'
+            AND (LOWER(namaSantri) LIKE '%ziswaf%' OR LOWER(kategoriDana) LIKE '%ziswaf%')
         `;
         let params = [satuanPendidikan];
         

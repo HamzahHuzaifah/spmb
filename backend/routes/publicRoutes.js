@@ -35,6 +35,10 @@ router.post('/info-pembayaran', pendaftaranLimiter, pembayaranController.cekPemb
 router.get('/api/santri-baru', apiIntegrationController.getSantriBaru);
 router.get('/api/tunggakan', apiIntegrationController.getTunggakan);
 router.post('/api/bayar-tunggakan', apiIntegrationController.postBayarTunggakan);
+router.post('/api/delete-tunggakan', apiIntegrationController.postDeleteTunggakan);
+router.post('/api/edit-tunggakan', apiIntegrationController.postEditTunggakan);
+router.get('/api/saldo-panitia-spmb', apiIntegrationController.getSaldoPanitiaSpmb);
+router.get('/api/status-buku', apiIntegrationController.getStatusBuku);
 
 // SSO Integrasi SIKMA
 router.get('/api/sso/login', ssoController.loginFromSikma);

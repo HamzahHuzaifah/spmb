@@ -365,3 +365,10 @@
         margin: 2px 0 !important;
     }
 }
+
+tr.row-duplicate, tr.row-duplicate td {
+    background-color: #fee2e2 !important;
+}
+tr.row-duplicate td:first-child {
+    border-left: 4px solid #ef4444 !important;
+}

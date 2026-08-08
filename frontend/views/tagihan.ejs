@@ -1,5 +1,16 @@
 <%- include('partials/header', { title: 'Tagihan Santri Baru', activePage: 'tagihan' }) %><link rel="stylesheet" href="/css/tagihan.css">
-    <%- include('partials/filter-bar', {
+
+<div class="premium-banner premium-banner-purple" style="margin-top: 20px;">
+    <div>
+        <h1>Data Tagihan Santri Baru</h1>
+        <p>Kelola tagihan, uang pangkal, dan seragam santri baru</p>
+    </div>
+    <div class="premium-banner-icon">
+        <i class="fas fa-file-invoice-dollar"></i>
+    </div>
+</div>
+
+<%- include('partials/filter-bar', {
         actionUrl: '/tagihan',
         searchQuery: typeof searchQuery !== 'undefined' ? searchQuery : '',
         filterType: 'pendidikan',
@@ -12,16 +23,6 @@
             </a>
         `
     }) %>
-
-    <div class="premium-banner premium-banner-purple" style="margin-top: 20px;">
-        <div>
-            <h1>Data Tagihan Santri Baru</h1>
-            <p>Kelola tagihan, uang pangkal, dan seragam santri baru</p>
-        </div>
-        <div class="premium-banner-icon">
-            <i class="fas fa-file-invoice-dollar"></i>
-        </div>
-    </div>
 
 <div class="premium-table-container">
     <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">

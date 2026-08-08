@@ -1,6 +1,16 @@
 <%- include('partials/header', { title: 'Laporan Utama' , activePage: 'laporan' }) %>
 
-    <div class="filter-bar">
+    <div class="premium-banner premium-banner-purple" style="margin-top: 20px;">
+        <div>
+            <h1>Laporan Keuangan Global</h1>
+            <p>Rekapitulasi seluruh transaksi secara terperinci per bulan</p>
+        </div>
+        <div class="premium-banner-icon">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+    </div>
+
+<div class="filter-bar">
         <form method="GET" action="/laporan" class="filter-form">
             <input type="text" name="search" class="form-control filter-search" placeholder="Cari Uraian / No Trans..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
             <input type="number" class="form-control filter-input-tahun" name="tahun" id="filterTahun" placeholder="Tahun" min="2000" max="2100" value="<%= typeof tahunQuery !== 'undefined' ? tahunQuery : '' %>">
@@ -33,130 +43,206 @@
         </div>
     </div>
 
-    <div class="premium-banner premium-banner-purple" style="margin-top: 20px;">
-        <div>
-            <h1>Laporan Keuangan Global</h1>
-            <p>Rekapitulasi seluruh transaksi secara terperinci per bulan</p>
-        </div>
-        <div class="premium-banner-icon">
-            <i class="fas fa-file-invoice-dollar"></i>
-        </div>
+    <!-- Tab Buttons -->
+    <div class="tabs-container tabs-container-laporan">
+        <button class="tab-btn tab-btn-laporan active" onclick="switchTab('spmb-tab')" id="btn-spmb-tab">
+            <i class="fas fa-university"></i> Laporan Internal SPMB
+        </button>
+        <button class="tab-btn tab-btn-laporan" onclick="switchTab('sikma-tab')" id="btn-sikma-tab">
+            <i class="fas fa-exchange-alt"></i> Laporan via SIKMA
+        </button>
     </div>
 
-    <div class="premium-table-container">
+
+
+    <%
+    function formatDateIndo(dateStr) {
+        if(!dateStr) return '';
+        let d = new Date(dateStr);
+        if(isNaN(d)) return dateStr;
+        let dd = String(d.getDate()).padStart(2, '0');
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    }
+    const monthsList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    %>
+
+    <!-- Tab 1 Contents: SPMB Internal -->
+    <div id="spmb-tab-content" class="premium-table-container" style="display: block; margin-top: 20px;">
         <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">
-            <div class="table-title" style="font-weight: 700; font-size: 18px; color: #1e293b;"><i class="fas fa-table mr-2"></i> Laporan Keuangan SPMB JIC</div>
+            <div class="table-title" style="font-weight: 700; font-size: 18px; color: #1e293b;"><i class="fas fa-table mr-2"></i> Laporan Keuangan SPMB JIC (Internal)</div>
         </div>
 
         <div class="table-responsive" style="overflow-x: auto; width: 100%;">
-<table id="tabelLaporan" class="premium-table">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Tanggal</th>
-                    <th>Bulan</th>
-                    <th>No Transaksi</th>
-                    <th>Uraian</th>
-                    <th>Pemasukan</th>
-                    <th>Pengeluaran</th>
-                    <th>Saldo Akhir</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                function formatDateIndo(dateStr) {
-                    if(!dateStr) return '';
-                    let d = new Date(dateStr);
-                    if(isNaN(d)) return dateStr;
-                    let dd = String(d.getDate()).padStart(2, '0');
-                    let mm = String(d.getMonth() + 1).padStart(2, '0');
-                    let yyyy = d.getFullYear();
-                    return `${dd}/${mm}/${yyyy}`;
-                }
-                
-                let saldo = typeof saldoAwalQuery !== 'undefined' ? Number(saldoAwalQuery) : 0; 
-                if (isNaN(saldo)) saldo = 0;
-                let no = ((typeof currentPage !== 'undefined' ? currentPage : 1) - 1) * 10 + 1;
-                const monthsList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                %>
-                
-                <% if ((typeof currentPage === 'undefined' || currentPage === 1) && typeof bulanQuery !== 'undefined' && bulanQuery !== '') { 
-                    let selBulanIdx = monthsList.indexOf(bulanQuery);
-                    if (selBulanIdx === -1) selBulanIdx = parseInt(bulanQuery) - 1;
-                    if (isNaN(selBulanIdx) || selBulanIdx < 0 || selBulanIdx > 11) selBulanIdx = new Date().getMonth();
+            <table id="tabelLaporan" class="premium-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Bulan</th>
+                        <th>No Transaksi</th>
+                        <th>Uraian</th>
+                        <th>Pemasukan</th>
+                        <th>Pengeluaran</th>
+                        <th>Saldo Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                    let saldoSpmb = typeof saldoAwalQuerySpmb !== 'undefined' ? Number(saldoAwalQuerySpmb) : 0; 
+                    if (isNaN(saldoSpmb)) saldoSpmb = 0;
+                    let noSpmb = 1;
+                    %>
                     
-                    let selTahun = typeof tahunQuery !== 'undefined' && tahunQuery ? parseInt(tahunQuery) : new Date().getFullYear();
-                    let prevMonthName = selBulanIdx === 0 ? "Desember" : monthsList[selBulanIdx - 1];
-                    let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
-                %>
-                <tr>
-                    <td><%= no++ %></td>
-                    <td>01/<%= String(selBulanIdx + 1).padStart(2, '0') %>/<%= selTahun %></td>
-                    <td><%= monthsList[selBulanIdx] %> <%= selTahun %></td>
-                    <td>-</td>
-                    <td>Saldo Bulan <%= prevMonthName %> <%= prevMonthYear %></td>
-                    <td style="color: var(--success);"><%= saldo > 0 ? 'Rp ' + Number(saldo).toLocaleString('id-ID') : (saldo === 0 ? 'Rp 0' : '-') %></td>
-                    <td style="color: var(--danger);"><%= saldo < 0 ? 'Rp ' + Math.abs(Number(saldo)).toLocaleString('id-ID') : '-' %></td>
-                    <td style="font-weight: bold;">Rp <%= Number(saldo).toLocaleString('id-ID') %></td>
-                </tr>
-                <% } %>
-
-                <% if(laporan && laporan.length > 0) {
-                    laporan.forEach((item) => {
-                    saldo = Number(saldo) + (Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0);
+                    <% if (typeof bulanQuery !== 'undefined' && bulanQuery !== '') { 
+                        let selBulanIdx = monthsList.indexOf(bulanQuery);
+                        if (selBulanIdx === -1) selBulanIdx = parseInt(bulanQuery) - 1;
+                        if (isNaN(selBulanIdx) || selBulanIdx < 0 || selBulanIdx > 11) selBulanIdx = new Date().getMonth();
+                        
+                        let selTahun = typeof tahunQuery !== 'undefined' && tahunQuery ? parseInt(tahunQuery) : new Date().getFullYear();
+                        let prevMonthName = selBulanIdx === 0 ? "Desember" : monthsList[selBulanIdx - 1];
+                        let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
                     %>
                     <tr>
-                        <td><%= no++ %></td>
-                        <td><%= formatDateIndo(item.tanggal) %></td>
-                        <td>
-                            <% 
-                            const bulanIdx = parseInt(item.bulan) - 1;
-                            const namaBulan = (bulanIdx >= 0 && bulanIdx < 12) ? monthsList[bulanIdx] : item.bulan;
-                            %>
-                            <%= namaBulan %> <%= item.tahun %>
-                        </td>
-                        <td><%= item.noTransaksi %></td>
-                        <td><%= item.uraian %></td>
-                        <td style="color: var(--success);">
-                            <%= Number(item.pemasukan) > 0 ? 'Rp ' + Number(item.pemasukan).toLocaleString('id-ID') : '-' %>
-                        </td>
-                        <td style="color: var(--danger);">
-                            <%= Number(item.pengeluaran) > 0 ? 'Rp ' + Number(item.pengeluaran).toLocaleString('id-ID') : '-' %>
-                        </td>
-                        <td style="font-weight: bold;">Rp <%= Number(saldo).toLocaleString('id-ID') %></td>
+                        <td><%= noSpmb++ %></td>
+                        <td>01/<%= String(selBulanIdx + 1).padStart(2, '0') %>/<%= selTahun %></td>
+                        <td><%= monthsList[selBulanIdx] %> <%= selTahun %></td>
+                        <td>-</td>
+                        <td>Saldo Bulan <%= prevMonthName %> <%= prevMonthYear %></td>
+                        <td style="color: var(--success);"><%= saldoSpmb > 0 ? 'Rp ' + Number(saldoSpmb).toLocaleString('id-ID') : (saldoSpmb === 0 ? 'Rp 0' : '-') %></td>
+                        <td style="color: var(--danger);"><%= saldoSpmb < 0 ? 'Rp ' + Math.abs(Number(saldoSpmb)).toLocaleString('id-ID') : '-' %></td>
+                        <td style="font-weight: bold;">Rp <%= Number(saldoSpmb).toLocaleString('id-ID') %></td>
                     </tr>
-                <% }) } else if ((typeof currentPage !== 'undefined' && currentPage !== 1) || typeof bulanQuery === 'undefined' || !bulanQuery) { %>
-                    <tr>
-                        <td colspan="8" style="text-align: center;">Tidak ada data laporan</td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-</div>
+                    <% } %>
 
-        <!-- Pagination UI -->
-        <%- include('partials/pagination', { 
-            currentPage: currentPage, 
-            totalPages: totalPages, 
-            totalData: totalData, 
-            baseUrl: '/laporan', 
-            queryParams: (typeof searchQuery !== 'undefined' && searchQuery ? '&search='+searchQuery : '') + 
-                         (typeof bulanQuery !== 'undefined' && bulanQuery ? '&bulan='+bulanQuery : '') + 
-                         (typeof tahunQuery !== 'undefined' && tahunQuery ? '&tahun='+tahunQuery : '')
-        }) %>
+                    <% if(laporanSpmb && laporanSpmb.length > 0) {
+                        laporanSpmb.forEach((item) => {
+                        saldoSpmb = Number(saldoSpmb) + (Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0);
+                        %>
+                        <tr>
+                            <td><%= noSpmb++ %></td>
+                            <td><%= formatDateIndo(item.tanggal) %></td>
+                            <td>
+                                <% 
+                                const bulanIdx = parseInt(item.bulan) - 1;
+                                const namaBulan = (bulanIdx >= 0 && bulanIdx < 12) ? monthsList[bulanIdx] : item.bulan;
+                                %>
+                                <%= namaBulan %> <%= item.tahun %>
+                            </td>
+                            <td><%= item.noTransaksi %></td>
+                            <td><%= item.uraian %></td>
+                            <td style="color: var(--success);">
+                                <%= Number(item.pemasukan) > 0 ? 'Rp ' + Number(item.pemasukan).toLocaleString('id-ID') : '-' %>
+                            </td>
+                            <td style="color: var(--danger);">
+                                <%= Number(item.pengeluaran) > 0 ? 'Rp ' + Number(item.pengeluaran).toLocaleString('id-ID') : '-' %>
+                            </td>
+                            <td style="font-weight: bold;">Rp <%= Number(saldoSpmb).toLocaleString('id-ID') %></td>
+                        </tr>
+                    <% }) } else { %>
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Tidak ada data laporan</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab 2 Contents: SIKMA Integration -->
+    <div id="sikma-tab-content" class="premium-table-container" style="display: none; margin-top: 20px;">
+        <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">
+            <div class="table-title" style="font-weight: 700; font-size: 18px; color: #1e293b;"><i class="fas fa-table mr-2"></i> Laporan Keuangan SPMB JIC (Input via SIKMA)</div>
+        </div>
+
+        <div class="table-responsive" style="overflow-x: auto; width: 100%;">
+            <table id="tabelLaporanSikma" class="premium-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Bulan</th>
+                        <th>No Transaksi</th>
+                        <th>Uraian</th>
+                        <th>Pemasukan</th>
+                        <th>Pengeluaran</th>
+                        <th>Saldo Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                    let saldoSikma = typeof saldoAwalQuerySikma !== 'undefined' ? Number(saldoAwalQuerySikma) : 0; 
+                    if (isNaN(saldoSikma)) saldoSikma = 0;
+                    let noSikma = 1;
+                    %>
+                    
+                    <% if (typeof bulanQuery !== 'undefined' && bulanQuery !== '') { 
+                        let selBulanIdx = monthsList.indexOf(bulanQuery);
+                        if (selBulanIdx === -1) selBulanIdx = parseInt(bulanQuery) - 1;
+                        if (isNaN(selBulanIdx) || selBulanIdx < 0 || selBulanIdx > 11) selBulanIdx = new Date().getMonth();
+                        
+                        let selTahun = typeof tahunQuery !== 'undefined' && tahunQuery ? parseInt(tahunQuery) : new Date().getFullYear();
+                        let prevMonthName = selBulanIdx === 0 ? "Desember" : monthsList[selBulanIdx - 1];
+                        let prevMonthYear = selBulanIdx === 0 ? selTahun - 1 : selTahun;
+                    %>
+                    <tr>
+                        <td><%= noSikma++ %></td>
+                        <td>01/<%= String(selBulanIdx + 1).padStart(2, '0') %>/<%= selTahun %></td>
+                        <td><%= monthsList[selBulanIdx] %> <%= selTahun %></td>
+                        <td>-</td>
+                        <td>Saldo Bulan <%= prevMonthName %> <%= prevMonthYear %></td>
+                        <td style="color: var(--success);"><%= saldoSikma > 0 ? 'Rp ' + Number(saldoSikma).toLocaleString('id-ID') : (saldoSikma === 0 ? 'Rp 0' : '-') %></td>
+                        <td style="color: var(--danger);"><%= saldoSikma < 0 ? 'Rp ' + Math.abs(Number(saldoSikma)).toLocaleString('id-ID') : '-' %></td>
+                        <td style="font-weight: bold;">Rp <%= Number(saldoSikma).toLocaleString('id-ID') %></td>
+                    </tr>
+                    <% } %>
+
+                    <% if(laporanSikma && laporanSikma.length > 0) {
+                        laporanSikma.forEach((item) => {
+                        saldoSikma = Number(saldoSikma) + (Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0);
+                        %>
+                        <tr>
+                            <td><%= noSikma++ %></td>
+                            <td><%= formatDateIndo(item.tanggal) %></td>
+                            <td>
+                                <% 
+                                const bulanIdx = parseInt(item.bulan) - 1;
+                                const namaBulan = (bulanIdx >= 0 && bulanIdx < 12) ? monthsList[bulanIdx] : item.bulan;
+                                %>
+                                <%= namaBulan %> <%= item.tahun %>
+                            </td>
+                            <td><%= item.noTransaksi %></td>
+                            <td><%= item.uraian %></td>
+                            <td style="color: var(--success);">
+                                <%= Number(item.pemasukan) > 0 ? 'Rp ' + Number(item.pemasukan).toLocaleString('id-ID') : '-' %>
+                            </td>
+                            <td style="color: var(--danger);">
+                                <%= Number(item.pengeluaran) > 0 ? 'Rp ' + Number(item.pengeluaran).toLocaleString('id-ID') : '-' %>
+                            </td>
+                            <td style="font-weight: bold;">Rp <%= Number(saldoSikma).toLocaleString('id-ID') %></td>
+                        </tr>
+                    <% }) } else { %>
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Tidak ada data laporan</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Laporan Modal (Iframe) -->
-    <div id="laporanModal" class="modal-overlay" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
-        <div class="modal-content" style="background-color: transparent; padding: 0; border-radius: 8px; width: 95%; max-width: 900px; height: 90vh; position: relative; display: flex; flex-direction: column;">
-            <div style="background-color: white; padding: 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
-                <h3 style="margin: 0; font-size: 18px;">Preview Laporan</h3>
-                <span class="close-modal" onclick="closeModalLaporan()" style="cursor: pointer; font-size: 24px; color: #666; font-weight: bold; line-height: 1;">&times;</span>
+    <div id="laporanModal" class="modal-overlay modal-overlay-laporan">
+        <div class="modal-content modal-content-laporan">
+            <div class="modal-header-laporan">
+                <h3 class="modal-title-laporan">Preview Laporan</h3>
+                <span class="close-modal modal-close-laporan" onclick="closeModalLaporan()">&times;</span>
             </div>
-            <div style="flex: 1; background: #f0f2f5; border-radius: 0 0 8px 8px; overflow: hidden;">
-                <iframe id="laporanIframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 0 0 8px 8px;"></iframe>
+            <div class="modal-body-laporan">
+                <iframe id="laporanIframe" src="" class="modal-iframe-laporan"></iframe>
             </div>
         </div>
     </div>

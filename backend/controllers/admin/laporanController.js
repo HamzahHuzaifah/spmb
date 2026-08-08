@@ -16,23 +16,27 @@ exports.getLaporan = async (req, res) => {
         const totalData = await TransaksiModel.getTotalLaporan(search, filterBulan, filterTahun);
         const totalPages = Math.ceil(totalData / limit);
 
-        let saldoAwal = 0;
-        if (filterBulan && filterTahun) {
-            saldoAwal = Number(await TransaksiModel.getSaldoAwalLaporan(filterBulan, filterTahun)) || 0;
-        }
+        // Ambil daftar nomor transaksi yang diinput dari SIKMA
+        const sikmaNoTrx = await TransaksiModel.getSikmaNoTransaksi();
+        const sikmaSet = new Set(sikmaNoTrx);
 
-        // Tambahkan selisih pemasukan-pengeluaran dari data yang di-skip karena pagination
-        if (offset > 0) {
-            const skippedData = await TransaksiModel.getLaporanPaginated(offset, 0, search, filterBulan, filterTahun);
-            skippedData.forEach(item => {
-                saldoAwal += ((Number(item.pemasukan) || 0) - (Number(item.pengeluaran) || 0));
-            });
+        // Pisahkan data laporan
+        const laporanSpmb = laporanData.filter(item => !sikmaSet.has(item.noTransaksi));
+        const laporanSikma = laporanData.filter(item => sikmaSet.has(item.noTransaksi));
+
+        let saldoAwalSpmb = 0;
+        let saldoAwalSikma = 0;
+        if (filterBulan && filterTahun) {
+            saldoAwalSpmb = Number(await TransaksiModel.getSaldoAwalLaporanBySource(filterBulan, filterTahun, false)) || 0;
+            saldoAwalSikma = Number(await TransaksiModel.getSaldoAwalLaporanBySource(filterBulan, filterTahun, true)) || 0;
         }
 
         res.render('laporan', { 
             title: 'Laporan Keuangan', 
             activePage: 'laporan', 
-            laporan: laporanData,
+            laporan: laporanData, // keep for backward compatibility
+            laporanSpmb: laporanSpmb,
+            laporanSikma: laporanSikma,
             fullLaporanData: fullLaporanData,
             currentPage: page,
             totalPages: totalPages,
@@ -40,7 +44,8 @@ exports.getLaporan = async (req, res) => {
             searchQuery: search,
             bulanQuery: filterBulan,
             tahunQuery: filterTahun,
-            saldoAwalQuery: saldoAwal
+            saldoAwalQuerySpmb: saldoAwalSpmb,
+            saldoAwalQuerySikma: saldoAwalSikma
         });
     } catch (err) {
         console.error(err);

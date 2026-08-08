@@ -1,12 +1,15 @@
 <%- include('partials/header', { title: 'Data Santri Baru' , activePage: 'santri' }) %><link rel="stylesheet" href="/css/santri.css">
-<style>
-    tr.row-duplicate, tr.row-duplicate td {
-        background-color: #fee2e2 !important;
-    }
-    tr.row-duplicate td:first-child {
-        border-left: 4px solid #ef4444 !important;
-    }
-</style>
+
+    <div class="premium-banner premium-banner-green" style="margin-top: 20px;">
+        <div>
+            <h1>Master Data Santri Baru</h1>
+            <p>Kelola data pendaftaran santri baru secara lengkap</p>
+        </div>
+        <div class="premium-banner-icon">
+            <i class="fas fa-users"></i>
+        </div>
+    </div>
+
 <%
 function formatTimestampIndo(isoStr) {
     if (!isoStr) return '-';
@@ -42,16 +45,6 @@ function formatTimestampIndo(isoStr) {
             </button>
         `
     }) %>
-
-    <div class="premium-banner premium-banner-green" style="margin-top: 20px;">
-        <div>
-            <h1>Master Data Santri Baru</h1>
-            <p>Kelola data pendaftaran santri baru secara lengkap</p>
-        </div>
-        <div class="premium-banner-icon">
-            <i class="fas fa-users"></i>
-        </div>
-    </div>
 
     <div class="premium-table-container">
         <div class="table-header" style="margin-bottom: 20px; padding: 0 10px;">
