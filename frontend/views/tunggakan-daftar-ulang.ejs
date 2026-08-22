@@ -39,6 +39,7 @@
                 <th>Total Tagihan</th>
                 <th>Total Bayar</th>
                 <th>Sisa Bayar</th>
+                <th>Progress</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -55,6 +56,20 @@
                     <td>Rp <%= item.totalBayar.toLocaleString('id-ID') %></td>
                     <td style="color: var(--danger); font-weight: bold;">Rp <%= item.sisaBayar.toLocaleString('id-ID') %></td>
                     <td>
+                        <% 
+                            let progressDU = 0;
+                            if (item.totalTagihan > 0) {
+                                progressDU = Math.round((item.totalBayar / item.totalTagihan) * 100);
+                            }
+                        %>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="flex-grow: 1; background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden; min-width: 60px;">
+                                <div style="background: <%= progressDU === 100 ? '#10b981' : (progressDU > 50 ? '#3b82f6' : '#f59e0b') %>; height: 100%; width: <%= progressDU %>%;"></div>
+                            </div>
+                            <span style="font-size: 12px; font-weight: 600; color: #475569; min-width: 35px;"><%= progressDU %>%</span>
+                        </div>
+                    </td>
+                    <td>
                         <span class="badge <%= item.status === 'Lunas' ? 'badge-success' : 'badge-danger' %>">
                             <%= item.status %>
                         </span>
@@ -63,7 +78,7 @@
                 <% }) %>
             <% } else { %>
                 <tr>
-                    <td colspan="9" style="text-align: center;">Tidak ada data tunggakan</td>
+                    <td colspan="10" style="text-align: center;">Tidak ada data tunggakan</td>
                 </tr>
             <% } %>
         </tbody>
