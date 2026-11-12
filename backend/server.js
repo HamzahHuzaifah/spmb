@@ -40,6 +40,20 @@ app.use(express.static(path.join(__dirname, '../frontend/public')));
 // PENTING: Filter Maintenance Mode (Hanya aktif di produksi/cPanel, dilewati jika di lokal)
 app.use(checkMaintenance);
 
+// PENTING: Global Middleware untuk Tahun Ajaran Aktif (Tersedia di semua view EJS)
+const SystemSettingModel = require('./models/SystemSetting');
+app.use(async (req, res, next) => {
+    try {
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        res.locals.tahunAjaranAktif = defaultTA ? defaultTA.nama : '2026/2027';
+        res.locals.tahunAjaranMulai = defaultTA ? defaultTA.tahun_mulai : new Date().getFullYear();
+    } catch (e) {
+        res.locals.tahunAjaranAktif = '2026/2027';
+        res.locals.tahunAjaranMulai = new Date().getFullYear();
+    }
+    next();
+});
+
 // ==========================================
 // ROUTES
 // ==========================================

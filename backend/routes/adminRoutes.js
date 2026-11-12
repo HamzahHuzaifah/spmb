@@ -25,6 +25,18 @@ router.use(cekAuth);
 // --- SSO Redirect SIKMA ---
 router.get('/sso/go-sikma', ssoController.goSikma);
 
+// Switcher Tahun Ajaran
+router.get('/set-tahun-ajaran/:tahun', (req, res) => {
+    const { tahun } = req.params;
+    const val = decodeURIComponent(tahun);
+    res.cookie('selected_tahun_ajaran', val, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: false
+    });
+    const referer = req.get('Referrer') || '/dashboard';
+    res.redirect(referer);
+});
+
 // Dashboard
 router.get('/dashboard/export-excel', dashboardController.exportDashboardExcel);
 router.get('/dashboard', dashboardController.getDashboard);

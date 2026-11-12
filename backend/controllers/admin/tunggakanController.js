@@ -9,9 +9,10 @@ exports.getTunggakan = async (req, res) => {
 
         const search = req.query.search || '';
         const statusFilter = req.query.status || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const tunggakanData = await TunggakanModel.getTunggakanPaginated(limit, offset, search, statusFilter);
-        const totalData = await TunggakanModel.getTotalTunggakan(search, statusFilter);
+        const tunggakanData = await TunggakanModel.getTunggakanPaginated(limit, offset, search, statusFilter, year);
+        const totalData = await TunggakanModel.getTotalTunggakan(search, statusFilter, year);
         const totalPages = Math.ceil(totalData / limit);
 
         res.render('tunggakan', { 
@@ -38,9 +39,10 @@ exports.getTunggakanDaftarUlang = async (req, res) => {
 
         const search = req.query.search || '';
         const statusFilter = req.query.status || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const tunggakanDaftarUlangData = await TunggakanModel.getTunggakanDaftarUlangPaginated(limit, offset, search, statusFilter);
-        const totalData = await TunggakanModel.getTotalTunggakanDaftarUlang(search, statusFilter);
+        const tunggakanDaftarUlangData = await TunggakanModel.getTunggakanDaftarUlangPaginated(limit, offset, search, statusFilter, year);
+        const totalData = await TunggakanModel.getTotalTunggakanDaftarUlang(search, statusFilter, year);
         const totalPages = Math.ceil(totalData / limit);
 
         res.render('tunggakan-daftar-ulang', { 
@@ -63,8 +65,9 @@ exports.exportTunggakanExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const statusFilter = req.query.status || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await TunggakanModel.getAllTunggakanFiltered(search, statusFilter);
+        const data = await TunggakanModel.getAllTunggakanFiltered(search, statusFilter, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,
@@ -96,8 +99,9 @@ exports.exportTunggakanDaftarUlangExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const statusFilter = req.query.status || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await TunggakanModel.getAllTunggakanDaftarUlangFiltered(search, statusFilter);
+        const data = await TunggakanModel.getAllTunggakanDaftarUlangFiltered(search, statusFilter, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,

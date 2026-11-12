@@ -12,12 +12,13 @@ exports.getSantri = async (req, res) => {
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const santriData = await SantriModel.getSantriPaginated(limit, offset, search, pendidikan);
+        const santriData = await SantriModel.getSantriPaginated(limit, offset, search, pendidikan, year);
         for (const item of santriData) {
             item.isDuplicate = await SantriModel.checkHasDuplicate(item, 'baru');
         }
-        const totalData = await SantriModel.getTotalSantri(search, pendidikan);
+        const totalData = await SantriModel.getTotalSantri(search, pendidikan, year);
         const totalPages = Math.ceil(totalData / limit);
 
         res.render('santri', { 
@@ -44,12 +45,13 @@ exports.getSantriDaftarUlang = async (req, res) => {
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const santriDaftarUlangData = await SantriModel.getSantriDaftarUlangPaginated(limit, offset, search, pendidikan);
+        const santriDaftarUlangData = await SantriModel.getSantriDaftarUlangPaginated(limit, offset, search, pendidikan, year);
         for (const item of santriDaftarUlangData) {
             item.isDuplicate = await SantriModel.checkHasDuplicate(item, 'daftar_ulang');
         }
-        const totalData = await SantriModel.getTotalSantriDaftarUlang(search, pendidikan);
+        const totalData = await SantriModel.getTotalSantriDaftarUlang(search, pendidikan, year);
         const totalPages = Math.ceil(totalData / limit);
 
         res.render('santri-daftar-ulang', { 
@@ -83,7 +85,7 @@ exports.editSantri = async (req, res) => {
         
         if (updatedData.tanggalLahir) {
             const birthDate = new Date(updatedData.tanggalLahir);
-            updatedData.usia = 2026 - birthDate.getFullYear();
+            updatedData.usia = new Date().getFullYear() - birthDate.getFullYear();
         }
 
         await SantriModel.updateSantri(id, updatedData);
@@ -165,7 +167,7 @@ exports.editSantriDaftarUlang = async (req, res) => {
 
         if (updatedData.tanggalLahir) {
             const birthDate = new Date(updatedData.tanggalLahir);
-            updatedData.usia = 2026 - birthDate.getFullYear();
+            updatedData.usia = new Date().getFullYear() - birthDate.getFullYear();
         }
 
         await SantriModel.updateSantriDaftarUlang(id, updatedData);
@@ -281,8 +283,9 @@ exports.exportSantriExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await SantriModel.getAllSantriFiltered(search, pendidikan);
+        const data = await SantriModel.getAllSantriFiltered(search, pendidikan, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,
@@ -331,8 +334,9 @@ exports.exportSantriDaftarUlangExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await SantriModel.getAllSantriDaftarUlangFiltered(search, pendidikan);
+        const data = await SantriModel.getAllSantriDaftarUlangFiltered(search, pendidikan, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,

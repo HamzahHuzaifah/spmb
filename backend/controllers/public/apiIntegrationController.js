@@ -90,7 +90,7 @@ exports.getTunggakan = async (req, res) => {
 
 exports.postBayarTunggakan = async (req, res) => {
     try {
-        const { no_transaksi, nama, satuan_pendidikan_asli, is_daftar_ulang, nominal, catatan } = req.body;
+        const { no_transaksi, nama, satuan_pendidikan_asli, is_daftar_ulang, nominal, catatan, tanggal, metode } = req.body;
 
         if (!nama || !satuan_pendidikan_asli || !nominal) {
             return res.status(400).json({ error: 'Data tidak lengkap. Harap kirimkan nama, satuan_pendidikan_asli, dan nominal.' });
@@ -125,10 +125,10 @@ exports.postBayarTunggakan = async (req, res) => {
 
         // Catat transaksi dan laporan keuangan di SPMB
         const prefix = isDaftarUlang ? 'KWI-DU' : 'KWI-DB';
-        const dateStr = new Date().toISOString().split('T')[0];
+        const dateStr = tanggal || new Date().toISOString().split('T')[0];
         const dateParts = dateStr.split('-');
         const year = dateParts[0];
-        const month = dateParts[1];
+        const month = String(dateParts[1]).padStart(2, '0');
 
         let finalNoTransaksi = no_transaksi;
         if (!finalNoTransaksi) {
@@ -145,7 +145,7 @@ exports.postBayarTunggakan = async (req, res) => {
             namaSantri: nama,
             satuanPendidikan: satuan_pendidikan_asli,
             nominal: bayar,
-            metodePembayaran: 'Cash',
+            metodePembayaran: metode || 'Cash',
             dibayarkanKepada: 'SIKMA',
             kategoriDana: catatan || '',
             diterimaDari: nama,

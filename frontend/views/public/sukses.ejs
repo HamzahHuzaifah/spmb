@@ -22,7 +22,7 @@
     <% } %>
 
     <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 16px;">
-        Terima kasih telah mendaftar di SPMB JIC Tahun Ajaran 2026/2027. Data Anda telah kami terima dan akan segera diproses oleh panitia.
+        Terima kasih telah mendaftar di SPMB JIC Tahun Ajaran <%= typeof tahunAjaranAktif !== 'undefined' ? tahunAjaranAktif : '2026/2027' %>. Data Anda telah kami terima dan akan segera diproses oleh panitia.
     </p>
     
     <div style="background-color: #f8fbf8; padding: 20px; border-radius: var(--radius-sm); border: 1px dashed var(--primary); margin-bottom: 30px; display: block; text-align: left;">

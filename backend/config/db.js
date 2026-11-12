@@ -211,6 +211,29 @@ async function runMigration() {
         // Seed default value for TUTUP_BUKU
         await poolPromise.query(`INSERT IGNORE INTO system_settings (\`key\`, \`value\`) VALUES ('TUTUP_BUKU', 'false')`);
 
+        // 6. Buat tabel master_tahun_ajaran
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS master_tahun_ajaran (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nama VARCHAR(50) NOT NULL UNIQUE,
+                tahun_mulai INT NOT NULL,
+                tahun_selesai INT NOT NULL,
+                status ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif',
+                is_default TINYINT(1) DEFAULT 0,
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+
+        // Seed tahun ajaran default jika tabel kosong
+        const [taRows] = await poolPromise.query('SELECT COUNT(*) as total FROM master_tahun_ajaran');
+        if (taRows[0].total === 0) {
+            const curY = new Date().getFullYear();
+            await poolPromise.query(
+                'INSERT INTO master_tahun_ajaran (nama, tahun_mulai, tahun_selesai, status, is_default) VALUES (?, ?, ?, ?, ?)',
+                [`${curY}/${curY + 1}`, curY, curY + 1, 'Aktif', 1]
+            );
+        }
+
         // Jalankan cleanup billing ganda/yatim piatu akibat bug lama
         await cleanupOrphanedBilling();
     } catch (err) {

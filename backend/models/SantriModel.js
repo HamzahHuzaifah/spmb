@@ -7,7 +7,7 @@ class SantriModel {
         return rows;
     }
 
-    static async getSantriPaginated(limit, offset, search = '', pendidikan = '') {
+    static async getSantriPaginated(limit, offset, search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM santri WHERE 1=1';
         let params = [];
 
@@ -19,6 +19,12 @@ class SantriModel {
         if (pendidikan) {
             query += ' AND pendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
         }
 
         // Limit & offset langsung disisipkan karena sudah diparsing menjadi integer (aman dari SQL Injection)
@@ -28,7 +34,7 @@ class SantriModel {
         return rows;
     }
 
-    static async getAllSantriFiltered(search = '', pendidikan = '') {
+    static async getAllSantriFiltered(search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM santri WHERE 1=1';
         let params = [];
 
@@ -42,13 +48,19 @@ class SantriModel {
             params.push(`${pendidikan}%`);
         }
 
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalSantri(search = '', pendidikan = '') {
+    static async getTotalSantri(search = '', pendidikan = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM santri WHERE 1=1';
         let params = [];
 
@@ -60,6 +72,12 @@ class SantriModel {
         if (pendidikan) {
             query += ' AND pendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
         }
 
         const [rows] = await db.execute(query, params);
@@ -201,7 +219,7 @@ class SantriModel {
         return rows;
     }
 
-    static async getSantriDaftarUlangPaginated(limit, offset, search = '', pendidikan = '') {
+    static async getSantriDaftarUlangPaginated(limit, offset, search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM santri_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -213,6 +231,12 @@ class SantriModel {
         if (pendidikan) {
             query += ' AND lanjutKe LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
         }
 
         query += ` ORDER BY id DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
@@ -221,7 +245,7 @@ class SantriModel {
         return rows;
     }
 
-    static async getAllSantriDaftarUlangFiltered(search = '', pendidikan = '') {
+    static async getAllSantriDaftarUlangFiltered(search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM santri_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -235,13 +259,19 @@ class SantriModel {
             params.push(`${pendidikan}%`);
         }
 
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalSantriDaftarUlang(search = '', pendidikan = '') {
+    static async getTotalSantriDaftarUlang(search = '', pendidikan = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -253,6 +283,12 @@ class SantriModel {
         if (pendidikan) {
             query += ' AND lanjutKe LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))';
+            params.push(`%/${startYear}/%`, startYear);
         }
 
         const [rows] = await db.execute(query, params);
@@ -486,13 +522,8 @@ class SantriModel {
             const isSameDOB = candDOB && inputDOB && 
                 (new Date(candDOB).toDateString() === new Date(inputDOB).toDateString());
                 
-            // 1. Exact name match (regardless of DOB, to prevent DOB bypass)
-            if (isExactName) {
-                return cand;
-            }
-            
-            // 2. High similarity (>= 85%) and different DOB (bypass attempt / typo)
-            if (sim >= 0.85 && !isSameDOB) {
+            // Duplikat HANYA jika nama sama / mirip (>= 85%) DAN tanggal lahir sama
+            if ((isExactName || sim >= 0.85) && isSameDOB) {
                 return cand;
             }
         }
@@ -538,12 +569,8 @@ class SantriModel {
             const isSameDOB = candDOB && inputDOB && 
                 (new Date(candDOB).toDateString() === new Date(inputDOB).toDateString());
                 
-            // 1. Exact name match (regardless of DOB)
-            if (isExactName) {
-                return true;
-            }
-            // 2. High similarity (>= 85%) and different DOB
-            if (sim >= 0.85 && !isSameDOB) {
+            // Duplikat HANYA jika nama sama / mirip (>= 85%) DAN tanggal lahir sama
+            if ((isExactName || sim >= 0.85) && isSameDOB) {
                 return true;
             }
         }

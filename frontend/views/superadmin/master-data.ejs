@@ -12,7 +12,7 @@
     </div>
 
     <!-- Custom Tabs Navigation -->
-    <div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="nav-tab active-tab" onclick="switchTab('jenjang')" id="tab-btn-jenjang" style="padding: 12px 24px; border: none; background: #e0f2fe; color: #0ea5e9; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">
             <i class="fas fa-graduation-cap" style="margin-right: 8px;"></i> Data Jenjang
         </button>
@@ -22,13 +22,21 @@
         <button class="nav-tab" onclick="switchTab('jalur')" id="tab-btn-jalur" style="padding: 12px 24px; border: none; background: transparent; color: #64748b; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">
             <i class="fas fa-route" style="margin-right: 8px;"></i> Jalur Pendaftaran
         </button>
+        <button class="nav-tab" onclick="switchTab('tahun-ajaran')" id="tab-btn-tahun-ajaran" style="padding: 12px 24px; border: none; background: transparent; color: #64748b; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+            <i class="fas fa-clock" style="margin-right: 8px;"></i> Tahun Ajaran
+        </button>
     </div>
 
     <!-- JENJANG -->
     <div id="tab-jenjang" class="tab-content-section" style="display: block;">
         <div class="table-container" style="border-radius: var(--radius-md); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
             <div class="table-header">
-                <h5 class="table-title" style="margin: 0; color: #1e293b; font-weight: 700;">Daftar Jenjang Akademik</h5>
+                <div>
+                    <h5 class="table-title" style="margin: 0; color: #1e293b; font-weight: 700;">Daftar Jenjang Akademik</h5>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">
+                        Kuota terisi & sisa kuota dihitung otomatis berdasarkan pendaftar pada <strong>Tahun Ajaran Aktif (<%= typeof defaultTA !== 'undefined' && defaultTA ? defaultTA.nama : (typeof tahunAjaranAktif !== 'undefined' ? tahunAjaranAktif : 'Aktif') %>)</strong>.
+                    </p>
+                </div>
                 <button class="btn btn-primary" onclick="openModal('jenjang')" style="background: #10b981; border-radius: 8px; padding: 10px 20px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
                     <i class="fas fa-plus"></i> Tambah Jenjang
                 </button>
@@ -164,6 +172,71 @@
             </div>
         </div>
     </div>
+
+    <!-- TAHUN AJARAN -->
+    <div id="tab-tahun-ajaran" class="tab-content-section" style="display: none;">
+        <div class="table-container" style="border-radius: var(--radius-md); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="table-header">
+                <div>
+                    <h5 class="table-title" style="margin: 0; color: #1e293b; font-weight: 700;">Daftar Tahun Ajaran</h5>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Hanya ada 1 Tahun Ajaran Aktif (Pendaftaran Dibuka). Tahun ajaran lain berstatus Nonaktif (Arsip).</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('tahun-ajaran')" style="background: #10b981; border-radius: 8px; padding: 10px 20px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-plus"></i> Tambah Tahun Ajaran
+                </button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">No</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Tahun Ajaran</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Rentang Periode</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Status Pendaftaran</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase; text-align: right;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof tahunAjaran !== 'undefined' && tahunAjaran.length > 0) { %>
+                            <% tahunAjaran.forEach((ta, idx) => { %>
+                            <tr style="transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;"><%= idx + 1 %></td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #0f172a;"><%= ta.nama %></td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; color: #475569;"><%= ta.tahun_mulai %> - <%= ta.tahun_selesai %></td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
+                                    <% if (ta.is_default === 1 || ta.status === 'Aktif') { %>
+                                        <span style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid #10b981; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-check-circle" style="color: #10b981;"></i> Sedang Aktif (Pendaftaran Dibuka)
+                                        </span>
+                                    <% } else { %>
+                                        <span style="background: rgba(100, 116, 139, 0.1); color: #64748b; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                            Nonaktif (Arsip)
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; text-align: right;">
+                                    <% if (ta.is_default !== 1 && ta.status !== 'Aktif') { %>
+                                    <button onclick="setDefaultTA(<%= ta.id %>)" style="background: #10b981; color: white; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-right: 5px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
+                                        <i class="fas fa-play mr-1"></i> Jadikan Aktif
+                                    </button>
+                                    <% } %>
+                                    <button data-item="<%= JSON.stringify(ta) %>" onclick="openModal('tahun-ajaran', true, JSON.parse(this.getAttribute('data-item')))" class="btn-edit" style="background: rgba(245, 158, 11, 0.1); color: #d97706; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-right: 5px;"><i class="fas fa-edit"></i> Edit</button>
+                                    <% if (ta.is_default !== 1 && ta.status !== 'Aktif') { %>
+                                    <button onclick="deleteData('tahun-ajaran', <%= ta.id %>)" class="btn-delete" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i class="fas fa-trash"></i> Hapus</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="padding: 24px; text-align: center; color: #94a3b8;">Belum ada data tahun ajaran.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Form -->
@@ -225,6 +298,21 @@
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Syarat Dokumen (Pisahkan dengan koma)</label>
                     <input type="text" id="m_syarat" name="syarat_dokumen" placeholder="KTP, Ijazah, dll" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #1e293b; outline: none; transition: border-color 0.2s;">
                 </div>
+
+                <!-- Tahun Ajaran Specific -->
+                <div class="tahun-ajaran-only" style="margin-bottom: 20px; display:none;">
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Tahun Mulai</label>
+                            <input type="number" id="m_tahun_mulai" name="tahun_mulai" placeholder="2026" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #1e293b; outline: none; transition: border-color 0.2s;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Tahun Selesai</label>
+                            <input type="number" id="m_tahun_selesai" name="tahun_selesai" placeholder="2027" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #1e293b; outline: none; transition: border-color 0.2s;">
+                        </div>
+                    </div>
+                    <small style="color: #64748b; font-size: 12px; margin-top: 6px; display: block;">Contoh: Tahun Mulai 2026, Tahun Selesai 2027 menghasilkan Nama "2026/2027".</small>
+                </div>
                 
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Status</label>
@@ -232,6 +320,9 @@
                         <option value="Aktif">Aktif</option>
                         <option value="Nonaktif">Nonaktif</option>
                     </select>
+                    <small id="status_help_text" style="color: #10b981; font-weight: 600; font-size: 12px; margin-top: 6px; display: none;">
+                        <i class="fas fa-info-circle"></i> Catatan: Memilih status 'Aktif' akan otomatis menjadikan tahun ajaran ini sebagai periode aktif publik berjalan, dan tahun ajaran sebelumnya akan diarsipkan (Nonaktif).
+                    </small>
                 </div>
                 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
@@ -271,7 +362,8 @@
         document.getElementById('m_nama').value = data.nama || '';
         document.getElementById('m_status').value = data.status || 'Aktif';
 
-        document.querySelectorAll('.jenjang-only, .gelombang-only, .jalur-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.jenjang-only, .gelombang-only, .jalur-only, .tahun-ajaran-only').forEach(el => el.style.display = 'none');
+        document.getElementById('status_help_text').style.display = (type === 'tahun-ajaran') ? 'block' : 'none';
         
         if(type === 'jenjang') {
             document.querySelectorAll('.jenjang-only').forEach(el => el.style.display = 'block');
@@ -287,6 +379,13 @@
             document.querySelectorAll('.jalur-only').forEach(el => el.style.display = 'block');
             document.getElementById('m_biaya').value = data.biaya || 0;
             document.getElementById('m_syarat').value = data.syarat_dokumen || '';
+        } else if(type === 'tahun-ajaran') {
+            document.querySelectorAll('.tahun-ajaran-only').forEach(el => el.style.display = 'block');
+            document.getElementById('m_tahun_mulai').value = data.tahun_mulai || new Date().getFullYear();
+            document.getElementById('m_tahun_selesai').value = data.tahun_selesai || (new Date().getFullYear() + 1);
+            if (!isEdit && !data.nama) {
+                document.getElementById('m_nama').value = `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`;
+            }
         }
         
         modal.style.display = 'flex';
@@ -326,6 +425,54 @@
             }
         });
     });
+
+    function setDefaultTA(id) {
+        Swal.fire({
+            title: 'Jadikan Default Publik?',
+            text: "Form pendaftaran publik akan diarahkan ke tahun ajaran ini.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Ya, Jadikan Default',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/superadmin/master-data/tahun-ajaran/set-default/${id}`, { method: 'POST' })
+                .then(r => r.json()).then(res => {
+                    if(res.success) {
+                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Gagal!', res.message, 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    // Auto-update Nama Tahun Ajaran saat tahun mulai/selesai diubah
+    const tMul = document.getElementById('m_tahun_mulai');
+    const tSel = document.getElementById('m_tahun_selesai');
+    if (tMul && tSel) {
+        tMul.addEventListener('input', function() {
+            if (document.getElementById('formType').value === 'tahun-ajaran') {
+                const y = parseInt(this.value, 10);
+                if (!isNaN(y)) {
+                    tSel.value = y + 1;
+                    document.getElementById('m_nama').value = `${y}/${y + 1}`;
+                }
+            }
+        });
+        tSel.addEventListener('input', function() {
+            if (document.getElementById('formType').value === 'tahun-ajaran') {
+                const y1 = parseInt(tMul.value, 10);
+                const y2 = parseInt(this.value, 10);
+                if (!isNaN(y1) && !isNaN(y2)) {
+                    document.getElementById('m_nama').value = `${y1}/${y2}`;
+                }
+            }
+        });
+    }
 
     function deleteData(type, id) {
         Swal.fire({

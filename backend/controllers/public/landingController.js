@@ -1,11 +1,13 @@
 const db = require('../../config/db');
+const SystemSettingModel = require('../../models/SystemSetting');
 
 // ---- Landing Page and Success ----
 
 exports.getLanding = async (req, res) => {
     try {
         const [jenjang] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif" ORDER BY id ASC');
-        const year = new Date().getFullYear();
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const year = defaultTA.tahun_mulai || new Date().getFullYear();
         
         for (let j of jenjang) {
             const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Baru/${year}/%`]);
@@ -16,9 +18,10 @@ exports.getLanding = async (req, res) => {
         }
 
         res.render('public/layout', { 
-            title: 'Pendaftaran SPMB JIC 2026', 
+            title: `Pendaftaran SPMB JIC ${defaultTA.nama}`, 
             bodyView: 'landing',
-            jenjangList: jenjang 
+            jenjangList: jenjang,
+            tahunAjaranAktif: defaultTA.nama
         });
     } catch (error) {
         console.error(error);

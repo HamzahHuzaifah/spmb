@@ -13,42 +13,45 @@ const reqAttr = isRequired ? 'required' : '';
 const reqLabelClass = isRequired ? 'required' : '';
 const lay = typeof layout !== 'undefined' ? layout : 'stacked';
 const includeEmail = typeof showEmail !== 'undefined' ? showEmail : false;
+
+const form = typeof formData !== 'undefined' && formData ? formData : {};
+const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field] : fallback);
 %>
 
 <% if (lay === 'stacked') { %>
     <% if (includeEmail) { %>
         <div class="<%= grpClass %>">
             <label class="<%= reqLabelClass %>">Email Pendaftar (Orang Tua/Wali)</label>
-            <input type="email" name="email" id="<%= prefix %>email" class="form-input" placeholder="contoh@email.com" <%= reqAttr %>>
+            <input type="email" name="email" id="<%= prefix %>email" class="form-input" placeholder="contoh@email.com" value="<%= getVal('email') %>" <%= reqAttr %>>
         </div>
     <% } %>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">Nama Ayah</label>
-        <input type="text" name="namaAyah" id="<%= prefix %>namaAyah" class="form-input" placeholder="Nama lengkap ayah" <%= reqAttr %>>
+        <input type="text" name="namaAyah" id="<%= prefix %>namaAyah" class="form-input" placeholder="Nama lengkap ayah" value="<%= getVal('namaAyah') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">Pekerjaan Ayah</label>
-        <input type="text" name="pekerjaanAyah" id="<%= prefix %>pekerjaanAyah" class="form-input" placeholder="Pekerjaan ayah saat ini" <%= reqAttr %>>
+        <input type="text" name="pekerjaanAyah" id="<%= prefix %>pekerjaanAyah" class="form-input" placeholder="Pekerjaan ayah saat ini" value="<%= getVal('pekerjaanAyah') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">No. Telepon/WhatsApp Ayah</label>
-        <input type="tel" name="teleponAyah" id="<%= prefix %>teleponAyah" class="form-input" placeholder="08xxxxxxxxxx" <%= reqAttr %>>
+        <input type="tel" name="teleponAyah" id="<%= prefix %>teleponAyah" class="form-input" placeholder="08xxxxxxxxxx" value="<%= getVal('teleponAyah') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">Nama Ibu</label>
-        <input type="text" name="namaIbu" id="<%= prefix %>namaIbu" class="form-input" placeholder="Nama lengkap ibu" <%= reqAttr %>>
+        <input type="text" name="namaIbu" id="<%= prefix %>namaIbu" class="form-input" placeholder="Nama lengkap ibu" value="<%= getVal('namaIbu') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">Pekerjaan Ibu</label>
-        <input type="text" name="pekerjaanIbu" id="<%= prefix %>pekerjaanIbu" class="form-input" placeholder="Pekerjaan ibu saat ini" <%= reqAttr %>>
+        <input type="text" name="pekerjaanIbu" id="<%= prefix %>pekerjaanIbu" class="form-input" placeholder="Pekerjaan ibu saat ini" value="<%= getVal('pekerjaanIbu') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">No. Telepon/WhatsApp Ibu</label>
-        <input type="tel" name="teleponIbu" id="<%= prefix %>teleponIbu" class="form-input" placeholder="08xxxxxxxxxx" <%= reqAttr %>>
+        <input type="tel" name="teleponIbu" id="<%= prefix %>teleponIbu" class="form-input" placeholder="08xxxxxxxxxx" value="<%= getVal('teleponIbu') %>" <%= reqAttr %>>
     </div>
     <div class="<%= grpClass %>">
         <label class="<%= reqLabelClass %>">Alamat Lengkap</label>
-        <textarea name="alamat" id="<%= prefix %>alamat" class="form-input" placeholder="Alamat domisili saat ini" <%= reqAttr %>></textarea>
+        <textarea name="alamat" id="<%= prefix %>alamat" class="form-input" placeholder="Alamat domisili saat ini" <%= reqAttr %>><%= getVal('alamat') %></textarea>
     </div>
 <% } else if (lay === 'grid') { %>
     <% if (includeEmail) { %>

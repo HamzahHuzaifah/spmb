@@ -1,11 +1,13 @@
 const SantriModel = require('../../models/SantriModel');
 const TagihanModel = require('../../models/TagihanModel');
 const TunggakanModel = require('../../models/TunggakanModel');
+const SystemSettingModel = require('../../models/SystemSetting');
 const db = require('../../config/db');
 
 async function getJenjangListWithQuota() {
     const [jenjangList] = await db.execute('SELECT * FROM master_jenjang WHERE status = "Aktif" ORDER BY id ASC');
-    const year = new Date().getFullYear();
+    const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+    const year = defaultTA.tahun_mulai || new Date().getFullYear();
     for (let j of jenjangList) {
         const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Baru/${year}/%`]);
         const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Ulang/${year}/%`]);
@@ -35,14 +37,16 @@ exports.postFormPendaftaran = async (req, res) => {
             namaAyah, pekerjaanAyah, teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat
         } = req.body;
 
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const year = defaultTA.tahun_mulai || new Date().getFullYear();
+
         let usia = 0;
         if (tanggalLahir) {
             const birthDate = new Date(tanggalLahir);
-            usia = 2026 - birthDate.getFullYear();
+            usia = year - birthDate.getFullYear();
         }
 
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
-        const year = new Date().getFullYear();
 
         // 1. Cek Kuota
         const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
@@ -55,12 +59,15 @@ exports.postFormPendaftaran = async (req, res) => {
 
             if (totalPendaftar >= kuotaMaksimal) {
                 const jenjangList = await getJenjangListWithQuota();
+                const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
                 const errorMsg = `Mohon maaf, kuota pendaftaran untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
                 return res.render('public/layout', {
                     title: 'Form Pendaftaran Baru',
                     bodyView: 'pendaftaran',
                     error: errorMsg,
-                    jenjangList
+                    jenjangList,
+                    jalurList,
+                    formData: req.body
                 });
             }
         }
@@ -75,12 +82,15 @@ exports.postFormPendaftaran = async (req, res) => {
         }, 'baru');
         if (existing) {
             const jenjangList = await getJenjangListWithQuota();
+            const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Pendaftaran Baru',
                 bodyView: 'pendaftaran',
                 error: errorMsg,
-                jenjangList
+                jenjangList,
+                jalurList,
+                formData: req.body
             });
         }
         
@@ -201,14 +211,16 @@ exports.postFormDaftarUlang = async (req, res) => {
             namaAyah, pekerjaanAyah, teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat
         } = req.body;
 
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const year = defaultTA.tahun_mulai || new Date().getFullYear();
+
         let usia = 0;
         if (tanggalLahir) {
             const birthDate = new Date(tanggalLahir);
-            usia = 2026 - birthDate.getFullYear();
+            usia = year - birthDate.getFullYear();
         }
 
         const prefixDaftarUlang = lanjutKe ? lanjutKe.split(' ')[0] : 'PAUDQu';
-        const year = new Date().getFullYear();
 
         // 1. (Dihapus) Cek Kuota - Santri Daftar Ulang tidak lagi dibatasi oleh kuota santri baru
 
@@ -222,12 +234,15 @@ exports.postFormDaftarUlang = async (req, res) => {
         }, 'daftar_ulang');
         if (existing) {
             const jenjangList = await getJenjangListWithQuota();
+            const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar dalam Daftar Ulang sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Daftar Ulang',
                 bodyView: 'pendaftaran-ulang',
                 error: errorMsg,
-                jenjangList
+                jenjangList,
+                jalurList,
+                formData: req.body
             });
         }
         
@@ -341,14 +356,16 @@ exports.postFormBeasiswa = async (req, res) => {
             namaAyah, pekerjaanAyah, teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat
         } = req.body;
 
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const year = defaultTA.tahun_mulai || new Date().getFullYear();
+
         let usia = 0;
         if (tanggalLahir) {
             const birthDate = new Date(tanggalLahir);
-            usia = 2026 - birthDate.getFullYear();
+            usia = year - birthDate.getFullYear();
         }
 
         const eduPrefix = pendidikan ? pendidikan.split(' ')[0] : 'PAUDQu';
-        const year = new Date().getFullYear();
 
         // 1. Cek Kuota
         const [jenjangRow] = await db.execute('SELECT kuota FROM master_jenjang WHERE nama = ? AND status = "Aktif"', [pendidikan]);
@@ -361,12 +378,15 @@ exports.postFormBeasiswa = async (req, res) => {
 
             if (totalPendaftar >= kuotaMaksimal) {
                 const jenjangList = await getJenjangListWithQuota();
+                const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
                 const errorMsg = `Mohon maaf, kuota beasiswa untuk jenjang ${pendidikan} sudah penuh. Silakan pilih jenjang lain atau hubungi panitia.`;
                 return res.render('public/layout', {
                     title: 'Form Beasiswa',
                     bodyView: 'beasiswa',
                     error: errorMsg,
-                    jenjangList
+                    jenjangList,
+                    jalurList,
+                    formData: req.body
                 });
             }
         }
@@ -381,12 +401,15 @@ exports.postFormBeasiswa = async (req, res) => {
         }, 'baru');
         if (existing) {
             const jenjangList = await getJenjangListWithQuota();
+            const [jalurList] = await db.execute('SELECT * FROM master_jalur WHERE status = "Aktif"');
             const errorMsg = `Pendaftaran gagal. Calon santri dengan nama/kemiripan "${existing.nama}" sudah terdaftar sebelumnya dengan Nomor Pendaftaran: "${existing.nomorPendaftaran}". Silakan gunakan nomor tersebut untuk melakukan info pembayaran atau hubungi admin jika ingin mengubah data.`;
             return res.render('public/layout', {
                 title: 'Form Beasiswa',
                 bodyView: 'beasiswa',
                 error: errorMsg,
-                jenjangList
+                jenjangList,
+                jalurList,
+                formData: req.body
             });
         }
         

@@ -7,7 +7,7 @@ class TunggakanModel {
         return rows;
     }
 
-    static async getTunggakanPaginated(limit, offset, search = '', status = '') {
+    static async getTunggakanPaginated(limit, offset, search = '', status = '', year = '') {
         let query = 'SELECT * FROM tunggakan WHERE 1=1';
         let params = [];
 
@@ -19,6 +19,12 @@ class TunggakanModel {
         if (status) {
             query += ' AND status = ?';
             params.push(status);
+        }
+
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         query += ` ORDER BY id DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
@@ -27,7 +33,7 @@ class TunggakanModel {
         return rows;
     }
 
-    static async getAllTunggakanFiltered(search = '', status = '') {
+    static async getAllTunggakanFiltered(search = '', status = '', year = '') {
         let query = 'SELECT * FROM tunggakan WHERE 1=1';
         let params = [];
 
@@ -41,13 +47,19 @@ class TunggakanModel {
             params.push(status);
         }
 
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalTunggakan(search = '', status = '') {
+    static async getTotalTunggakan(search = '', status = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM tunggakan WHERE 1=1';
         let params = [];
 
@@ -59,6 +71,12 @@ class TunggakanModel {
         if (status) {
             query += ' AND status = ?';
             params.push(status);
+        }
+
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         const [rows] = await db.execute(query, params);
@@ -204,7 +222,7 @@ class TunggakanModel {
         return rows;
     }
 
-    static async getTunggakanDaftarUlangPaginated(limit, offset, search = '', status = '') {
+    static async getTunggakanDaftarUlangPaginated(limit, offset, search = '', status = '', year = '') {
         let query = 'SELECT * FROM tunggakan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -216,6 +234,12 @@ class TunggakanModel {
         if (status) {
             query += ' AND status = ?';
             params.push(status);
+        }
+
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         query += ` ORDER BY id DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
@@ -224,7 +248,7 @@ class TunggakanModel {
         return rows;
     }
 
-    static async getAllTunggakanDaftarUlangFiltered(search = '', status = '') {
+    static async getAllTunggakanDaftarUlangFiltered(search = '', status = '', year = '') {
         let query = 'SELECT * FROM tunggakan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -238,13 +262,19 @@ class TunggakanModel {
             params.push(status);
         }
 
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalTunggakanDaftarUlang(search = '', status = '') {
+    static async getTotalTunggakanDaftarUlang(search = '', status = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM tunggakan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -256,6 +286,12 @@ class TunggakanModel {
         if (status) {
             query += ' AND status = ?';
             params.push(status);
+        }
+
+        if (year && year !== 'ALL' && !search) {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         const [rows] = await db.execute(query, params);

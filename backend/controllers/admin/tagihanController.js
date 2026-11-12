@@ -10,9 +10,10 @@ exports.getTagihan = async (req, res) => {
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const tagihanData = await TagihanModel.getTagihanPaginated(limit, offset, search, pendidikan);
-        const totalData = await TagihanModel.getTotalTagihan(search, pendidikan);
+        const tagihanData = await TagihanModel.getTagihanPaginated(limit, offset, search, pendidikan, year);
+        const totalData = await TagihanModel.getTotalTagihan(search, pendidikan, year);
         const totalPages = Math.ceil(totalData / limit);
 
         const tunggakanData = await TunggakanModel.getAllTunggakan();
@@ -42,9 +43,10 @@ exports.getTagihanDaftarUlang = async (req, res) => {
 
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const tagihanDaftarUlangData = await TagihanModel.getTagihanDaftarUlangPaginated(limit, offset, search, pendidikan);
-        const totalData = await TagihanModel.getTotalTagihanDaftarUlang(search, pendidikan);
+        const tagihanDaftarUlangData = await TagihanModel.getTagihanDaftarUlangPaginated(limit, offset, search, pendidikan, year);
+        const totalData = await TagihanModel.getTotalTagihanDaftarUlang(search, pendidikan, year);
         const totalPages = Math.ceil(totalData / limit);
 
         const tunggakanDaftarUlangData = await TunggakanModel.getAllTunggakanDaftarUlang();
@@ -144,8 +146,9 @@ exports.exportTagihanExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await TagihanModel.getAllTagihanFiltered(search, pendidikan);
+        const data = await TagihanModel.getAllTagihanFiltered(search, pendidikan, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,
@@ -179,8 +182,9 @@ exports.exportTagihanDaftarUlangExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
         const pendidikan = req.query.pendidikan || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const data = await TagihanModel.getAllTagihanDaftarUlangFiltered(search, pendidikan);
+        const data = await TagihanModel.getAllTagihanDaftarUlangFiltered(search, pendidikan, year);
         
         const worksheetData = data.map((item, index) => ({
             'No': index + 1,

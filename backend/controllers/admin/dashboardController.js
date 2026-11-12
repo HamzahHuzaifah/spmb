@@ -4,7 +4,7 @@ const TunggakanModel = require('../../models/TunggakanModel');
 const TransaksiModel = require('../../models/TransaksiModel');
 const xlsx = require('xlsx');
 
-async function generateDashboardStats(startDate, endDate) {
+async function generateDashboardStats(startDate, endDate, year = 'ALL') {
     let santriData = await SantriModel.getAllSantri();
     let santriDaftarUlangData = await SantriModel.getAllSantriDaftarUlang();
     let tagihanData = await TagihanModel.getAllTagihan();
@@ -13,15 +13,32 @@ async function generateDashboardStats(startDate, endDate) {
     let tunggakanDaftarUlangData = await TunggakanModel.getAllTunggakanDaftarUlang();
     
     // Filter out 'Mundur' students from global stats
-    const activeNamesBaru = new Set(santriData.filter(s => s.status_santri !== 'Mundur').map(s => s.nama));
-    const activeNamesLama = new Set(santriDaftarUlangData.filter(s => s.status_santri !== 'Mundur').map(s => s.nama));
+    santriData = santriData.filter(s => s.status_santri !== 'Mundur');
+    santriDaftarUlangData = santriDaftarUlangData.filter(s => s.status_santri !== 'Mundur');
+
+    // Filter berdasarkan Tahun Ajaran jika dipilih (bukan 'ALL')
+    if (year && year !== 'ALL') {
+        const startYear = year.includes('/') ? year.split('/')[0] : year;
+        const matchesYear = (item) => {
+            if (item.nomorPendaftaran) {
+                return item.nomorPendaftaran.includes(`/${startYear}/`);
+            }
+            if (item.timestamp) {
+                return item.timestamp.startsWith(startYear);
+            }
+            return false;
+        };
+        santriData = santriData.filter(matchesYear);
+        santriDaftarUlangData = santriDaftarUlangData.filter(matchesYear);
+    }
+
+    const activeNamesBaru = new Set(santriData.map(s => s.nama));
+    const activeNamesLama = new Set(santriDaftarUlangData.map(s => s.nama));
     
     tagihanData = tagihanData.filter(t => activeNamesBaru.has(t.nama));
     tunggakanData = tunggakanData.filter(t => activeNamesBaru.has(t.nama));
     tagihanDaftarUlangData = tagihanDaftarUlangData.filter(t => activeNamesLama.has(t.nama));
     tunggakanDaftarUlangData = tunggakanDaftarUlangData.filter(t => activeNamesLama.has(t.nama));
-    santriData = santriData.filter(s => s.status_santri !== 'Mundur');
-    santriDaftarUlangData = santriDaftarUlangData.filter(s => s.status_santri !== 'Mundur');
 
     const filterTanggal = { start: startDate, end: endDate };
 
@@ -176,7 +193,10 @@ async function generateDashboardStats(startDate, endDate) {
 
     // -- New Chart Data --
     let currentYear = new Date().getFullYear();
-    if (startDate) {
+    if (year && year !== 'ALL') {
+        const startYear = year.includes('/') ? year.split('/')[0] : year;
+        currentYear = parseInt(startYear) || currentYear;
+    } else if (startDate) {
         currentYear = new Date(startDate).getFullYear();
     }
     const trendBulanan = await TransaksiModel.getPemasukanTrendBulanan(currentYear);
@@ -244,8 +264,9 @@ exports.getDashboard = async (req, res) => {
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
         const filterTanggal = { start: startDate, end: endDate };
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const { tunggakanData, tunggakanDaftarUlangData, dashboardStats } = await generateDashboardStats(startDate, endDate);
+        const { tunggakanData, tunggakanDaftarUlangData, dashboardStats } = await generateDashboardStats(startDate, endDate, year);
 
         const transaksiTerbaru = await TransaksiModel.getTransaksiPaginated(limit, offset, '', filterTanggal, '');
         const totalData = await TransaksiModel.getTotalTransaksi('', filterTanggal, '');
@@ -287,8 +308,9 @@ exports.exportDashboardExcel = async (req, res) => {
     try {
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
+        const year = req.selectedTahunAjaran || 'ALL';
 
-        const { dashboardStats } = await generateDashboardStats(startDate, endDate);
+        const { dashboardStats } = await generateDashboardStats(startDate, endDate, year);
 
         const wb = xlsx.utils.book_new();
 

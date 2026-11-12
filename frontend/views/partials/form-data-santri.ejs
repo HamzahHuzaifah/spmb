@@ -6,17 +6,20 @@ const nInput = typeof nameInputName !== 'undefined' ? nameInputName : 'namaSantr
 const gInputType = typeof genderInputType !== 'undefined' ? genderInputType : 'radio';
 const gInputName = typeof genderInputName !== 'undefined' ? genderInputName : 'jenisKelamin';
 const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
+
+const form = typeof formData !== 'undefined' && formData ? formData : {};
+const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field] : fallback);
 %>
 
 <% if (lay === 'stacked') { %>
     <div class="<%= cGroup %>">
         <label class="required">Nama Lengkap Santri</label>
-        <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" placeholder="Masukkan nama lengkap" required>
+        <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" placeholder="Masukkan nama lengkap" value="<%= getVal(nInput) %>" required>
     </div>
 
     <div class="<%= cGroup %>">
         <label>Nama Panggilan</label>
-        <input type="text" name="namaPanggilan" id="<%= idPre %>namaPanggilan" class="form-input" placeholder="Masukkan nama panggilan">
+        <input type="text" name="namaPanggilan" id="<%= idPre %>namaPanggilan" class="form-input" placeholder="Masukkan nama panggilan" value="<%= getVal('namaPanggilan') %>">
     </div>
 
     <div class="<%= cGroup %>">
@@ -24,16 +27,16 @@ const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
         <% if (gInputType === 'radio') { %>
             <div class="radio-group">
                 <label class="radio-label">
-                    <input type="radio" name="<%= gInputName %>" value="Laki-laki" required> Laki-laki
+                    <input type="radio" name="<%= gInputName %>" value="Laki-laki" <%= getVal(gInputName) === 'Laki-laki' || !getVal(gInputName) ? 'checked' : '' %> required> Laki-laki
                 </label>
                 <label class="radio-label">
-                    <input type="radio" name="<%= gInputName %>" value="Perempuan"> Perempuan
+                    <input type="radio" name="<%= gInputName %>" value="Perempuan" <%= getVal(gInputName) === 'Perempuan' ? 'checked' : '' %>> Perempuan
                 </label>
             </div>
         <% } else { %>
             <select name="<%= gInputName %>" id="<%= idPre %>jenisKelamin" class="form-input" required>
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
+                <option value="Laki-laki" <%= getVal(gInputName) === 'Laki-laki' ? 'selected' : '' %>>Laki-laki</option>
+                <option value="Perempuan" <%= getVal(gInputName) === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
             </select>
         <% } %>
     </div>
@@ -41,25 +44,25 @@ const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
     <div class="<%= cGroup %>" style="display: flex; gap: 15px;">
         <div style="flex: 1;">
             <label class="required">Tempat Lahir</label>
-            <input type="text" name="tempatLahir" id="<%= idPre %>tempatLahir" class="form-input" placeholder="Kota tempat lahir" required>
+            <input type="text" name="tempatLahir" id="<%= idPre %>tempatLahir" class="form-input" placeholder="Kota tempat lahir" value="<%= getVal('tempatLahir') %>" required>
         </div>
         <div style="flex: 1;">
             <label class="required">Tanggal Lahir</label>
-            <input type="date" name="tanggalLahir" id="<%= idPre %>tanggalLahir" class="form-input" required>
+            <input type="date" name="tanggalLahir" id="<%= idPre %>tanggalLahir" class="form-input" value="<%= getVal('tanggalLahir') %>" required>
         </div>
     </div>
 
     <div class="<%= cGroup %>">
         <label class="required">Agama</label>
         <% if (isRead) { %>
-            <input type="text" name="agama" id="<%= idPre %>agama" class="form-input" value="Islam" readonly>
+            <input type="text" name="agama" id="<%= idPre %>agama" class="form-input" value="<%= getVal('agama', 'Islam') %>" readonly>
         <% } else { %>
             <%- include('select-agama', { 
                 name: 'agama',
                 id: idPre + 'agama',
                 className: 'form-input',
                 required: true,
-                selectedValue: 'Islam'
+                selectedValue: getVal('agama', 'Islam')
             }) %>
         <% } %>
     </div>
@@ -70,7 +73,8 @@ const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
             name: 'statusKeluarga',
             id: idPre + 'statusKeluarga',
             className: 'form-input',
-            required: true
+            required: true,
+            selectedValue: getVal('statusKeluarga')
         }) %>
     </div>
 
@@ -78,9 +82,9 @@ const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
         <label class="required">Anak ke (berdasarkan Kartu Keluarga)</label>
         <div style="display: flex; align-items: center; gap: 10px;">
             <span>Anak ke</span>
-            <input type="number" name="anakKe" id="<%= idPre %>anakKe" class="form-input" style="width: 70px;" required>
+            <input type="number" name="anakKe" id="<%= idPre %>anakKe" class="form-input" style="width: 70px;" value="<%= getVal('anakKe') %>" required>
             <span>dari</span>
-            <input type="number" name="dariBersaudara" id="<%= idPre %>dariBersaudara" class="form-input" style="width: 70px;" required>
+            <input type="number" name="dariBersaudara" id="<%= idPre %>dariBersaudara" class="form-input" style="width: 70px;" value="<%= getVal('dariBersaudara') %>" required>
             <span>Bersaudara</span>
         </div>
     </div>
@@ -88,7 +92,7 @@ const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
     <div class="<%= cGroup %>">
         <label>Asal Sekolah</label>
         <input type="text" name="asalSekolah" id="<%= idPre %>asalSekolah" class="form-input"
-            placeholder="Nama asal sekolah (contoh: BimBa / TK ...). Kosongkan jika belum pernah.">
+            placeholder="Nama asal sekolah (contoh: BimBa / TK ...). Kosongkan jika belum pernah." value="<%= getVal('asalSekolah') %>">
     </div>
 
 <% } else if (lay === 'flat-grid' || lay === 'grid-rows' || lay === 'flex-rows') { %>

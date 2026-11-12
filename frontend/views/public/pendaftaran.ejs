@@ -60,7 +60,8 @@
                 name: 'pendidikan',
                 className: 'form-input',
                 required: true,
-                placeholder: '-- Pilih Satuan Pendidikan --'
+                placeholder: '-- Pilih Satuan Pendidikan --',
+                selectedValue: typeof formData !== 'undefined' && formData.pendidikan ? formData.pendidikan : ''
             }) %>
         </div>
 

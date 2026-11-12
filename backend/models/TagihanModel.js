@@ -7,7 +7,7 @@ class TagihanModel {
         return rows;
     }
 
-    static async getTagihanPaginated(limit, offset, search = '', pendidikan = '') {
+    static async getTagihanPaginated(limit, offset, search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM tagihan WHERE 1=1';
         let params = [];
 
@@ -19,6 +19,12 @@ class TagihanModel {
         if (pendidikan) {
             query += ' AND satuanPendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         query += ` ORDER BY id DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
@@ -27,7 +33,7 @@ class TagihanModel {
         return rows;
     }
 
-    static async getAllTagihanFiltered(search = '', pendidikan = '') {
+    static async getAllTagihanFiltered(search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM tagihan WHERE 1=1';
         let params = [];
 
@@ -41,13 +47,19 @@ class TagihanModel {
             params.push(`${pendidikan}%`);
         }
 
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalTagihan(search = '', pendidikan = '') {
+    static async getTotalTagihan(search = '', pendidikan = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM tagihan WHERE 1=1';
         let params = [];
 
@@ -59,6 +71,12 @@ class TagihanModel {
         if (pendidikan) {
             query += ' AND satuanPendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         const [rows] = await db.execute(query, params);
@@ -159,7 +177,7 @@ class TagihanModel {
         return rows;
     }
 
-    static async getTagihanDaftarUlangPaginated(limit, offset, search = '', pendidikan = '') {
+    static async getTagihanDaftarUlangPaginated(limit, offset, search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM tagihan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -171,6 +189,12 @@ class TagihanModel {
         if (pendidikan) {
             query += ' AND satuanPendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         query += ` ORDER BY id DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
@@ -179,7 +203,7 @@ class TagihanModel {
         return rows;
     }
 
-    static async getAllTagihanDaftarUlangFiltered(search = '', pendidikan = '') {
+    static async getAllTagihanDaftarUlangFiltered(search = '', pendidikan = '', year = '') {
         let query = 'SELECT * FROM tagihan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -193,13 +217,19 @@ class TagihanModel {
             params.push(`${pendidikan}%`);
         }
 
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
+        }
+
         query += ` ORDER BY id DESC`;
         
         const [rows] = await db.execute(query, params);
         return rows;
     }
 
-    static async getTotalTagihanDaftarUlang(search = '', pendidikan = '') {
+    static async getTotalTagihanDaftarUlang(search = '', pendidikan = '', year = '') {
         let query = 'SELECT COUNT(*) as total FROM tagihan_daftar_ulang WHERE 1=1';
         let params = [];
 
@@ -211,6 +241,12 @@ class TagihanModel {
         if (pendidikan) {
             query += ' AND satuanPendidikan LIKE ?';
             params.push(`${pendidikan}%`);
+        }
+
+        if (year && year !== 'ALL') {
+            const startYear = year.includes('/') ? year.split('/')[0] : year;
+            query += ' AND nomorPendaftaran LIKE ?';
+            params.push(`%/${startYear}/%`);
         }
 
         const [rows] = await db.execute(query, params);

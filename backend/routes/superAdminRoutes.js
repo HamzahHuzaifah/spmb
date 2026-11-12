@@ -44,6 +44,11 @@ router.post('/master-data/gelombang/add', masterDataController.addGelombang);
 router.post('/master-data/gelombang/edit/:id', masterDataController.editGelombang);
 router.post('/master-data/gelombang/delete/:id', masterDataController.deleteGelombang);
 
+router.post('/master-data/tahun-ajaran/add', masterDataController.addTahunAjaran);
+router.post('/master-data/tahun-ajaran/edit/:id', masterDataController.editTahunAjaran);
+router.post('/master-data/tahun-ajaran/set-default/:id', masterDataController.setDefaultTahunAjaran);
+router.post('/master-data/tahun-ajaran/delete/:id', masterDataController.deleteTahunAjaran);
+
 // Activity Logs
 router.get('/logs', logController.getLogs);
 

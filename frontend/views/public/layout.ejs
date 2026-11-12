@@ -47,7 +47,7 @@
     <% if (bodyView !== 'landing') { %>
     <div class="public-header">
         <h1>Madrasah Jakarta Islamic Centre</h1>
-        <p>Sistem Penerimaan Murid Baru Tahun Ajaran 2026/2027</p>
+        <p>Sistem Penerimaan Murid Baru Tahun Ajaran <%= typeof tahunAjaranAktif !== 'undefined' ? tahunAjaranAktif : '2026/2027' %></p>
     </div>
     <div class="public-container">
         <%- include(bodyView) %>

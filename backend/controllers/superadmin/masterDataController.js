@@ -1,13 +1,17 @@
 const db = require('../../config/db');
 const { logActivity } = require('../../utils/logActivity');
+const SystemSettingModel = require('../../models/SystemSetting');
 
 exports.getMasterData = async (req, res) => {
     try {
         const [jenjang] = await db.execute('SELECT * FROM master_jenjang ORDER BY id ASC');
         const [jalur] = await db.execute('SELECT * FROM master_jalur ORDER BY id ASC');
         const [gelombang] = await db.execute('SELECT * FROM master_gelombang ORDER BY id ASC');
+        const [tahunAjaran] = await db.execute('SELECT * FROM master_tahun_ajaran ORDER BY tahun_mulai DESC, id DESC');
 
-        const year = new Date().getFullYear();
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const year = defaultTA.tahun_mulai || new Date().getFullYear();
+
         for (let j of jenjang) {
             const [countBaru] = await db.execute(`SELECT COUNT(*) as total FROM santri WHERE pendidikan = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Baru/${year}/%`]);
             const [countUlang] = await db.execute(`SELECT COUNT(*) as total FROM santri_daftar_ulang WHERE lanjutKe = ? AND nomorPendaftaran LIKE ?`, [j.nama, `SPMB-Daftar.Ulang/${year}/%`]);
@@ -22,6 +26,8 @@ exports.getMasterData = async (req, res) => {
             jenjang,
             jalur,
             gelombang,
+            tahunAjaran,
+            defaultTA,
             bodyView: 'master-data'
         });
     } catch (err) {
@@ -179,5 +185,94 @@ exports.deleteGelombang = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Gagal menghapus gelombang' });
+    }
+};
+
+// --- TAHUN AJARAN ---
+exports.addTahunAjaran = async (req, res) => {
+    const { nama, tahun_mulai, tahun_selesai, status } = req.body;
+    try {
+        const mul = parseInt(tahun_mulai, 10);
+        const sel = parseInt(tahun_selesai, 10);
+        if (!nama || isNaN(mul) || isNaN(sel)) {
+            return res.status(400).json({ success: false, message: 'Data tahun ajaran tidak valid' });
+        }
+
+        const isAktif = (status === 'Aktif');
+        if (isAktif) {
+            // Jika tahun baru diset Aktif, nonaktifkan semua tahun ajaran lain
+            await db.execute('UPDATE master_tahun_ajaran SET is_default = 0, status = "Nonaktif"');
+        }
+
+        const [result] = await db.execute(
+            'INSERT INTO master_tahun_ajaran (nama, tahun_mulai, tahun_selesai, status, is_default) VALUES (?, ?, ?, ?, ?)',
+            [nama.trim(), mul, sel, isAktif ? 'Aktif' : 'Nonaktif', isAktif ? 1 : 0]
+        );
+        await logActivity(req, 'Tambah Tahun Ajaran', 'master_tahun_ajaran', result.insertId, `Nama: ${nama}`);
+        res.json({ success: true, message: 'Tahun ajaran berhasil ditambahkan' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal menambahkan tahun ajaran: ' + err.message });
+    }
+};
+
+exports.editTahunAjaran = async (req, res) => {
+    const { id } = req.params;
+    const { nama, status } = req.body;
+    try {
+        const isAktif = (status === 'Aktif');
+        if (isAktif) {
+            // Jadikan yang ini satu-satunya yang aktif & default
+            await db.execute('UPDATE master_tahun_ajaran SET is_default = 0, status = "Nonaktif"');
+            await db.execute(
+                'UPDATE master_tahun_ajaran SET nama = ?, status = "Aktif", is_default = 1 WHERE id = ?',
+                [nama.trim(), id]
+            );
+        } else {
+            // Cek apakah sedang default
+            const [rows] = await db.execute('SELECT is_default FROM master_tahun_ajaran WHERE id = ?', [id]);
+            if (rows.length > 0 && rows[0].is_default === 1) {
+                return res.status(400).json({ success: false, message: 'Tahun ajaran aktif publik tidak dapat dinonaktifkan langsung. Silakan aktifkan tahun ajaran lain terlebih dahulu.' });
+            }
+            await db.execute(
+                'UPDATE master_tahun_ajaran SET nama = ?, status = "Nonaktif", is_default = 0 WHERE id = ?',
+                [nama.trim(), id]
+            );
+        }
+        await logActivity(req, 'Edit Tahun Ajaran', 'master_tahun_ajaran', id, `Nama: ${nama}`);
+        res.json({ success: true, message: 'Tahun ajaran berhasil diperbarui' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal memperbarui tahun ajaran: ' + err.message });
+    }
+};
+
+exports.setDefaultTahunAjaran = async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Hanya satu tahun ajaran yang aktif & default
+        await db.execute('UPDATE master_tahun_ajaran SET is_default = 0, status = "Nonaktif"');
+        await db.execute('UPDATE master_tahun_ajaran SET is_default = 1, status = "Aktif" WHERE id = ?', [id]);
+        await logActivity(req, 'Set Default Tahun Ajaran', 'master_tahun_ajaran', id, '');
+        res.json({ success: true, message: 'Tahun ajaran aktif berhasil diubah' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal mengubah default tahun ajaran' });
+    }
+};
+
+exports.deleteTahunAjaran = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await db.execute('SELECT is_default FROM master_tahun_ajaran WHERE id = ?', [id]);
+        if (rows.length > 0 && rows[0].is_default === 1) {
+            return res.status(400).json({ success: false, message: 'Tidak dapat menghapus tahun ajaran yang sedang aktif sebagai default publik!' });
+        }
+        await db.execute('DELETE FROM master_tahun_ajaran WHERE id = ?', [id]);
+        await logActivity(req, 'Hapus Tahun Ajaran', 'master_tahun_ajaran', id, '');
+        res.json({ success: true, message: 'Tahun ajaran berhasil dihapus' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal menghapus tahun ajaran' });
     }
 };
