@@ -714,7 +714,7 @@
 // SPREADSHEET-LIKE TABLE FILTER & SORTING
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    const tables = document.querySelectorAll('.table-container table, table#dataTable, table#tabelLaporan');
+    const tables = document.querySelectorAll('.table-container table, table#dataTable, table#tabelLaporan, table#tabelLaporanSikma');
     if (tables.length === 0) return;
 
     // Dynamic dropdown overlay

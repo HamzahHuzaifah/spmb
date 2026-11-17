@@ -255,15 +255,25 @@ class TransaksiModel {
             query = `
                 SELECT SUM(l.pemasukan) - SUM(l.pengeluaran) as saldoAwal 
                 FROM laporan l
-                INNER JOIN transaksi t ON l.noTransaksi = t.noTransaksi
-                WHERE t.inputOleh = 'SIKMA' AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
+                WHERE (
+                    l.uraian LIKE '%(via SIKMA)%'
+                    OR EXISTS (
+                        SELECT 1 FROM transaksi t
+                        WHERE t.noTransaksi = l.noTransaksi AND t.inputOleh = 'SIKMA'
+                    )
+                )
+                AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
             `;
         } else {
             query = `
                 SELECT SUM(l.pemasukan) - SUM(l.pengeluaran) as saldoAwal 
                 FROM laporan l
-                LEFT JOIN transaksi t ON l.noTransaksi = t.noTransaksi
-                WHERE (t.inputOleh IS NULL OR t.inputOleh != 'SIKMA') AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
+                WHERE (l.uraian IS NULL OR l.uraian NOT LIKE '%(via SIKMA)%')
+                AND NOT EXISTS (
+                    SELECT 1 FROM transaksi t
+                    WHERE t.noTransaksi = l.noTransaksi AND t.inputOleh = 'SIKMA'
+                )
+                AND ((l.tahun < ?) OR (l.tahun = ? AND l.bulan < ?))
             `;
         }
         const [rows] = await db.execute(query, [filterTahun, filterTahun, filterBulan]);
@@ -315,6 +325,35 @@ class TransaksiModel {
             noTransaksi
         ];
         await db.execute(query, values);
+    }
+
+    static async updateLaporan(id, data) {
+        const query = `
+            UPDATE laporan SET 
+                tanggal = COALESCE(?, tanggal),
+                bulan = COALESCE(?, bulan),
+                tahun = COALESCE(?, tahun),
+                noTransaksi = COALESCE(?, noTransaksi),
+                uraian = COALESCE(?, uraian),
+                pemasukan = COALESCE(?, pemasukan),
+                pengeluaran = COALESCE(?, pengeluaran)
+            WHERE id = ?
+        `;
+        const values = [
+            data.tanggal !== undefined ? data.tanggal : null,
+            data.bulan !== undefined ? data.bulan : null,
+            data.tahun !== undefined ? data.tahun : null,
+            data.noTransaksi !== undefined ? data.noTransaksi : null,
+            data.uraian !== undefined ? data.uraian : null,
+            data.pemasukan !== undefined ? data.pemasukan : null,
+            data.pengeluaran !== undefined ? data.pengeluaran : null,
+            id
+        ];
+        await db.execute(query, values);
+    }
+
+    static async deleteLaporan(id) {
+        await db.execute('DELETE FROM laporan WHERE id = ?', [id]);
     }
 
     static async deleteLaporanByNoTransaksi(noTransaksi) {

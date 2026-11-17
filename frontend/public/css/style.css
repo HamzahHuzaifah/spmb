@@ -1865,3 +1865,22 @@ th.filterable {
 .modal-iframe-laporan {
     width: 100%; height: 100%; border: none; border-radius: 0 0 8px 8px;
 }
+
+
+/* Laporan table: wrap Uraian column so nominal columns stay visible */
+#tabelLaporan th,
+#tabelLaporan td,
+#tabelLaporanSikma th,
+#tabelLaporanSikma td {
+    padding: 12px 10px;
+}
+
+#tabelLaporan td:nth-child(5),
+#tabelLaporanSikma td:nth-child(5) {
+    white-space: normal;
+    min-width: 190px;
+    max-width: 320px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}

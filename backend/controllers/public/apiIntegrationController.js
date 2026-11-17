@@ -174,14 +174,17 @@ exports.postBayarTunggakan = async (req, res) => {
 
 exports.postDeleteTunggakan = async (req, res) => {
     try {
-        const { no_transaksi } = req.body;
+        const { no_transaksi, nama } = req.body;
         if (!no_transaksi) return res.status(400).json({ error: 'no_transaksi wajib dikirim' });
 
-        // Cari transaksi di SPMB berdasarkan no_transaksi
+        // Cari semua transaksi di SPMB yang cocok dengan no_transaksi (dan nama jika dikirim)
         const allTransaksi = await TransaksiModel.getAllTransaksi();
-        const transaksi = allTransaksi.find(t => t.noTransaksi === no_transaksi);
-        
-        if (transaksi) {
+        const matchingTransaksi = allTransaksi.filter(t =>
+            t.noTransaksi === no_transaksi &&
+            (!nama || (t.namaSantri && t.namaSantri.toUpperCase() === nama.toUpperCase()))
+        );
+
+        for (const transaksi of matchingTransaksi) {
             // Reverse tunggakan
             const isDaftarUlang = transaksi.jenis === 'Pembayaran Daftar Ulang';
             let tgg;
@@ -202,14 +205,24 @@ exports.postDeleteTunggakan = async (req, res) => {
                     await TunggakanModel.updateTunggakan(tgg.id, tgg);
                 }
             }
-            // Hapus Transaksi & Laporan
             await TransaksiModel.deleteTransaksi(transaksi.id);
-            const allLaporan = await TransaksiModel.getAllLaporan();
-            const laporan = allLaporan.find(l => l.noTransaksi === no_transaksi);
-            if (laporan) {
-                await TransaksiModel.deleteLaporan(laporan.id);
-            }
         }
+
+        // Tetap hapus baris laporan yang cocok meski record transaksi sudah hilang sebelumnya
+        const allLaporan = await TransaksiModel.getAllLaporan();
+        const targetNames = matchingTransaksi.map(t => t.namaSantri).filter(Boolean);
+        if (nama) targetNames.push(nama);
+
+        const matchingLaporan = allLaporan.filter(l => {
+            if (l.noTransaksi !== no_transaksi) return false;
+            if (targetNames.length === 0) return true;
+            return targetNames.some(n => l.uraian && l.uraian.toUpperCase().includes(n.toUpperCase()));
+        });
+
+        for (const laporan of matchingLaporan) {
+            await TransaksiModel.deleteLaporan(laporan.id);
+        }
+
         res.status(200).json({ success: true, message: 'Transaksi berhasil dihapus dari SPMB' });
     } catch (error) {
         console.error('API Error /api/delete-tunggakan:', error);

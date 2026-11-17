@@ -19,10 +19,13 @@ exports.getLaporan = async (req, res) => {
         // Ambil daftar nomor transaksi yang diinput dari SIKMA
         const sikmaNoTrx = await TransaksiModel.getSikmaNoTransaksi();
         const sikmaSet = new Set(sikmaNoTrx);
+        const isSikmaLaporan = (item) =>
+            sikmaSet.has(item.noTransaksi) ||
+            (typeof item.uraian === 'string' && item.uraian.includes('(via SIKMA)'));
 
         // Pisahkan data laporan
-        const laporanSpmb = laporanData.filter(item => !sikmaSet.has(item.noTransaksi));
-        const laporanSikma = laporanData.filter(item => sikmaSet.has(item.noTransaksi));
+        const laporanSpmb = laporanData.filter(item => !isSikmaLaporan(item));
+        const laporanSikma = laporanData.filter(item => isSikmaLaporan(item));
 
         let saldoAwalSpmb = 0;
         let saldoAwalSikma = 0;
