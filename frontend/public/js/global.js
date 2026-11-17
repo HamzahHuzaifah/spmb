@@ -1143,7 +1143,7 @@ window.promptUndoMundur = function(url) {
         if (!pagContainer) {
             pagContainer = document.createElement('div');
             pagContainer.className = 'pagination-container client-pagination no-print';
-            pagContainer.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;';
+            pagContainer.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;';
             table.parentNode.insertBefore(pagContainer, table.nextSibling);
             table._pagContainer = pagContainer;
         }
@@ -1178,8 +1178,15 @@ window.promptUndoMundur = function(url) {
             <div style="color: #666; font-size: 14px;">
                 Menampilkan Halaman <strong>${currentPage}</strong> dari <strong>${totalPages}</strong> (Total: ${totalItems} Data)
             </div>
-            <div style="display: flex; gap: 5px;">
-                ${buttonsHtml}
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    ${buttonsHtml}
+                </div>
+                <div class="pag-jump-wrapper" style="display: flex; align-items: center; gap: 6px; padding-left: 10px; border-left: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                    <span>Ke hal:</span>
+                    <input type="number" class="pag-jump-input" min="1" max="${totalPages}" value="${currentPage}" aria-label="Nomor halaman" style="width: 60px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; text-align: center; outline: none;">
+                    <button type="button" class="btn btn-secondary btn-pag-jump" style="padding: 5px 10px; cursor: pointer; font-size: 13px;">Buka</button>
+                </div>
             </div>
         `;
         
@@ -1191,6 +1198,30 @@ window.promptUndoMundur = function(url) {
                 updatePagination(table);
             });
         });
+
+        const jumpInput = pagContainer.querySelector('.pag-jump-input');
+        const jumpBtn = pagContainer.querySelector('.btn-pag-jump');
+        const executeJump = () => {
+            let val = parseInt(jumpInput.value, 10);
+            if (isNaN(val)) return;
+            val = Math.max(1, Math.min(totalPages, val));
+            table._currentPage = val;
+            updatePagination(table);
+        };
+        if (jumpBtn) {
+            jumpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                executeJump();
+            });
+        }
+        if (jumpInput) {
+            jumpInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    executeJump();
+                }
+            });
+        }
     }
 
     function parseValueForSorting(val) {

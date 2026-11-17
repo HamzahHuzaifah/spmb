@@ -251,18 +251,25 @@ function formatDateIndo(dateStr) {
         
         <!-- Pagination Controls -->
         <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
-            <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 5px;">
-                <% if (currentPage > 1) { %>
-                    <a href="?page=<%= currentPage - 1 %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">&laquo; Prev</a>
-                <% } %>
-                
-                <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
-                    <a href="?page=<%= i %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 10px;"><%= i %></a>
-                <% } %>
-                
-                <% if (currentPage < totalPages) { %>
-                    <a href="?page=<%= currentPage + 1 %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">Next &raquo;</a>
-                <% } %>
+            <div class="pagination" style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">&laquo; Prev</a>
+                    <% } %>
+                    
+                    <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                        <a href="?page=<%= i %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 10px;"><%= i %></a>
+                    <% } %>
+                    
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>&search=<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? startDateQuery : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? endDateQuery : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? jenisTransaksiQuery : '' %>" class="btn btn-secondary" style="padding: 5px 10px;">Next &raquo;</a>
+                    <% } %>
+                </div>
+                <form onsubmit="event.preventDefault(); const p = Math.max(1, Math.min(<%= totalPages %>, parseInt(this.page.value) || 1)); window.location.href='?page=' + p + '&search=<%= typeof searchQuery !== 'undefined' ? encodeURIComponent(searchQuery) : '' %>&startDate=<%= typeof startDateQuery !== 'undefined' ? encodeURIComponent(startDateQuery) : '' %>&endDate=<%= typeof endDateQuery !== 'undefined' ? encodeURIComponent(endDateQuery) : '' %>&jenisTransaksi=<%= typeof jenisTransaksiQuery !== 'undefined' ? encodeURIComponent(jenisTransaksiQuery) : '' %>';" style="display: flex; align-items: center; gap: 6px; padding-left: 10px; border-left: 1px solid #e2e8f0; font-size: 13px; color: #475569; margin: 0;">
+                    <span>Ke hal:</span>
+                    <input type="number" name="page" min="1" max="<%= totalPages %>" value="<%= currentPage %>" aria-label="Nomor halaman" style="width: 60px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; text-align: center; outline: none;">
+                    <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; cursor: pointer; font-size: 13px;">Buka</button>
+                </form>
             </div>
             <div style="text-align: center; margin-top: 10px; color: #64748b; font-size: 14px;">
                 Menampilkan halaman <%= currentPage %> dari <%= totalPages %> (Total: <%= totalData %> data)

@@ -1,27 +1,34 @@
 <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
-    <div class="pagination-container no-print" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;">
+    <div class="pagination-container no-print" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; padding: 10px 0; border-top: 1px solid #eee;">
         <div style="color: #666; font-size: 14px;">
             Menampilkan Halaman <strong><%= currentPage %></strong> dari <strong><%= totalPages %></strong> 
             (Total: <%= totalData %> Data)
         </div>
-        <div style="display: flex; gap: 5px;">
-            <% if (currentPage > 1) { %>
-                <a href="<%= baseUrl %>?page=<%= currentPage - 1 %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">&laquo; Prev</a>
-            <% } %>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <% if (currentPage > 1) { %>
+                    <a href="<%= baseUrl %>?page=<%= currentPage - 1 %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">&laquo; Prev</a>
+                <% } %>
 
-            <% 
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, currentPage + 2);
-            for(let i = startPage; i <= endPage; i++) { 
-            %>
-                <a href="<%= baseUrl %>?page=<%= i %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 12px; text-decoration: none;">
-                    <%= i %>
-                </a>
-            <% } %>
+                <% 
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+                for(let i = startPage; i <= endPage; i++) { 
+                %>
+                    <a href="<%= baseUrl %>?page=<%= i %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %>" style="padding: 5px 12px; text-decoration: none;">
+                        <%= i %>
+                    </a>
+                <% } %>
 
-            <% if (currentPage < totalPages) { %>
-                <a href="<%= baseUrl %>?page=<%= currentPage + 1 %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">Next &raquo;</a>
-            <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <a href="<%= baseUrl %>?page=<%= currentPage + 1 %><%= typeof queryParams !== 'undefined' ? queryParams : '' %>" class="btn btn-secondary" style="padding: 5px 12px; text-decoration: none;">Next &raquo;</a>
+                <% } %>
+            </div>
+            <form onsubmit="event.preventDefault(); const p = Math.max(1, Math.min(<%= totalPages %>, parseInt(this.page.value) || 1)); window.location.href='<%= baseUrl %>?page=' + p + '<%= typeof queryParams !== 'undefined' ? queryParams : '' %>';" style="display: flex; align-items: center; gap: 6px; padding-left: 10px; border-left: 1px solid #e2e8f0; font-size: 13px; color: #475569; margin: 0;">
+                <span>Ke hal:</span>
+                <input type="number" name="page" min="1" max="<%= totalPages %>" value="<%= currentPage %>" aria-label="Nomor halaman" style="width: 60px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; text-align: center; outline: none;">
+                <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; cursor: pointer; font-size: 13px;">Buka</button>
+            </form>
         </div>
     </div>
 <% } %>
