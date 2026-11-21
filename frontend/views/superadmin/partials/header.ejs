@@ -68,6 +68,16 @@
                         </div>
                     </div>
                     <div class="topbar-right">
+                        <!-- Tombol Tur Halaman & Panduan Admin -->
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button type="button" class="btn-tour-navbar" onclick="startCurrentPageTour()" title="Tunjukkan cara menggunakan halaman ini secara langsung langkah demi langkah">
+                                <i class="fas fa-magic"></i> <span>Tur Halaman</span>
+                            </button>
+                            <button type="button" class="btn-tutorial-navbar" onclick="openAdminTutorialModal('tut-superadmin')" title="Buka Buku Panduan & SOP Operasional Admin">
+                                <i class="fas fa-book-open"></i> <span>Panduan Admin</span>
+                            </button>
+                        </div>
+
                         <!-- Indikator Admin Online Realtime -->
                         <div class="online-users-wrapper" id="onlineUsersWrapper" style="display: none;">
                             <span class="online-users-title">Online</span>
@@ -260,5 +270,7 @@
                         });
                     })();
                 </script>
+
+                <%- include('../../partials/tutorial-modal') %>
 
                 <div class="content-area">

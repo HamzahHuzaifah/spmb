@@ -1,0 +1,2293 @@
+<!-- MODAL PANDUAN & TUTORIAL ADMIN LENGKAP + TUR VISUAL INTERAKTIF -->
+<div id="adminTutorialModal" class="tutorial-modal-overlay" style="display: none;">
+    <div class="tutorial-modal-container">
+        <!-- Header Modal -->
+        <div class="tutorial-modal-header">
+            <div class="tutorial-header-title">
+                <div class="tutorial-header-icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <div>
+                    <h2>Pusat Panduan Visual & Tur Interaktif Admin SPMB JIC</h2>
+                    <p>Dilengkapi tampilan ilustrasi persis seperti halaman asli & fitur <strong>"Tunjukkan di Layar"</strong> bagi pengguna non-IT</p>
+                </div>
+            </div>
+            <div class="tutorial-header-actions">
+                <button type="button" class="btn-start-page-tour" onclick="startCurrentPageTour()" title="Mulai penunjuk interaktif pada halaman yang sedang Anda buka">
+                    <i class="fas fa-magic"></i> Tur Halaman Ini
+                </button>
+                <div class="tutorial-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tutorialSearchInput" placeholder="Cari bantuan (misal: mundur, kwitansi, tutup buku)..." oninput="filterTutorialSearch(this.value)">
+                </div>
+                <button type="button" class="tutorial-close-btn" onclick="closeAdminTutorialModal()" title="Tutup Panduan (Esc)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body Modal: Sidebar Kategori + Area Materi -->
+        <div class="tutorial-modal-body">
+            <!-- Navigasi Kategori Kiri -->
+            <div class="tutorial-sidebar" id="tutorialSidebar">
+                <div class="tutorial-nav-group">PENDAHULUAN & ATURAN</div>
+                <button class="tutorial-nav-btn active" data-target="tut-intro" onclick="switchTutorialTab('tut-intro', this)">
+                    <i class="fas fa-compass"></i> <span>1. Peta Halaman & Alur</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-warning" onclick="switchTutorialTab('tut-warning', this)">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> <span>2. Pantangan Wajib Tahu</span>
+                </button>
+
+                <div class="tutorial-nav-group">OPERASIONAL HARIAN</div>
+                <button class="tutorial-nav-btn" data-target="tut-dashboard" onclick="switchTutorialTab('tut-dashboard', this)">
+                    <i class="fas fa-chart-pie"></i> <span>3. Visual Dashboard & T.A</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-santri" onclick="switchTutorialTab('tut-santri', this)">
+                    <i class="fas fa-user-graduate"></i> <span>4. Visual Halaman Santri</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-mundur" onclick="switchTutorialTab('tut-mundur', this)">
+                    <i class="fas fa-user-slash"></i> <span>5. Visual Tombol Mundur vs Hapus</span>
+                </button>
+
+                <div class="tutorial-nav-group">KEUANGAN & PEMBUKUAN</div>
+                <button class="tutorial-nav-btn" data-target="tut-tagihan" onclick="switchTutorialTab('tut-tagihan', this)">
+                    <i class="fas fa-file-invoice-dollar"></i> <span>6. Visual Tagihan & Tunggakan</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-transaksi" onclick="switchTutorialTab('tut-transaksi', this)">
+                    <i class="fas fa-cash-register"></i> <span>7. Visual Form Input Transaksi</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-kwitansi" onclick="switchTutorialTab('tut-kwitansi', this)">
+                    <i class="fas fa-print"></i> <span>8. Visual Cetak & Edit Kwitansi</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-laporan" onclick="switchTutorialTab('tut-laporan', this)">
+                    <i class="fas fa-file-contract"></i> <span>9. Visual Laporan & SIKMA</span>
+                </button>
+
+                <div class="tutorial-nav-group">KONFIGURASI & BANTUAN</div>
+                <button class="tutorial-nav-btn" data-target="tut-superadmin" onclick="switchTutorialTab('tut-superadmin', this)">
+                    <i class="fas fa-shield-alt"></i> <span>10. Visual Super Admin</span>
+                </button>
+                <button class="tutorial-nav-btn" data-target="tut-faq" onclick="switchTutorialTab('tut-faq', this)">
+                    <i class="fas fa-life-ring"></i> <span>11. Tanya Jawab (FAQ)</span>
+                </button>
+            </div>
+
+            <!-- Konten Materi Kanan -->
+            <div class="tutorial-content" id="tutorialContentArea">
+
+                <!-- 1. PETA HALAMAN & ALUR SISTEM -->
+                <div class="tutorial-section active" id="tut-intro">
+                    <div class="tut-badge-header">BAB 1 • PENGENALAN VISUAL UNTUK PEMULA / NON-IT</div>
+                    <h3>Mengenal Tata Letak Layar & Cara Kerja Otomatis Website</h3>
+                    <p class="tut-lead">
+                        Jangan khawatir jika Anda baru pertama kali menggunakan sistem ini. Di setiap bab panduan ini, kami menampilkan <strong>gambar bentuk tombol & halaman persis seperti aslinya</strong>, ditambah tombol <span class="mock-tour-pill"><i class="fas fa-bullseye"></i> Tunjukkan Langsung di Layar</span> yang jika Anda klik akan langsung membawa Anda ke halaman tersebut dan menunjuk tombolnya dengan lingkaran bercahaya!
+                    </p>
+
+                    <!-- VISUAL MOCKUP: TATA LETAK LAYAR -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span>
+                            <span class="ui-mockup-url">Gambaran Layar Website Admin SPMB JIC</span>
+                        </div>
+                        <div class="ui-mockup-layout">
+                            <!-- Mock Sidebar -->
+                            <div class="ui-mock-sidebar">
+                                <div class="ui-mock-logo"><span class="mock-badge-num">1</span> Menu Kiri (Sidebar)</div>
+                                <div class="ui-mock-menu-item active"><i class="fas fa-home"></i> Dashboard</div>
+                                <div class="ui-mock-menu-item"><i class="fas fa-plus-circle"></i> Input Transaksi</div>
+                                <div class="ui-mock-menu-item"><i class="fas fa-chart-bar"></i> Laporan Utama</div>
+                                <div class="ui-mock-menu-label">SANTRI BARU</div>
+                                <div class="ui-mock-menu-item"><i class="fas fa-user-graduate"></i> Data Santri</div>
+                                <div class="ui-mock-menu-item"><i class="fas fa-file-invoice-dollar"></i> Tagihan</div>
+                                <div class="ui-mock-menu-item"><i class="fas fa-exclamation-circle"></i> Tunggakan</div>
+                            </div>
+                            <!-- Mock Main -->
+                            <div class="ui-mock-main">
+                                <!-- Mock Topbar -->
+                                <div class="ui-mock-topbar">
+                                    <div style="font-weight: 700; font-size: 13px; color: #1e293b;">Judul Halaman</div>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <div class="ui-mock-ta"><span class="mock-badge-num">2</span> <i class="fas fa-calendar-check" style="color:#10b981;"></i> T.A: <strong>2026/2027 (Aktif) &#9662;</strong></div>
+                                        <div class="ui-mock-btn-green"><span class="mock-badge-num">3</span> <i class="fas fa-book-open"></i> Panduan Admin</div>
+                                        <div class="ui-mock-avatar">A</div>
+                                    </div>
+                                </div>
+                                <!-- Mock Content -->
+                                <div class="ui-mock-body">
+                                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;"><span class="mock-badge-num">4</span> Area Kerja Utama (Tabel & Formulir)</div>
+                                    <p style="font-size: 12px; color: #64748b; margin: 0;">Tempat Anda melihat grafik, mencari nama santri, menginput pembayaran, dan mencetak kwitansi.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Menu Kiri (Sidebar):</strong> Klik tulisan di sini untuk berpindah halaman (misal dari Dashboard ke Data Santri).</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Pilihan Tahun Ajaran (T.A):</strong> Mengatur data tahun berapa yang sedang ditampilkan di layar.</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Tombol Panduan Admin:</strong> Tombol hijau untuk membuka buku petunjuk ini kapan saja.</div>
+                            <div><span class="mock-badge-num">4</span> <strong>Area Kerja Utama:</strong> Isi halaman yang berubah sesuai menu yang Anda klik di sebelah kiri.</div>
+                        </div>
+                    </div>
+
+                    <!-- DIAGRAM VISUAL ALUR OTOMATIS -->
+                    <div class="tut-step-box">
+                        <h4>Bagaimana Data Terhubung Otomatis? (Anda Tidak Perlu Hitung Manual!)</h4>
+                        <p>Dulu dengan Excel manual, saat ada santri daftar atau bayar, admin harus mengetik di banyak sheet. <strong>Di website ini, cukup input 1 kali, halaman lain otomatis berubah:</strong></p>
+                        <div class="visual-flow-diagram">
+                            <div class="vflow-box vflow-green">
+                                <div class="vflow-step">LANGKAH 1</div>
+                                <i class="fas fa-user-plus"></i>
+                                <strong>Santri Mendaftar</strong>
+                                <span>Lewat Web Depan / Tombol "+ Tambah Santri"</span>
+                            </div>
+                            <div class="vflow-arrow"><i class="fas fa-long-arrow-alt-right"></i><span>Otomatis Buat</span></div>
+                            <div class="vflow-box vflow-purple">
+                                <div class="vflow-step">OTOMATIS 1</div>
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <strong>Muncul di Tagihan & Tunggakan</strong>
+                                <span>Tarif dihitung otomatis sesuai Unit & Jalur</span>
+                            </div>
+                            <div class="vflow-arrow"><i class="fas fa-long-arrow-alt-right"></i><span>Saat Membayar</span></div>
+                            <div class="vflow-box vflow-blue">
+                                <div class="vflow-step">LANGKAH 2</div>
+                                <i class="fas fa-cash-register"></i>
+                                <strong>Input Transaksi</strong>
+                                <span>Admin mencatat uang masuk santri</span>
+                            </div>
+                            <div class="vflow-arrow"><i class="fas fa-long-arrow-alt-right"></i><span>Otomatis Update</span></div>
+                            <div class="vflow-box vflow-amber">
+                                <div class="vflow-step">OTOMATIS 2</div>
+                                <i class="fas fa-check-double"></i>
+                                <strong>Tunggakan Berkurang & Masuk Laporan</strong>
+                                <span>Kwitansi siap cetak & Saldo Kas bertambah</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PANTANGAN & HAL KRUSIAL -->
+                <div class="tutorial-section" id="tut-warning">
+                    <div class="tut-badge-header" style="background: #fef2f2; color: #dc2626;">BAB 2 • WAJIB DIPERHATIKAN</div>
+                    <h3>Kenali Bentuk Tombol Ini Agar Tidak Salah Klik!</h3>
+                    <p class="tut-lead">
+                        Bagi admin baru, kesalahan paling fatal biasanya hanya karena <strong>salah membedakan tombol warna Merah dan Kuning</strong> di halaman Data Santri. Lihat bentuk visualnya di bawah ini:
+                    </p>
+
+                    <!-- VISUAL MOCKUP PERBANDINGAN TOMBOL AKSI SANTRI -->
+                    <div class="ui-mockup-frame" style="border-color: #fca5a5;">
+                        <div class="ui-mockup-titlebar" style="background: #fef2f2; border-bottom-color: #fecaca;">
+                            <i class="fas fa-eye" style="color: #dc2626;"></i>
+                            <span class="ui-mockup-url" style="color: #991b1b; font-weight: 700;">Tampilan Persis Kolom "Aksi" di Tabel Data Santri</span>
+                        </div>
+                        <div style="padding: 20px; background: #fff;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border: 2px dashed #cbd5e1; border-radius: 10px; background: #f8fafc; flex-wrap: wrap; gap: 15px;">
+                                <div>
+                                    <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Contoh Baris Data Santri:</div>
+                                    <div style="font-size: 15px; font-weight: 800; color: #0f172a;">REG-2026001 &bull; AHMAD FAUZAN &bull; <span style="background: rgba(52,152,219,0.15); color: #2980b9; padding: 3px 8px; border-radius: 12px; font-size: 11px;">PAUDQu</span></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 12px; color: #64748b; margin-right: 6px;">Kolom Aksi:</span>
+                                    <!-- Persis seperti table-actions.ejs -->
+                                    <span style="padding: 6px 12px; font-size: 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600; color: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <span class="mock-badge-num">A</span> Detail
+                                    </span>
+                                    <span style="padding: 6px 12px; font-size: 12px; background-color: #dc3545; color: white; border-radius: 4px; font-weight: 600;">
+                                        <span class="mock-badge-num">B</span> Hapus
+                                    </span>
+                                    <span style="padding: 6px 12px; font-size: 12px; background-color: #f59e0b; color: white; border-radius: 4px; font-weight: 600;">
+                                        <span class="mock-badge-num">C</span> Mundur
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="tut-grid-3" style="margin-top: 18px;">
+                                <div class="visual-explain-card" style="border-top: 4px solid #64748b;">
+                                    <div style="font-weight: 800; color: #1e293b; margin-bottom: 6px;"><span class="mock-badge-num">A</span> Tombol Putih "Detail"</div>
+                                    <p style="font-size: 12.5px; margin: 0; color: #475569;"><strong>AMAN DIKLIK.</strong> Gunanya untuk melihat biodata lengkap santri, mengedit salah ketik nama/orang tua, atau mencetak formulir PDF.</p>
+                                </div>
+                                <div class="visual-explain-card" style="border-top: 4px solid #dc3545; background: #fef2f2;">
+                                    <div style="font-weight: 800; color: #991b1b; margin-bottom: 6px;"><span class="mock-badge-num">B</span> Tombol Merah "Hapus"</div>
+                                    <p style="font-size: 12.5px; margin: 0; color: #7f1d1d;"><strong>BAHAYA! JANGAN DIKLIK</strong> untuk santri yang batal sekolah! Tombol ini akan melenyapkan nama santri <u>beserta uang transaksi yang pernah dibayarkannya</u> dari laporan kas. Hanya gunakan untuk data kembar (Duplikat) yang belum bayar.</p>
+                                </div>
+                                <div class="visual-explain-card" style="border-top: 4px solid #f59e0b; background: #fffbeb;">
+                                    <div style="font-weight: 800; color: #92400e; margin-bottom: 6px;"><span class="mock-badge-num">C</span> Tombol Kuning "Mundur"</div>
+                                    <p style="font-size: 12.5px; margin: 0; color: #78350f;"><strong>GUNAKAN INI</strong> jika santri batal sekolah / mengundurkan diri! Sisa hutangnya otomatis dihapus, tapi uang yang sudah masuk tetap aman di pembukuan (dan bisa hitung refund otomatis).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tut-callout tut-callout-info">
+                        <div class="tut-callout-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div>
+                            <h4>Jangan Panik Jika Data Tiba-tiba Kosong: Cek Kotak "T.A" di Kanan Atas!</h4>
+                            <p>Di bar atas sebelah kanan ada kotak bertuliskan <span style="background:#fff; border:1px solid #cbd5e1; padding:2px 8px; border-radius:6px; font-weight:700; color:#0f172a;"><i class="fas fa-calendar-check" style="color:#10b981;"></i> T.A: 2026/2027 (Aktif)</span>. Jika Anda tidak sengaja menggantinya ke tahun lain yang belum ada pendaftarnya, tabel akan terlihat kosong. Cukup klik kotak tersebut dan pilih kembali tahun yang ada tulisan <strong>(Aktif)</strong>.</p>
+                            <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('topbar-ta')">
+                                <i class="fas fa-bullseye"></i> Tunjukkan Kotak T.A di Layar Saya Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. VISUAL DASHBOARD & T.A -->
+                <div class="tutorial-section" id="tut-dashboard">
+                    <div class="tut-badge-header">BAB 3 • VISUAL HALAMAN DASHBOARD</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Mengenal Bagian-Bagian di Halaman Dashboard</h3>
+                        <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('dashboard')">
+                            <i class="fas fa-magic"></i> Buka Dashboard & Tunjukkan Bagiannya Satu per Satu
+                        </button>
+                    </div>
+                    <p class="tut-lead">
+                        Saat pertama kali login, Anda berada di halaman <strong>Dashboard</strong>. Berikut adalah tampilan persis kartu-kartu di Dashboard dan artinya:
+                    </p>
+
+                    <!-- MOCKUP KARTU ARUS KAS DASHBOARD -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-home" style="color: #059669;"></i>
+                            <span class="ui-mockup-url">Visual 1: Tiga Kartu Besar di Bagian Paling Atas Dashboard</span>
+                        </div>
+                        <div style="padding: 18px; background: #f8fafc;">
+                            <div class="tut-grid-3">
+                                <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 16px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 700; opacity: 0.9;"><span class="mock-badge-num">1</span> TOTAL PEMASUKAN</div>
+                                        <div style="font-size: 20px; font-weight: 800; margin-top: 4px;">Rp 45.500.000</div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-down"></i></div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 16px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 700; opacity: 0.9;"><span class="mock-badge-num">2</span> TOTAL PENGELUARAN</div>
+                                        <div style="font-size: 20px; font-weight: 800; margin-top: 4px;">Rp 5.200.000</div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-up"></i></div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 16px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 700; opacity: 0.9;"><span class="mock-badge-num">3</span> SALDO SPMB</div>
+                                        <div style="font-size: 20px; font-weight: 800; margin-top: 4px;">Rp 40.300.000</div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-wallet"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Kotak Hijau (Total Pemasukan):</strong> Jumlah seluruh uang yang sudah masuk ke kasir.</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Kotak Merah (Total Pengeluaran):</strong> Jumlah seluruh uang yang dipakai belanja / operasional / refund.</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Kotak Biru (Saldo SPMB):</strong> Sisa uang bersih yang harus ada di tangan/rekening Bendahara saat ini (Hijau dikurangi Merah).</div>
+                        </div>
+                    </div>
+
+                    <!-- MOCKUP TABEL PENGELUARAN BISA DIKLIK -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-mouse-pointer" style="color: #2563eb;"></i>
+                            <span class="ui-mockup-url">Visual 2: Tabel "Informasi Pengeluaran" yang Angkanya Bisa Diklik!</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+                                <div style="background: #3b82f6; color: white; padding: 10px 16px; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between;">
+                                    <span><i class="fas fa-hand-holding-usd"></i> INFORMASI PENGELUARAN KEUANGAN SPMB</span>
+                                    <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;"><i class="fas fa-mouse-pointer"></i> Klik nominal untuk detail</span>
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;">
+                                    <tr style="background: #f8fafc;">
+                                        <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">MADRASAH (UMUM)</th>
+                                        <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">PAUDQu</th>
+                                        <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">TPQ</th>
+                                        <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">MDT</th>
+                                        <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center; color: #ef4444;">TOTAL PENGELUARAN</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #e2e8f0; background: rgba(16, 185, 129, 0.12); text-decoration: underline; font-weight: 700; cursor: pointer;">
+                                            <span class="mock-badge-num">!</span> Rp 2.000.000 <i class="fas fa-hand-pointer" style="color: #059669;"></i>
+                                        </td>
+                                        <td style="padding: 10px; border: 1px solid #e2e8f0; text-decoration: underline;">Rp 1.200.000</td>
+                                        <td style="padding: 10px; border: 1px solid #e2e8f0; text-decoration: underline;">Rp 1.000.000</td>
+                                        <td style="padding: 10px; border: 1px solid #e2e8f0; text-decoration: underline;">Rp 1.000.000</td>
+                                        <td style="padding: 10px; border: 1px solid #e2e8f0; color: #ef4444; font-weight: 800; text-decoration: underline;">Rp 5.200.000</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p style="font-size: 13px; color: #334155; margin: 12px 0 0 0;">
+                                👉 <strong>Cara Pakai:</strong> Arahkan mouse Anda dan <strong>klik langsung tulisan angka Rupiah</strong> di dalam tabel tersebut. Akan muncul jendela pop-up daftar belanja detail beserta tombol <strong>Export PDF</strong>!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. VISUAL HALAMAN SANTRI -->
+                <div class="tutorial-section" id="tut-santri">
+                    <div class="tut-badge-header">BAB 4 • VISUAL HALAMAN DATA SANTRI</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Panduan Visual Halaman Data Santri Baru & Daftar Ulang</h3>
+                        <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('santri')">
+                            <i class="fas fa-magic"></i> Buka Halaman Santri & Tunjukkan Tombolnya
+                        </button>
+                    </div>
+                    <p class="tut-lead">
+                        Untuk membuka halaman ini, lihat <strong>Menu Kiri (Sidebar)</strong> lalu klik <strong>Data Santri</strong> (di bawah judul <em>SANTRI BARU</em> atau <em>DAFTAR ULANG</em>). Berikut adalah fungsi setiap tombol yang ada di halaman tersebut:
+                    </p>
+
+                    <!-- VISUAL MOCKUP BAR FILTER & TOMBOL TAMBAH SANTRI -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-user-graduate" style="color: #059669;"></i>
+                            <span class="ui-mockup-url">Visual 1: Baris Pencarian & Tombol di Atas Tabel Data Santri</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 7px 12px; border-radius: 8px; font-size: 12px; color: #64748b; width: 170px;">
+                                        <span class="mock-badge-num">1</span> Cari nama santri...
+                                    </div>
+                                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 7px 12px; border-radius: 8px; font-size: 12px; color: #1e293b; font-weight: 600;">
+                                        <span class="mock-badge-num">2</span> Semua Pendidikan &#9662;
+                                    </div>
+                                    <span style="background: #3b82f6; color: white; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">Filter</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span style="background: #fff; border: 1px solid #cbd5e1; color: #1e293b; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                                        <span class="mock-badge-num">3</span> <i class="fas fa-file-excel" style="color: #10b981;"></i> Export Excel
+                                    </span>
+                                    <span style="background: #3b82f6; color: white; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                                        <span class="mock-badge-num">4</span> <i class="fas fa-plus"></i> Tambah Santri
+                                    </span>
+                                    <span style="background: #ffc107; color: #000; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">
+                                        <span class="mock-badge-num">5</span> <i class="fas fa-plus"></i> Tambah Santri Beasiswa
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Kotak Cari Nama:</strong> Ketik nama santri lalu klik tombol biru <strong>Filter</strong> untuk mencari santri tertentu.</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Pilih Pendidikan:</strong> Menyaring tabel agar hanya menampilkan santri <code>PAUDQu</code>, <code>TPQ</code>, atau <code>MDT</code> saja.</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Export Excel:</strong> Mengunduh seluruh data biodata santri ke komputer Anda dalam bentuk file Excel (<code>.xlsx</code>).</div>
+                            <div><span class="mock-badge-num">4</span> <strong>+ Tambah Santri (Biru):</strong> Klik ini jika admin ingin mendaftarkan santri jalur <strong>Reguler</strong> secara manual.</div>
+                            <div><span class="mock-badge-num">5</span> <strong>+ Tambah Santri Beasiswa (Kuning):</strong> Klik ini jika admin ingin mendaftarkan santri jalur <strong>Beasiswa</strong> (Dhuafa / Yatim / Komunitas JIC / Satu Keluarga).</div>
+                        </div>
+                    </div>
+
+                    <!-- VISUAL MOCKUP POPUP DETAIL & CETAK PDF -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-id-card" style="color: #3b82f6;"></i>
+                            <span class="ui-mockup-url">Visual 2: Tampilan Saat Anda Klik Tombol "Detail" pada Tabel Santri</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; background: #f8fafc;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 12px;">
+                                    <strong style="color: #3b82f6; font-size: 16px;">Detail Data Santri</strong>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="background: #059669; color: white; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                                            <span class="mock-badge-num">A</span> <i class="fas fa-print"></i> Cetak PDF
+                                        </span>
+                                        <span style="font-size: 20px; color: #94a3b8; font-weight: bold;">&times;</span>
+                                    </div>
+                                </div>
+                                <div style="font-size: 12.5px; color: #475569; margin-bottom: 12px;">
+                                    Di dalam jendela ini akan tampil kotak-kotak biodata (Email, Jalur Pendaftaran, Tingkat Pendidikan, Tempat/Tanggal Lahir, Nama Ayah/Ibu, No. HP, Alamat).
+                                </div>
+                                <div style="text-align: right; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                                    <span style="background: #e2e8f0; color: #475569; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-right: 6px;">Batal</span>
+                                    <span style="background: #3b82f6; color: white; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                                        <span class="mock-badge-num">B</span> Simpan Perubahan
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">A</span> <strong>Tombol Cetak PDF:</strong> Mencetak lembar formulir biodata santri resmi lengkap dengan Kop Surat Madrasah JIC & ruang tanda tangan.</div>
+                            <div><span class="mock-badge-num">B</span> <strong>Tombol Simpan Perubahan:</strong> Klik setelah Anda memperbaiki data santri. <em>Ingat: Mengubah Jalur Pendaftaran di sini akan otomatis mengubah tarif tagihan santri tersebut!</em></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. VISUAL TOMBOL MUNDUR VS HAPUS -->
+                <div class="tutorial-section" id="tut-mundur">
+                    <div class="tut-badge-header" style="background: #fffbeb; color: #d97706;">BAB 5 • VISUAL PROSES SANTRI MUNDUR</div>
+                    <h3>Tampilan Langkah demi Langkah Saat Memproses Santri Mundur</h3>
+                    <p class="tut-lead">
+                        Ketika ada orang tua santri yang mengabari bahwa anaknya batal masuk / mengundurkan diri, ikuti tampilan visual di bawah ini:
+                    </p>
+
+                    <!-- VISUAL MOCKUP POPUP MUNDUR -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-user-slash" style="color: #d97706;"></i>
+                            <span class="ui-mockup-url">Visual 1: Jendela Pop-up Saat Anda Klik Tombol Kuning "Mundur"</span>
+                        </div>
+                        <div style="padding: 20px; background: #f8fafc; display: flex; justify-content: center;">
+                            <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 14px; width: 100%; max-width: 480px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+                                <h4 style="text-align: center; margin: 0 0 12px 0; color: #1e293b; font-size: 18px;">Proses Santri Mundur</h4>
+                                <p style="font-size: 12.5px; color: #dc3545; margin-bottom: 10px;">Tindakan ini akan merubah status santri menjadi <strong>Mundur</strong> dan membatalkan sisa tunggakannya secara otomatis.</p>
+                                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 8px 12px; border-radius: 8px; color: #059669; font-weight: 700; font-size: 13px; margin-bottom: 14px;">
+                                    <span class="mock-badge-num">1</span> Total Pembayaran Saat Ini: Rp 1.000.000
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <label style="font-weight: 700; font-size: 12.5px; display: block; margin-bottom: 4px;"><span class="mock-badge-num">2</span> Alasan Mundur:</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-size: 13px; background: #fff; font-weight: 600;">
+                                        Pindah Tugas Orang Tua (Refund 50%) &#9662;
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="font-weight: 700; font-size: 12.5px; display: block; margin-bottom: 4px;"><span class="mock-badge-num">3</span> Nominal Refund (Rp):</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-size: 14px; background: #f8fafc; font-weight: 800; color: #0f172a;">
+                                        500000
+                                    </div>
+                                    <small style="color: #64748b; font-size: 11px;">Otomatis terisi sesuai alasan, namun tetap bisa diketik manual.</small>
+                                </div>
+                                <div style="display: flex; justify-content: center; gap: 10px;">
+                                    <span style="background: #d33; color: white; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 700;">
+                                        <span class="mock-badge-num">4</span> Ya, Proses Mundur
+                                    </span>
+                                    <span style="background: #6e7881; color: white; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600;">Batal</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Total Pembayaran Saat Ini:</strong> Sistem otomatis memberi tahu Anda berapa total uang yang sudah pernah disetor oleh santri tersebut.</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Pilih Alasan Mundur:</strong>
+                                <ul style="margin: 4px 0 0 18px; font-size: 12px;">
+                                    <li>Pilih <em>Meninggal Dunia</em> &rarr; Uang kembali 100%.</li>
+                                    <li>Pilih <em>Pindah Tugas Orang Tua</em> &rarr; Uang kembali 50%.</li>
+                                    <li>Pilih <em>Diterima di Sekolah Lain / Lainnya</em> &rarr; Uang hangus (Rp 0).</li>
+                                </ul>
+                            </div>
+                            <div><span class="mock-badge-num">3</span> <strong>Nominal Refund (Rp):</strong> Angka uang yang dikembalikan kepada orang tua. Jika angkanya lebih dari 0, sistem otomatis membuatkan bukti kas keluar (<code>KWI-OUT</code>) di Laporan Keuangan!</div>
+                            <div><span class="mock-badge-num">4</span> <strong>Setelah Diklik:</strong> Nama santri di tabel akan memiliki tanda merah <span class="badge badge-danger" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 6px;">Mundur</span> dan tombol kuning tadi berubah menjadi tombol biru muda <span style="background:#0dcaf0; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">Batal Mundur</span>.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. VISUAL TAGIHAN & TUNGGAKAN -->
+                <div class="tutorial-section" id="tut-tagihan">
+                    <div class="tut-badge-header">BAB 6 • VISUAL TAGIHAN & TUNGGAKAN</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Panduan Visual Halaman Tagihan & Tunggakan</h3>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('tagihan')">
+                                <i class="fas fa-bullseye"></i> Tunjukkan Halaman Tagihan
+                            </button>
+                            <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('tunggakan')" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
+                                <i class="fas fa-bullseye"></i> Tunjukkan Halaman Tunggakan
+                            </button>
+                        </div>
+                    </div>
+                    <p class="tut-lead">
+                        Apa beda menu <strong>Tagihan</strong> dan <strong>Tunggakan</strong> di sidebar kiri? Lihat ilustrasi kedua halaman tersebut di bawah ini:
+                    </p>
+
+                    <!-- VISUAL MOCKUP TABEL TAGIHAN -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-file-invoice-dollar" style="color: #7c3aed;"></i>
+                            <span class="ui-mockup-url">Visual 1: Halaman "Tagihan" (Tempat Mengubah Rincian Biaya / Memberi Diskon)</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff; overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                <thead>
+                                    <tr style="background: #f8fafc; color: #64748b;">
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Nama Santri</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Formulir</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Uang Pangkal</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Perlengkapan</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Seragam</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">SPP (Juli)</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Total Tagihan</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 10px 8px; font-weight: 700;">AHMAD FAUZAN</td>
+                                        <td style="padding: 10px 8px;">Rp 100.000</td>
+                                        <td style="padding: 10px 8px;">Rp 250.000</td>
+                                        <td style="padding: 10px 8px;">Rp 700.000</td>
+                                        <td style="padding: 10px 8px;">Rp 800.000</td>
+                                        <td style="padding: 10px 8px;">Rp 150.000</td>
+                                        <td style="padding: 10px 8px; font-weight: 800; color: #3b82f6;">Rp 2.000.000</td>
+                                        <td style="padding: 10px 8px;">
+                                            <span style="padding: 5px 10px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600;">
+                                                <span class="mock-badge-num">1</span> <i class="fas fa-edit"></i> Edit
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Tombol Edit di Halaman Tagihan:</strong> Klik tombol ini jika ada santri yang mendapat keringanan/potongan biaya khusus. Anda bisa mengubah angka Formulir, Uang Pangkal, Perlengkapan, Seragam, atau SPP satu per satu.</div>
+                        </div>
+                    </div>
+
+                    <!-- VISUAL MOCKUP TABEL TUNGGAKAN -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                            <span class="ui-mockup-url">Visual 2: Halaman "Tunggakan" (Tempat Memantau Cicilan & Status Lunas)</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff; overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                <thead>
+                                    <tr style="background: #f8fafc; color: #64748b;">
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Nama Lengkap</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">No Telepon</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Total Tagihan</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Total Bayar</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Sisa Bayar</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Progress</th>
+                                        <th style="padding: 8px; border-bottom: 2px solid #e2e8f0;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 10px 8px; font-weight: 700;">AHMAD FAUZAN</td>
+                                        <td style="padding: 10px 8px;">08123456789</td>
+                                        <td style="padding: 10px 8px;">Rp 2.000.000</td>
+                                        <td style="padding: 10px 8px; color: #059669; font-weight: 700;">Rp 1.000.000</td>
+                                        <td style="padding: 10px 8px; color: #ef4444; font-weight: 800;">Rp 1.000.000</td>
+                                        <td style="padding: 10px 8px;">
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <div style="width: 70px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                                                    <div style="width: 50%; height: 100%; background: #f59e0b;"></div>
+                                                </div>
+                                                <span style="font-weight: 700;">50%</span>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 10px 8px;">
+                                            <span class="badge badge-danger">Belum Lunas</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div>💡 <strong>Penting:</strong> Di halaman <strong>Tunggakan</strong> tidak ada tombol Edit karena halaman ini 100% dihitung otomatis dari <code>Total Tagihan</code> dikurangi uang yang masuk di menu <code>Input Transaksi</code>.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. VISUAL FORM INPUT TRANSAKSI -->
+                <div class="tutorial-section" id="tut-transaksi">
+                    <div class="tut-badge-header">BAB 7 • VISUAL HALAMAN INPUT TRANSAKSI</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Tampilan Persis Cara Menginput Pembayaran & Pengeluaran</h3>
+                        <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('input-transaksi')">
+                            <i class="fas fa-magic"></i> Buka Form Input Transaksi & Pandu Saya
+                        </button>
+                    </div>
+                    <p class="tut-lead">
+                        Klik menu <strong><i class="fas fa-plus-circle"></i> Input Transaksi</strong> di sidebar kiri. Formulir ini akan berubah bentuk menyesuaikan pilihan pada kotak <strong>Jenis Transaksi</strong>:
+                    </p>
+
+                    <!-- VISUAL MOCKUP FORM INPUT TRANSAKSI -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-edit" style="color: #059669;"></i>
+                            <span class="ui-mockup-url">Visual 1: Urutan Mengisi Form Saat Santri Membayar (Baru / Daftar Ulang)</span>
+                        </div>
+                        <div style="padding: 20px; background: #fff;">
+                            <div class="tut-grid-2" style="margin-bottom: 14px;">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">1</span> Tanggal Transaksi</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 9px 12px; border-radius: 8px; font-size: 13px; background: #f8fafc;">21/11/2026 <i class="far fa-calendar-alt" style="float: right; color: #64748b;"></i></div>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">2</span> Jenis Transaksi (WAJIB PILIH DULU)</label>
+                                    <div style="border: 2px solid #059669; padding: 9px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #059669; background: #ecfdf5;">
+                                        Pembayaran Pendaftaran Baru &#9662;
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kotak Hijau Muda yang Muncul -->
+                            <div style="background: #f8fbf8; border: 1px solid #d1fae5; padding: 16px; border-radius: 10px; margin-bottom: 14px;">
+                                <div style="margin-bottom: 12px;">
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">3</span> Satuan Pendidikan</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 13px; background: #fff;">PAUDQu &#9662;</div>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">4</span> Pilih Nama Pendaftar (Ketik Nama Santri)</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 13px; background: #fff; font-weight: 600;">
+                                        AHMAD FAUZAN (Sisa Tagihan: Rp 2.000.000) &#9662;
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tut-grid-2" style="margin-bottom: 14px;">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">5</span> Jumlah Nominal (Rp)</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; font-size: 16px; font-weight: 800; background: #fff;">2000000</div>
+                                    <small style="font-size: 11px; color: #d97706;">*Ubah angkanya jika santri baru membayar cicilan (misal ketik 500000)</small>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;"><span class="mock-badge-num">6</span> Metode Pembayaran</label>
+                                    <div style="border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; background: #fff;">Transfer / Cash &#9662;</div>
+                                </div>
+                            </div>
+
+                            <div style="text-align: right;">
+                                <span style="background: #3b82f6; color: white; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; display: inline-block;">
+                                    <span class="mock-badge-num">7</span> <i class="fas fa-save"></i> Simpan Transaksi
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">2</span> <strong>Pilihan Jenis Transaksi:</strong>
+                                <ul style="margin: 4px 0 0 18px; font-size: 12px;">
+                                    <li><strong>Pembayaran Pendaftaran Baru:</strong> Untuk uang masuk dari Santri Baru.</li>
+                                    <li><strong>Pembayaran Daftar Ulang:</strong> Untuk uang masuk dari Santri Lama.</li>
+                                    <li><strong>Pemasukan (Selain Biaya Santri):</strong> Untuk uang masuk dari Ziswaf / Donasi (ketik kata <code>Ziswaf</code> di uraian agar masuk ke tabel subsidi Ziswaf di Dashboard).</li>
+                                    <li><strong>Pengeluaran:</strong> Untuk uang keluar (belanja ATK, honor, transport). Bisa klik tombol <strong>+ Tambah Rincian</strong> jika item belanjanya banyak.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VISUAL MOCKUP TABEL TRANSAKSI TERBARU DI BAWAH FORM -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-list-ul" style="color: #3b82f6;"></i>
+                            <span class="ui-mockup-url">Visual 2: Tombol Aksi pada Tabel "Transaksi Terbaru" (Di Bawah Form Input)</span>
+                        </div>
+                        <div style="padding: 16px; background: #fff;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 10px; flex-wrap: wrap; gap: 10px;">
+                                <div style="font-size: 13px;">
+                                    <strong>KWI-DB/001/11/2026</strong> &bull; AHMAD FAUZAN &bull; <span style="color: #059669; font-weight: 700;">Rp 1.000.000</span>
+                                </div>
+                                <div style="display: flex; gap: 6px;">
+                                    <span style="background: #10b981; color: white; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                        <span class="mock-badge-num">A</span> <i class="fas fa-print"></i> Cetak
+                                    </span>
+                                    <span style="background: #f59e0b; color: white; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                        <span class="mock-badge-num">B</span> <i class="fas fa-edit"></i> Edit
+                                    </span>
+                                    <span style="background: #ef4444; color: white; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                        <span class="mock-badge-num">C</span> <i class="fas fa-trash"></i> Hapus
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">A</span> <strong>Cetak (Hijau):</strong> Membuka layar kwitansi untuk dicetak ke printer / PDF.</div>
+                            <div><span class="mock-badge-num">B</span> <strong>Edit (Kuning):</strong> Mengubah nominal/tanggal jika salah ketik. Sisa tunggakan santri akan otomatis dikoreksi!</div>
+                            <div><span class="mock-badge-num">C</span> <strong>Hapus (Merah):</strong> Membatalkan transaksi. Jika dihapus, hutang/tunggakan santri otomatis kembali seperti semula.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. VISUAL CETAK & EDIT KWITANSI -->
+                <div class="tutorial-section" id="tut-kwitansi">
+                    <div class="tut-badge-header">BAB 8 • VISUAL LAYAR KWITANSI</div>
+                    <h3>Tampilan Persis Cara Mencetak & Menggeser Posisi Kwitansi</h3>
+                    <p class="tut-lead">
+                        Saat Anda mengklik tombol <strong><i class="fas fa-print"></i> Cetak</strong> pada transaksi, akan muncul jendela <strong>Preview Kwitansi</strong>. Lihat bagian-bagian tombolnya di bawah ini:
+                    </p>
+
+                    <!-- VISUAL MOCKUP KWITANSI -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-receipt" style="color: #059669;"></i>
+                            <span class="ui-mockup-url">Visual Layar Preview Kwitansi & Mode "Edit Data"</span>
+                        </div>
+                        <div style="padding: 18px; background: #525659; display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start;">
+                            <!-- Panel Kiri Kwitansi -->
+                            <div style="width: 200px; background: #fff; padding: 14px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;">
+                                <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Panel Tombol Kiri:</div>
+                                <div style="background: #10b981; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: center;">
+                                    <span class="mock-badge-num">1</span> <i class="fas fa-print"></i> Cetak Kwitansi
+                                </div>
+                                <div style="background: #f59e0b; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: center;">
+                                    <span class="mock-badge-num">2</span> <i class="fas fa-edit"></i> Edit Data
+                                </div>
+                                <div style="border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; background: #f8fafc; margin-top: 4px;">
+                                    <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 6px;"><span class="mock-badge-num">3</span> Geser Tata Letak:</div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px;">
+                                        <span style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center; border-radius:4px;"><i class="fas fa-arrow-up"></i> Naik</span>
+                                        <span style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center; border-radius:4px;"><i class="fas fa-arrow-down"></i> Turun</span>
+                                        <span style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center; border-radius:4px;"><i class="fas fa-arrow-left"></i> Kiri</span>
+                                        <span style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center; border-radius:4px;"><i class="fas fa-arrow-right"></i> Kanan</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kertas Kwitansi Kanan -->
+                            <div style="flex: 1; min-width: 280px; background: #fff; border-radius: 8px; padding: 20px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+                                <div style="text-align: center; border-bottom: 2px solid #059669; padding-bottom: 10px; margin-bottom: 14px;">
+                                    <div style="font-size: 11px; color: #059669; font-weight: 700;">KOP SURAT MADRASAH JIC</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 4px;">
+                                        <span style="border: 2px dashed #f59e0b; padding: 2px 8px; background: #fffbeb;"><span class="mock-badge-num">4</span> KWITANSI PEMBAYARAN</span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #64748b; margin-top: 4px;">No: KWI-DB/001/11/2026</div>
+                                </div>
+                                <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 10px;"><span class="mock-badge-num">5</span> <i class="fas fa-arrow-up"></i><i class="fas fa-arrow-down"></i></span>
+                                        <span style="width: 120px; color: #64748b;">Telah Diterima Dari:</span>
+                                        <strong style="border: 1px dashed #f59e0b; padding: 2px 6px; background: #fffbeb;">Bpk. Abdullah (Orang Tua)</strong>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 10px;"><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-down"></i></span>
+                                        <span style="width: 120px; color: #64748b;">Untuk Pembayaran:</span>
+                                        <strong style="border: 1px dashed #f59e0b; padding: 2px 6px; background: #fffbeb;">Pembayaran Pendaftaran Baru - AHMAD</strong>
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 18px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                                    <div style="border: 2px solid #0f172a; padding: 6px 14px; font-weight: 800; font-size: 14px;">Rp 1.000.000,-</div>
+                                    <div style="text-align: center;">
+                                        <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 6px; border-radius: 4px; font-size: 10px; margin-bottom: 4px;">
+                                            <span class="mock-badge-num">6</span> <i class="fas fa-trash" style="color:red;"></i> <i class="fas fa-search-plus" style="color:blue;"></i> <i class="fas fa-arrows-alt" style="color:green;"></i>
+                                        </div>
+                                        <div style="font-size: 11px; font-style: italic; color: #059669;">[ TTD Digital Bendahara ]</div>
+                                        <div style="font-size: 11px; font-weight: 700; text-decoration: underline;">Nama Bendahara</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Cetak Kwitansi (Hijau):</strong> Klik ini jika tampilan sudah rapi dan siap diprint.</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Edit Data (Oranye):</strong> Klik ini jika Anda ingin mengubah tulisan di dalam kwitansi atau menggeser posisi tanda tangan. Setelah diklik, tombol ini berubah menjadi biru <strong>Simpan Perubahan</strong>.</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Geser Tata Letak:</strong> Muncul saat mode Edit Data aktif. Klik Naik/Turun/Kiri/Kanan jika hasil print kurang pas dengan kop kertas.</div>
+                            <div><span class="mock-badge-num">4</span> <strong>Kotak Bergaris Kuning:</strong> Saat mode Edit Data aktif, Anda bisa langsung mengklik tulisan di kertas kwitansi dan mengetik perubahannya!</div>
+                            <div><span class="mock-badge-num">5</span> <strong>Panah Urutan Baris:</strong> Menukar urutan baris ke atas atau ke bawah.</div>
+                            <div><span class="mock-badge-num">6</span> <strong>Kontrol TTD Digital:</strong> Ikon tempat sampah merah untuk menghapus TTD digital (jika ingin TTD pulpen basah), kaca pembesar biru untuk memperbesar TTD, dan panah hijau untuk menggeser TTD.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. VISUAL LAPORAN & SIKMA -->
+                <div class="tutorial-section" id="tut-laporan">
+                    <div class="tut-badge-header">BAB 9 • VISUAL LAPORAN & SIKMA</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Panduan Visual Halaman Laporan Utama & Tombol SIKMA</h3>
+                        <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('laporan')">
+                            <i class="fas fa-magic"></i> Buka Halaman Laporan & Tunjukkan Bagiannya
+                        </button>
+                    </div>
+                    <p class="tut-lead">
+                        Klik menu <strong><i class="fas fa-chart-bar"></i> Laporan Utama</strong> di sidebar kiri untuk melihat pembukuan bulanan atau mencetak laporan resmi.
+                    </p>
+
+                    <!-- VISUAL MOCKUP LAPORAN -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-file-contract" style="color: #7c3aed;"></i>
+                            <span class="ui-mockup-url">Visual Halaman Laporan Utama</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <!-- Bar Filter Laporan -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; margin-bottom: 14px;">
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <span style="background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 12px;">Cari Uraian...</span>
+                                    <span style="background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;"><span class="mock-badge-num">1</span> Tahun: 2026</span>
+                                    <span style="background: #fff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;"><span class="mock-badge-num">2</span> Bulan: Agustus &#9662;</span>
+                                    <span style="background: #3b82f6; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Filter</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="background: #0ea5e9; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                                        <span class="mock-badge-num">3</span> <i class="fas fa-eye"></i> Preview Laporan
+                                    </span>
+                                    <span style="background: #fff; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                        <i class="fas fa-file-excel" style="color: #10b981;"></i> Export Excel
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Dua Tab Laporan -->
+                            <div style="display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                                <span style="background: #059669; color: white; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">4</span> <i class="fas fa-university"></i> Laporan Internal SPMB
+                                </span>
+                                <span style="background: #f1f5f9; color: #475569; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">5</span> <i class="fas fa-exchange-alt"></i> Laporan via SIKMA
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> & <span class="mock-badge-num">2</span> <strong>Filter Tahun & Bulan:</strong> Pilih tahun dan bulan lalu klik <strong>Filter</strong>. Baris pertama tabel akan otomatis memunculkan <em>"Saldo Bulan Sebelumnya"</em>.</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Preview Laporan (Biru Muda):</strong> Klik ini untuk mencetak lembar Laporan Keuangan Bulanan resmi ber-kop Madrasah JIC.</div>
+                            <div><span class="mock-badge-num">4</span> <strong>Tab Laporan Internal SPMB:</strong> Daftar uang masuk & keluar yang diinput di website SPMB ini.</div>
+                            <div><span class="mock-badge-num">5</span> <strong>Tab Laporan via SIKMA:</strong> Daftar pelunasan tunggakan santri yang diinput melalui aplikasi SIKMA setelah SPMB Tutup Buku.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. VISUAL SUPER ADMIN -->
+                <div class="tutorial-section" id="tut-superadmin">
+                    <div class="tut-badge-header" style="background: #f5f3ff; color: #7c3aed;">BAB 10 • VISUAL KHUSUS SUPER ADMIN</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Tampilan Saklar Tutup Buku & Pengaturan Tahun Ajaran Baru</h3>
+                        <% if (typeof admin !== 'undefined' && admin.role === 'super_admin') { %>
+                        <button type="button" class="btn-tour-jump" onclick="launchGuidedTour('superadmin')">
+                            <i class="fas fa-magic"></i> Buka Dashboard Super Admin & Tunjukkan
+                        </button>
+                        <% } %>
+                    </div>
+                    <p class="tut-lead">
+                        Jika akun Anda adalah <strong>Super Admin</strong>, di bagian bawah menu kiri (Sidebar) terdapat tombol hijau <strong><i class="fas fa-shield-alt"></i> Dashboard Super Admin</strong>. Berikut adalah tampilan kontrol pentingnya:
+                    </p>
+
+                    <!-- VISUAL MOCKUP SAKLAR TUTUP BUKU -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-shield-alt" style="color: #7c3aed;"></i>
+                            <span class="ui-mockup-url">Visual 1: Saklar "Tutup Buku / Buka Buku" di Dashboard Super Admin</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border: 1px solid #e2e8f0; border-radius: 14px; background: #f8fafc; flex-wrap: wrap; gap: 15px;">
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                                        <i class="fas fa-lock-open"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase;">Status Pendaftaran SPMB</div>
+                                        <div style="font-size: 18px; font-weight: 800; color: #1e293b;">Buka Buku (Aktif)</div>
+                                        <div style="font-size: 12px; color: #64748b;">Jika ditutup, admin tidak dapat menginput transaksi pendaftaran SPMB lagi.</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="mock-badge-num">!</span>
+                                    <div style="width: 56px; height: 30px; background: #cbd5e1; border-radius: 30px; position: relative; padding: 3px;">
+                                        <div style="width: 24px; height: 24px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">!</span> <strong>Saklar Geser (Toggle):</strong> Jika digeser ke kanan (berubah warna Merah / <strong>Tutup Buku</strong>), maka halaman <em>Input Transaksi</em> milik seluruh admin akan otomatis terkunci dan menampilkan pesan agar pembayaran diinput lewat Web SIKMA.</div>
+                        </div>
+                    </div>
+
+                    <!-- VISUAL MOCKUP 4 TAB MASTER DATA -->
+                    <div class="ui-mockup-frame">
+                        <div class="ui-mockup-titlebar">
+                            <i class="fas fa-database" style="color: #059669;"></i>
+                            <span class="ui-mockup-url">Visual 2: Empat Tab di Menu "Master Data & Jadwal" (Saat Ganti Tahun Ajaran)</span>
+                        </div>
+                        <div style="padding: 18px; background: #fff;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                                <span style="background: #e0f2fe; color: #0ea5e9; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">1</span> <i class="fas fa-graduation-cap"></i> Data Jenjang
+                                </span>
+                                <span style="background: #f1f5f9; color: #64748b; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">2</span> <i class="fas fa-calendar-alt"></i> Gelombang Pendaftaran
+                                </span>
+                                <span style="background: #f1f5f9; color: #64748b; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">3</span> <i class="fas fa-route"></i> Jalur Pendaftaran
+                                </span>
+                                <span style="background: #f1f5f9; color: #64748b; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
+                                    <span class="mock-badge-num">4</span> <i class="fas fa-clock"></i> Tahun Ajaran
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ui-mockup-legend">
+                            <div><span class="mock-badge-num">1</span> <strong>Tab Data Jenjang:</strong> Tempat mengatur <strong>Kuota Maksimal</strong> pendaftar PAUDQu, TPQ, dan MDT. Jika sisa kuota habis (0), jenjang tersebut otomatis tertutup di halaman pendaftaran publik.</div>
+                            <div><span class="mock-badge-num">2</span> <strong>Tab Gelombang Pendaftaran:</strong> Tempat mengatur tanggal buka & tutup pendaftaran serta mencentang form mana saja yang dibuka (Santri Baru / Beasiswa / Daftar Ulang).</div>
+                            <div><span class="mock-badge-num">3</span> <strong>Tab Jalur Pendaftaran:</strong> Tempat mengatur nama jalur dan syarat dokumen yang tampil di halaman depan.</div>
+                            <div><span class="mock-badge-num">4</span> <strong>Tab Tahun Ajaran:</strong> Klik tombol hijau <span style="background:#10b981; color:white; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;"><i class="fas fa-play"></i> Jadikan Aktif</span> pada tahun ajaran baru untuk memulai periode penerimaan santri tahun berikutnya.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11. SOLUSI MASALAH (FAQ) -->
+                <div class="tutorial-section" id="tut-faq">
+                    <div class="tut-badge-header">BAB 11 • TANYA JAWAB & SOLUSI CEPAT</div>
+                    <h3>Tanya Jawab Kendala Sehari-hari (FAQ)</h3>
+                    <p class="tut-lead">
+                        Berikut adalah daftar pertanyaan yang paling sering ditanyakan admin baru beserta langkah mengatasinya:
+                    </p>
+
+                    <div class="tut-faq-list">
+                        <div class="tut-faq-item">
+                            <h5><i class="fas fa-question-circle"></i> 1. Mengapa nama santri tidak muncul saat diketik di form Input Transaksi?</h5>
+                            <p><strong>Penyebab & Solusi:</strong><br>
+                            a) Pastikan Anda sudah memilih <strong>Satuan Pendidikan</strong> (PAUDQu / TPQ / MDT) terlebih dahulu sebelum mengetik nama santri.<br>
+                            b) Pastikan Anda tidak salah memilih antara <em>"Pembayaran Pendaftaran Baru"</em> dan <em>"Pembayaran Daftar Ulang"</em>.<br>
+                            c) Cek apakah santri tersebut sudah berstatus <span class="badge badge-danger">Mundur</span> di halaman Data Santri.</p>
+                        </div>
+
+                        <div class="tut-faq-item">
+                            <h5><i class="fas fa-question-circle"></i> 2. Mengapa tiba-tiba semua data santri atau tagihan tampak kosong?</h5>
+                            <p><strong>Penyebab & Solusi:</strong> Lihat ke pojok kanan atas layar pada kotak <strong>T.A (Tahun Ajaran)</strong>. Pastikan pilihannya berada pada tahun ajaran yang ada tulisan <strong>(Aktif)</strong> atau pilih <code>-- Semua Tahun / Arsip --</code>.</p>
+                        </div>
+
+                        <div class="tut-faq-item">
+                            <h5><i class="fas fa-question-circle"></i> 3. Mengapa form Input Transaksi terkunci dan muncul kotak merah "SPMB Telah Tutup Buku"?</h5>
+                            <p><strong>Penyebab & Solusi:</strong> Super Admin telah menggeser saklar <strong>Tutup Buku</strong> karena masa SPMB sudah selesai. Hubungi Super Admin jika masih ada transaksi susulan yang harus diinput di web SPMB.</p>
+                        </div>
+
+                        <div class="tut-faq-item">
+                            <h5><i class="fas fa-question-circle"></i> 4. Orang tua salah daftar jalur (harusnya Beasiswa tapi daftar Reguler), bagaimana cara mengubahnya?</h5>
+                            <p><strong>Solusi:</strong> Jangan dihapus! Buka menu <strong>Data Santri</strong> &rarr; klik tombol putih <strong>Detail</strong> pada baris santri tersebut &rarr; ubah pilihan <strong>Jalur Pendaftaran</strong> menjadi jalur beasiswa yang diinginkan &rarr; klik <strong>Simpan Perubahan</strong>. Tagihannya akan otomatis berubah ke tarif beasiswa!</p>
+                        </div>
+
+                        <div class="tut-faq-item">
+                            <h5><i class="fas fa-question-circle"></i> 5. Saya salah mengetik angka nominal uang saat Input Transaksi, bagaimana memperbaikinya?</h5>
+                            <p><strong>Solusi:</strong> Gulir ke tabel <strong>Transaksi Terbaru</strong> di bagian bawah halaman Input Transaksi &rarr; klik tombol kuning <strong><i class="fas fa-edit"></i> Edit</strong> pada baris transaksi tersebut &rarr; ketik nominal yang benar lalu simpan. Sisa tunggakan santri dan saldo kas otomatis terkoreksi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pesan Jika Pencarian Tidak Ditemukan -->
+                <div id="tutorialNoResult" style="display: none; text-align: center; padding: 50px 20px; color: #64748b;">
+                    <i class="fas fa-search-minus" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
+                    <h4 style="color: #1e293b; margin-bottom: 8px; font-size: 18px;">Topik panduan tidak ditemukan</h4>
+                    <p style="font-size: 14px;">Coba gunakan kata kunci lain seperti: <em>santri, mundur, tagihan, transaksi, kwitansi, laporan, tutup buku</em>.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="tutorial-modal-footer">
+            <div class="tutorial-footer-info">
+                <i class="fas fa-hand-sparkles" style="color: #059669;"></i>
+                <span>Klik tombol biru <strong>"Tur Halaman Ini"</strong> di pojok atas panduan untuk melihat penunjuk langsung di layar Anda!</span>
+            </div>
+            <div class="tutorial-footer-buttons">
+                <button type="button" class="btn btn-secondary" id="btnPrevTutorial" onclick="navigateTutorialStep(-1)" style="padding: 8px 16px; font-size: 13px;">
+                    <i class="fas fa-arrow-left"></i> Bab Sebelumnya
+                </button>
+                <button type="button" class="btn btn-primary" id="btnNextTutorial" onclick="navigateTutorialStep(1)" style="padding: 8px 16px; font-size: 13px; background: #059669;">
+                    Bab Selanjutnya <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeAdminTutorialModal()" style="padding: 8px 18px; font-size: 13px; background: #e2e8f0; color: #1e293b; border: none;">
+                    Tutup Panduan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OVERLAY TUR INTERAKTIF PENUNJUK ELEMEN ASLI DI LAYAR -->
+<div id="guidedTourBackdrop" class="gtour-backdrop" style="display: none;"></div>
+<div id="guidedTourSpotlight" class="gtour-spotlight" style="display: none;"></div>
+<div id="guidedTourTooltip" class="gtour-tooltip" style="display: none;">
+    <div class="gtour-tooltip-header">
+        <span class="gtour-step-badge" id="gtourStepBadge">Langkah 1 dari 4</span>
+        <button type="button" class="gtour-close-btn" onclick="endGuidedTour()" title="Tutup Tur">&times;</button>
+    </div>
+    <h4 id="gtourTitle">Judul Penunjuk</h4>
+    <p id="gtourDesc">Penjelasan detail elemen ini.</p>
+    <div class="gtour-tooltip-footer">
+        <button type="button" class="gtour-btn-secondary" onclick="openAdminTutorialModal(); endGuidedTour();">
+            <i class="fas fa-book-open"></i> Kembali ke Buku Panduan
+        </button>
+        <div style="display: flex; gap: 6px;">
+            <button type="button" class="gtour-btn-nav" id="gtourBtnPrev" onclick="stepGuidedTour(-1)">Sebelumnya</button>
+            <button type="button" class="gtour-btn-primary" id="gtourBtnNext" onclick="stepGuidedTour(1)">Lanjut &rarr;</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-tour-navbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.28);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.btn-tour-navbar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+}
+.btn-tour-navbar i {
+    font-size: 13px;
+}
+.btn-tutorial-navbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.btn-tutorial-navbar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+}
+.btn-start-page-tour {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fef08a;
+    color: #854d0e;
+    border: 1px solid #fde047;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-start-page-tour:hover {
+    background: #fde047;
+    transform: translateY(-1px);
+}
+.btn-tour-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1.5px solid #6ee7b7;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 6px;
+}
+.btn-tour-jump:hover {
+    background: #059669;
+    color: #ffffff;
+    border-color: #059669;
+}
+.mock-tour-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* UI MOCKUP REPLICA STYLES */
+.ui-mockup-frame {
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.ui-mockup-titlebar {
+    background: #f1f5f9;
+    padding: 10px 16px;
+    border-bottom: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #334155;
+}
+.dot-red, .dot-yellow, .dot-green {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+.ui-mockup-url {
+    margin-left: 4px;
+}
+.ui-mockup-layout {
+    display: flex;
+    min-height: 190px;
+}
+.ui-mock-sidebar {
+    width: 190px;
+    background: linear-gradient(180deg, #064e3b 0%, #043e30 100%);
+    color: rgba(255,255,255,0.85);
+    padding: 12px 0;
+    font-size: 11.5px;
+    flex-shrink: 0;
+}
+.ui-mock-logo {
+    padding: 6px 14px 12px;
+    font-weight: 800;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 6px;
+}
+.ui-mock-menu-label {
+    padding: 8px 14px 3px;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+}
+.ui-mock-menu-item {
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ui-mock-menu-item.active {
+    background: rgba(255,255,255,0.12);
+    border-left: 3px solid #d97706;
+    font-weight: 700;
+    color: #fff;
+}
+.ui-mock-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+.ui-mock-topbar {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.ui-mock-ta {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+.ui-mock-btn-green {
+    background: #059669;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.ui-mock-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #059669;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+.ui-mock-body {
+    padding: 18px;
+    flex: 1;
+}
+.mock-badge-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+    margin-right: 3px;
+    flex-shrink: 0;
+}
+.ui-mockup-legend {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 14px 18px;
+    font-size: 12.5px;
+    color: #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* VISUAL FLOW DIAGRAM */
+.visual-flow-diagram {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.vflow-box {
+    flex: 1;
+    min-width: 150px;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    border: 1.5px solid;
+}
+.vflow-step {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+}
+.vflow-box i {
+    font-size: 24px;
+    margin: 4px 0;
+}
+.vflow-box strong {
+    font-size: 13px;
+}
+.vflow-box span {
+    font-size: 11.5px;
+    line-height: 1.35;
+}
+.vflow-green { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+.vflow-purple { background: #f5f3ff; border-color: #c4b5fd; color: #5b21b6; }
+.vflow-blue { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+.vflow-amber { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.vflow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 18px;
+    padding: 0 4px;
+}
+.vflow-arrow span {
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tut-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.visual-explain-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+/* GUIDED TOUR SPOTLIGHT & TOOLTIP */
+.gtour-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000;
+    pointer-events: none;
+}
+.gtour-spotlight {
+    position: fixed;
+    z-index: 100001;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 0 4px #10b981, 0 0 20px rgba(16, 185, 129, 0.8);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+.gtour-tooltip {
+    position: fixed;
+    z-index: 100002;
+    background: #ffffff;
+    width: 360px;
+    max-width: calc(100vw - 24px);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 20px 35px -5px rgba(0,0,0,0.35);
+    border: 2px solid #10b981;
+    transition: all 0.25s ease;
+}
+.gtour-tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.gtour-step-badge {
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.gtour-close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+}
+.gtour-tooltip h4 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+}
+.gtour-tooltip p {
+    margin: 0 0 16px 0;
+    font-size: 13.5px;
+    color: #334155;
+    line-height: 1.55;
+}
+.gtour-tooltip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 12px;
+}
+.gtour-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.gtour-btn-nav {
+    background: #e2e8f0;
+    color: #1e293b;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.gtour-btn-primary {
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tutorial-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(5px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.tutorial-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 1220px;
+    height: 90vh;
+    max-height: 880px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: tutorialModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes tutorialModalPop {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.tutorial-modal-header {
+    background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+    color: #ffffff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.tutorial-header-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.tutorial-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.tutorial-header-title h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #ffffff;
+}
+.tutorial-header-title p {
+    margin: 3px 0 0 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.88);
+}
+.tutorial-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.tutorial-search-box {
+    position: relative;
+    width: 260px;
+}
+.tutorial-search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 13px;
+}
+.tutorial-search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 32px;
+    border-radius: 8px;
+    border: none;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 12.5px;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.tutorial-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.tutorial-close-btn:hover {
+    background: rgba(239, 68, 68, 0.9);
+}
+
+.tutorial-modal-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    background: #f8fafc;
+}
+.tutorial-sidebar {
+    width: 265px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    padding: 14px 10px;
+    overflow-y: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.tutorial-nav-group {
+    font-size: 10px;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.8px;
+    padding: 10px 12px 4px;
+    text-transform: uppercase;
+}
+.tutorial-nav-group:first-child {
+    padding-top: 2px;
+}
+.tutorial-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    padding: 9px 12px;
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.tutorial-nav-btn i {
+    width: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
+}
+.tutorial-nav-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+.tutorial-nav-btn.active {
+    background: #ecfdf5;
+    color: #059669;
+    font-weight: 700;
+}
+.tutorial-nav-btn.active i {
+    color: #059669;
+}
+
+.tutorial-content {
+    flex: 1;
+    padding: 24px 30px;
+    overflow-y: auto;
+    color: #334155;
+    line-height: 1.6;
+}
+.tutorial-section {
+    display: none;
+}
+.tutorial-section.active {
+    display: block;
+    animation: fadeInTut 0.2s ease;
+}
+@keyframes fadeInTut {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tut-badge-header {
+    display: inline-block;
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+}
+.tutorial-section h3 {
+    font-size: 21px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.3px;
+}
+.tut-lead {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 18px;
+}
+
+.tut-callout {
+    display: flex;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 5px solid;
+}
+.tut-callout-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.tut-callout h4 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+.tut-callout p {
+    margin: 0;
+    font-size: 13px;
+}
+.tut-callout-info {
+    background: #eff6ff;
+    border-left-color: #3b82f6;
+    color: #1e3a8a;
+}
+.tut-callout-info .tut-callout-icon { color: #2563eb; }
+.tut-callout-warning {
+    background: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #78350f;
+}
+.tut-callout-warning .tut-callout-icon { color: #d97706; }
+.tut-callout-danger {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+    color: #7f1d1d;
+}
+.tut-callout-danger .tut-callout-icon { color: #dc2626; }
+
+.tut-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+}
+.tut-step-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.tut-step-box h4 {
+    margin: 0 0 10px 0;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+.tut-step-box p {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.tut-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.tut-faq-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px 18px;
+}
+.tut-faq-item h5 {
+    margin: 0 0 6px 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tut-faq-item h5 i {
+    color: #059669;
+}
+.tut-faq-item p {
+    margin: 0;
+    font-size: 13px;
+    color: #475569;
+}
+
+.tutorial-modal-footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.tutorial-footer-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #64748b;
+}
+.tutorial-footer-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 860px) {
+    .tutorial-modal-container {
+        height: 94vh;
+    }
+    .tutorial-modal-body {
+        flex-direction: column;
+    }
+    .tutorial-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px;
+    }
+    .tutorial-nav-group {
+        display: none;
+    }
+    .tutorial-nav-btn {
+        width: auto;
+        white-space: nowrap;
+        padding: 8px 12px;
+    }
+    .tutorial-search-box {
+        width: 100%;
+    }
+    .tutorial-content {
+        padding: 16px;
+    }
+    .btn-tutorial-navbar span,
+    .btn-tour-navbar span {
+        display: none;
+    }
+    .ui-mockup-layout {
+        flex-direction: column;
+    }
+    .ui-mock-sidebar {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+const tutorialOrder = [
+    'tut-intro',
+    'tut-warning',
+    'tut-dashboard',
+    'tut-santri',
+    'tut-mundur',
+    'tut-tagihan',
+    'tut-transaksi',
+    'tut-kwitansi',
+    'tut-laporan',
+    'tut-superadmin',
+    'tut-faq'
+];
+let currentTutorialId = 'tut-intro';
+
+// =====================================================
+// DEFINISI LANGKAH TUR INTERAKTIF UNTUK TIAP HALAMAN
+// =====================================================
+const GUIDED_TOURS = {
+    'topbar-ta': {
+        url: null, // bisa dijalankan di halaman mana saja
+        steps: [
+            {
+                selector: '.tahun-ajaran-switcher-wrapper, .topbar-right',
+                title: 'Kotak Pilihan Tahun Ajaran (T.A)',
+                desc: 'Ini adalah kotak pengatur Tahun Ajaran. Jika data santri/tagihan tampak kosong, klik pilihan ini dan pastikan memilih Tahun Ajaran yang ada tulisan (Aktif).'
+            },
+            {
+                selector: '.sidebar-menu',
+                title: 'Menu Kiri (Sidebar)',
+                desc: 'Gunakan daftar menu di sebelah kiri ini untuk berpindah antara halaman Dashboard, Input Transaksi, Laporan, Data Santri Baru, dan Daftar Ulang.'
+            }
+        ]
+    },
+    'dashboard': {
+        url: '/dashboard',
+        steps: [
+            {
+                selector: '.tahun-ajaran-switcher-wrapper',
+                title: '1. Filter Tahun Ajaran (T.A)',
+                desc: 'Pastikan Tahun Ajaran di sini sesuai dengan periode yang ingin Anda pantau.'
+            },
+            {
+                selector: '.arus-kas-card.pemasukan',
+                title: '2. Kartu Total Pemasukan (Hijau)',
+                desc: 'Menampilkan total seluruh uang nyata yang sudah masuk dari pembayaran santri maupun pemasukan lainnya.'
+            },
+            {
+                selector: '.arus-kas-card.pengeluaran',
+                title: '3. Kartu Total Pengeluaran (Merah)',
+                desc: 'Menampilkan total uang yang dikeluarkan untuk operasional maupun pengembalian dana (refund) santri mundur.'
+            },
+            {
+                selector: '.arus-kas-card.saldo',
+                title: '4. Kartu Saldo SPMB (Biru)',
+                desc: 'Sisa uang kas bersih saat ini (Total Pemasukan dikurangi Total Pengeluaran).'
+            },
+            {
+                selector: '[data-group="pengeluaran-global"]',
+                title: '5. Tabel Pengeluaran Interaktif (Bisa Diklik!)',
+                desc: 'Coba klik langsung angka Rupiah di dalam tabel ini! Akan muncul pop-up rincian pengeluaran beserta tombol Export PDF.'
+            },
+            {
+                selector: '[data-group="ziswaf-subsidy"]',
+                title: '6. Tabel Status Subsidi Beasiswa (ZISWAF JIC)',
+                desc: 'Memantau jumlah santri penerima beasiswa beserta target dana subsidi Ziswaf dan sisa tunggakannya.'
+            }
+        ]
+    },
+    'santri': {
+        url: '/santri',
+        steps: [
+            {
+                selector: '.filter-bar',
+                title: '1. Baris Pencarian & Tombol Tambah Santri',
+                desc: 'Di bagian atas ini Anda bisa mencari nama santri, mendownload Excel, atau klik tombol biru "+ Tambah Santri" dan tombol kuning "+ Tambah Santri Beasiswa" untuk mendaftarkan santri secara manual.'
+            },
+            {
+                selector: '#dataTable thead',
+                title: '2. Judul Kolom Tabel (Bisa Diurutkan & Difilter)',
+                desc: 'Klik panah kecil di sebelah judul kolom (seperti Jalur Pendaftaran atau Pendidikan) untuk menyaring tabel ala Excel.'
+            },
+            {
+                selector: '#dataTable tbody tr:first-child td:last-child, #dataTable',
+                title: '3. Kolom Aksi: Detail, Hapus & Mundur',
+                desc: 'INGAT ATURAN EMAS: Klik "Detail" (putih) untuk edit biodata/cetak PDF. Klik "Mundur" (kuning) jika santri batal sekolah. JANGAN klik "Hapus" (merah) kecuali untuk data duplikat/salah input!'
+            }
+        ]
+    },
+    'tagihan': {
+        url: '/tagihan',
+        steps: [
+            {
+                selector: '.filter-bar',
+                title: '1. Filter & Export Excel Tagihan',
+                desc: 'Anda dapat mencari nama santri atau menyaring berdasarkan jenjang pendidikan, lalu mengunduhnya ke Excel.'
+            },
+            {
+                selector: '#dataTable',
+                title: '2. Tabel Rincian Komponen Tagihan',
+                desc: 'Menampilkan rincian biaya Formulir, Uang Pangkal, Perlengkapan, Seragam, dan SPP Juli yang dibuat otomatis saat santri mendaftar.'
+            },
+            {
+                selector: '#dataTable tbody tr:first-child td:last-child, #dataTable',
+                title: '3. Tombol Edit Tagihan',
+                desc: 'Klik tombol "Edit" di kolom paling kanan jika Anda ingin mengubah nominal tagihan atau memberikan diskon khusus pada santri tertentu.'
+            }
+        ]
+    },
+    'tunggakan': {
+        url: '/tunggakan',
+        steps: [
+            {
+                selector: '.filter-bar',
+                title: '1. Filter Status Belum Lunas / Lunas',
+                desc: 'Gunakan pilihan Status di sini untuk menampilkan khusus santri yang "Belum Lunas" saja, lalu klik Export Excel untuk bahan penagihan.'
+            },
+            {
+                selector: '#dataTable',
+                title: '2. Pemantauan Sisa Bayar & Progress Cicilan',
+                desc: 'Halaman ini 100% otomatis. Setiap kali Anda mencatat pembayaran santri di menu Input Transaksi, kolom Total Bayar, Sisa Bayar, dan Progress (%) di sini otomatis terpotong.'
+            }
+        ]
+    },
+    'input-transaksi': {
+        url: '/input-transaksi',
+        steps: [
+            {
+                selector: '#tanggal',
+                title: '1. Pilih Tanggal Transaksi',
+                desc: 'Pastikan tanggal transaksi sesuai dengan tanggal uang diterima atau dikeluarkan.'
+            },
+            {
+                selector: '#jenisTransaksi',
+                title: '2. Pilih Jenis Transaksi (Kunci Utama!)',
+                desc: 'Pilih "Pembayaran Pendaftaran Baru" atau "Pembayaran Daftar Ulang" untuk memotong tunggakan santri. Pilih "Pemasukan" untuk dana Ziswaf/donasi, atau "Pengeluaran" untuk belanja operasional.'
+            },
+            {
+                selector: '#formTransaksi button[type="submit"]',
+                title: '3. Tombol Simpan Transaksi',
+                desc: 'Setelah memilih nama santri dan mengisi nominal uang, klik tombol Simpan ini. Kwitansi dan Laporan akan otomatis terbuat.'
+            },
+            {
+                selector: '#tabelTransaksi',
+                title: '4. Tabel Transaksi Terbaru (Cetak Kwitansi & Edit)',
+                desc: 'Semua transaksi yang sudah disimpan muncul di tabel bawah ini. Klik tombol "Cetak" untuk membuka dan mencetak Kwitansi, atau klik "Edit" jika salah memasukkan nominal.'
+            }
+        ]
+    },
+    'laporan': {
+        url: '/laporan',
+        steps: [
+            {
+                selector: '.filter-form',
+                title: '1. Filter Tahun & Bulan Laporan',
+                desc: 'Pilih Tahun dan Bulan lalu klik Filter. Sistem otomatis menghitung Saldo Awal dari bulan sebelumnya pada baris pertama tabel.'
+            },
+            {
+                selector: '.btn-preview-laporan',
+                title: '2. Tombol Preview Laporan (Cetak Resmi)',
+                desc: 'Klik tombol biru muda ini untuk melihat dan mencetak Laporan Keuangan Bulanan resmi lengkap dengan Kop Madrasah JIC dan tanda tangan Bendahara.'
+            },
+            {
+                selector: '.tabs-container-laporan',
+                title: '3. Tab Laporan Internal SPMB vs SIKMA',
+                desc: 'Anda dapat berpindah antara laporan transaksi yang diinput di web SPMB ini dan laporan pelunasan yang diinput lewat web SIKMA.'
+            }
+        ]
+    },
+    'superadmin': {
+        url: '/superadmin/dashboard',
+        steps: [
+            {
+                selector: '#toggleTutupBuku, .stat-card',
+                title: '1. Saklar Tutup Buku / Buka Buku SPMB',
+                desc: 'Geser saklar ini untuk mengunci seluruh input transaksi di halaman admin saat periode SPMB berakhir dan pembukuan diserahkan ke SIKMA.'
+            },
+            {
+                selector: '.grid-cards:last-of-type',
+                title: '2. Kartu Pintasan Super Admin',
+                desc: 'Klik salah satu kartu ini untuk langsung menuju halaman Kelola Admin, Konfigurasi Master Data, atau Pemantauan Log Aktivitas.'
+            },
+            {
+                selector: '.sidebar-menu',
+                title: '3. Menu Navigasi Super Admin',
+                desc: 'Gunakan menu di kiri untuk berpindah halaman atau klik "Dashboard Admin Biasa" untuk kembali ke tampilan kasir/admin.'
+            }
+        ]
+    },
+    'superadmin-users': {
+        url: '/superadmin/users',
+        steps: [
+            {
+                selector: '.table-header button',
+                title: '1. Tombol + Tambah Pengguna',
+                desc: 'Klik tombol biru ini untuk membuat akun login baru bagi Admin atau Panitia baru.'
+            },
+            {
+                selector: '.table-container table',
+                title: '2. Daftar Akun Pengguna & Hak Akses',
+                desc: 'Menampilkan seluruh akun beserta Role (Super Admin / Admin) dan status Aktif/Nonaktif. Klik tombol "Edit" di sebelah kanan untuk mengganti password atau menonaktifkan admin lama.'
+            }
+        ]
+    },
+    'superadmin-master': {
+        url: '/superadmin/master-data',
+        steps: [
+            {
+                selector: '#tab-btn-jenjang',
+                title: '1. Tab Data Jenjang (Kuota Pendaftaran)',
+                desc: 'Atur batas kuota maksimal pendaftar PAUDQu, TPQ, dan MDT di sini. Jika sisa kuota habis, jenjang tersebut otomatis tertutup di form pendaftaran publik.'
+            },
+            {
+                selector: '#tab-btn-gelombang',
+                title: '2. Tab Gelombang Pendaftaran (Jadwal Buka/Tutup)',
+                desc: 'Klik tab ini untuk mengatur tanggal mulai & selesai pendaftaran serta memilih formulir mana saja yang dibuka.'
+            },
+            {
+                selector: '#tab-btn-jalur',
+                title: '3. Tab Jalur Pendaftaran',
+                desc: 'Klik tab ini untuk mengelola nama jalur pendaftaran, biaya formulir, dan syarat dokumen.'
+            },
+            {
+                selector: '#tab-btn-tahun-ajaran',
+                title: '4. Tab Tahun Ajaran (Pergantian Periode)',
+                desc: 'Klik tab ini saat memasuki tahun ajaran baru, tambahkan tahun ajaran baru, lalu klik tombol hijau "Jadikan Aktif".'
+            }
+        ]
+    },
+    'superadmin-logs': {
+        url: '/superadmin/logs',
+        steps: [
+            {
+                selector: '.table-header button',
+                title: '1. Tombol Segarkan Log',
+                desc: 'Klik tombol ini untuk memuat ulang catatan aktivitas terbaru secara real-time.'
+            },
+            {
+                selector: '.table-container table',
+                title: '2. Tabel Riwayat Aktivitas Sistem',
+                desc: 'Merekam siapa melakukan apa dan kapan (Login, Tambah, Edit, Hapus data) beserta alamat IP perangkatnya untuk keamanan audit.'
+            }
+        ]
+    }
+};
+
+let activeTourSteps = [];
+let activeTourIndex = 0;
+
+function detectCurrentPageTourKey() {
+    const path = window.location.pathname;
+    if (path.includes('/input-transaksi')) return 'input-transaksi';
+    if (path.includes('/santri')) return 'santri';
+    if (path.includes('/tagihan')) return 'tagihan';
+    if (path.includes('/tunggakan')) return 'tunggakan';
+    if (path.includes('/laporan')) return 'laporan';
+    if (path.includes('/superadmin/users')) return 'superadmin-users';
+    if (path.includes('/superadmin/master-data')) return 'superadmin-master';
+    if (path.includes('/superadmin/logs')) return 'superadmin-logs';
+    if (path.includes('/superadmin')) return 'superadmin';
+    return 'dashboard';
+}
+
+function startCurrentPageTour() {
+    const key = detectCurrentPageTourKey();
+    launchGuidedTour(key, true);
+}
+
+function launchGuidedTour(tourKey, skipRedirect) {
+    const tour = GUIDED_TOURS[tourKey];
+    if (!tour) return;
+
+    // Jika butuh pindah halaman terlebih dahulu (hanya bila dipanggil dari buku panduan, bukan dari tombol Tur Halaman di navbar)
+    if (!skipRedirect && tour.url && window.location.pathname !== tour.url) {
+        sessionStorage.setItem('spmb_pending_guided_tour', tourKey);
+        window.location.href = tour.url;
+        return;
+    }
+
+    closeAdminTutorialModal();
+
+    // Filter hanya step yang elemennya ada di halaman saat ini
+    activeTourSteps = tour.steps.filter(s => document.querySelector(s.selector));
+    if (activeTourSteps.length === 0) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire('Info', 'Elemen yang ditunjuk tidak ditampilkan pada halaman ini.', 'info');
+        }
+        return;
+    }
+
+    activeTourIndex = 0;
+    document.getElementById('guidedTourBackdrop').style.display = 'block';
+    document.getElementById('guidedTourSpotlight').style.display = 'block';
+    document.getElementById('guidedTourTooltip').style.display = 'block';
+    renderGuidedTourStep();
+}
+
+function renderGuidedTourStep() {
+    if (activeTourIndex < 0 || activeTourIndex >= activeTourSteps.length) {
+        endGuidedTour();
+        return;
+    }
+
+    const step = activeTourSteps[activeTourIndex];
+    const el = document.querySelector(step.selector);
+    if (!el) {
+        endGuidedTour();
+        return;
+    }
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    setTimeout(() => {
+        const rect = el.getBoundingClientRect();
+        const pad = 8;
+        const spotlight = document.getElementById('guidedTourSpotlight');
+        const tooltip = document.getElementById('guidedTourTooltip');
+
+        spotlight.style.top = Math.max(4, rect.top - pad) + 'px';
+        spotlight.style.left = Math.max(4, rect.left - pad) + 'px';
+        spotlight.style.width = Math.min(window.innerWidth - 8, rect.width + pad * 2) + 'px';
+        spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+        document.getElementById('gtourStepBadge').innerText = `Penunjuk Visual ${activeTourIndex + 1} dari ${activeTourSteps.length}`;
+        document.getElementById('gtourTitle').innerText = step.title;
+        document.getElementById('gtourDesc').innerText = step.desc;
+
+        const btnPrev = document.getElementById('gtourBtnPrev');
+        const btnNext = document.getElementById('gtourBtnNext');
+        btnPrev.style.display = activeTourIndex === 0 ? 'none' : 'inline-block';
+        btnNext.innerHTML = activeTourIndex === activeTourSteps.length - 1 ? '<i class="fas fa-check"></i> Selesai' : 'Lanjut &rarr;';
+
+        // Posisikan tooltip di bawah atau di atas elemen
+        const tooltipWidth = 360;
+        let topPos = rect.bottom + pad + 14;
+        if (topPos + 210 > window.innerHeight) {
+            topPos = Math.max(12, rect.top - 210);
+        }
+        let leftPos = rect.left;
+        if (leftPos + tooltipWidth > window.innerWidth - 16) {
+            leftPos = Math.max(12, window.innerWidth - tooltipWidth - 16);
+        }
+
+        tooltip.style.top = topPos + 'px';
+        tooltip.style.left = leftPos + 'px';
+    }, 280);
+}
+
+function stepGuidedTour(dir) {
+    activeTourIndex += dir;
+    if (activeTourIndex >= activeTourSteps.length) {
+        endGuidedTour();
+        return;
+    }
+    renderGuidedTourStep();
+}
+
+function endGuidedTour() {
+    document.getElementById('guidedTourBackdrop').style.display = 'none';
+    document.getElementById('guidedTourSpotlight').style.display = 'none';
+    document.getElementById('guidedTourTooltip').style.display = 'none';
+    activeTourSteps = [];
+}
+
+// Jalankan tur otomatis jika baru saja berpindah halaman dari tombol "Tunjukkan di Layar"
+document.addEventListener('DOMContentLoaded', function() {
+    const pendingTour = sessionStorage.getItem('spmb_pending_guided_tour');
+    if (pendingTour) {
+        sessionStorage.removeItem('spmb_pending_guided_tour');
+        setTimeout(() => {
+            launchGuidedTour(pendingTour);
+        }, 450);
+    }
+});
+
+window.addEventListener('resize', function() {
+    if (activeTourSteps.length > 0) {
+        renderGuidedTourStep();
+    }
+});
+
+function openAdminTutorialModal(initialTabId) {
+    endGuidedTour();
+    const modal = document.getElementById('adminTutorialModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    const searchInput = document.getElementById('tutorialSearchInput');
+    if (searchInput && searchInput.value) {
+        searchInput.value = '';
+        filterTutorialSearch('');
+    }
+
+    if (initialTabId) {
+        const targetBtn = document.querySelector(`.tutorial-nav-btn[data-target="${initialTabId}"]`);
+        if (targetBtn) switchTutorialTab(initialTabId, targetBtn);
+    } else {
+        // Otomatis buka bab yang sesuai dengan halaman yang sedang dibuka jika baru pertama dibuka
+        updateTutorialNavButtons();
+    }
+}
+
+function closeAdminTutorialModal() {
+    const modal = document.getElementById('adminTutorialModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function switchTutorialTab(targetId, btnElement) {
+    const searchInput = document.getElementById('tutorialSearchInput');
+    if (searchInput && searchInput.value.trim() !== '') {
+        searchInput.value = '';
+        document.getElementById('tutorialNoResult').style.display = 'none';
+    }
+
+    currentTutorialId = targetId;
+    document.querySelectorAll('.tutorial-section').forEach(sec => {
+        sec.classList.remove('active');
+        sec.style.display = '';
+    });
+    document.querySelectorAll('.tutorial-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    const targetSec = document.getElementById(targetId);
+    if (targetSec) targetSec.classList.add('active');
+    if (btnElement) {
+        btnElement.classList.add('active');
+    } else {
+        const autoBtn = document.querySelector(`.tutorial-nav-btn[data-target="${targetId}"]`);
+        if (autoBtn) autoBtn.classList.add('active');
+    }
+
+    const contentArea = document.getElementById('tutorialContentArea');
+    if (contentArea) contentArea.scrollTop = 0;
+
+    updateTutorialNavButtons();
+}
+
+function navigateTutorialStep(direction) {
+    const idx = tutorialOrder.indexOf(currentTutorialId);
+    if (idx === -1) return;
+    const nextIdx = idx + direction;
+    if (nextIdx >= 0 && nextIdx < tutorialOrder.length) {
+        switchTutorialTab(tutorialOrder[nextIdx]);
+    }
+}
+
+functionUpdateNavSafe();
+function functionUpdateNavSafe() {
+    document.addEventListener('DOMContentLoaded', updateTutorialNavButtons);
+}
+
+function updateTutorialNavButtons() {
+    const idx = tutorialOrder.indexOf(currentTutorialId);
+    const btnPrev = document.getElementById('btnPrevTutorial');
+    const btnNext = document.getElementById('btnNextTutorial');
+    if (btnPrev) btnPrev.disabled = (idx <= 0);
+    if (btnNext) btnNext.disabled = (idx >= tutorialOrder.length - 1);
+}
+
+function filterTutorialSearch(query) {
+    const q = (query || '').trim().toLowerCase();
+    const sections = document.querySelectorAll('.tutorial-section');
+    const noResult = document.getElementById('tutorialNoResult');
+
+    if (!q) {
+        noResult.style.display = 'none';
+        sections.forEach(sec => {
+            sec.style.display = '';
+            sec.classList.toggle('active', sec.id === currentTutorialId);
+        });
+        return;
+    }
+
+    let matchCount = 0;
+    sections.forEach(sec => {
+        const text = sec.innerText.toLowerCase();
+        if (text.includes(q)) {
+            sec.style.display = 'block';
+            sec.classList.add('active');
+            matchCount++;
+        } else {
+            sec.style.display = 'none';
+            sec.classList.remove('active');
+        }
+    });
+
+    noResult.style.display = matchCount === 0 ? 'block' : 'none';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('adminTutorialModal');
+        if (modal && modal.style.display === 'flex') {
+            closeAdminTutorialModal();
+        }
+        if (activeTourSteps.length > 0) {
+            endGuidedTour();
+        }
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('adminTutorialModal');
+    if (modal && e.target === modal) {
+        closeAdminTutorialModal();
+    }
+});
+</script>
