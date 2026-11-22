@@ -1,21 +1,21 @@
-// Toggle Password Visibility
+// Toggle Visibility Input Sandi
 document.addEventListener('DOMContentLoaded', function() {
-    const togglePassword = document.querySelector('#togglePassword');
+    const eyeIcon = document.querySelector('#togglePassword');
     const toggleBtn = document.querySelector('.toggle-password-btn');
-    const password = document.querySelector('#password');
+    const pwdInput = document.querySelector('#password');
 
     const handleToggle = function() {
-        if (!password || !togglePassword) return;
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-        togglePassword.classList.toggle('fa-eye');
-        togglePassword.classList.toggle('fa-eye-slash');
+        if (!pwdInput || !eyeIcon) return;
+        const isMasked = pwdInput.getAttribute('type') === 'password';
+        pwdInput.setAttribute('type', isMasked ? 'text' : 'password');
+        eyeIcon.classList.toggle('fa-eye');
+        eyeIcon.classList.toggle('fa-eye-slash');
     };
 
     if (toggleBtn) {
         toggleBtn.addEventListener('click', handleToggle);
-    } else if (togglePassword) {
-        togglePassword.addEventListener('click', handleToggle);
+    } else if (eyeIcon) {
+        eyeIcon.addEventListener('click', handleToggle);
     }
 
     // Add loading state to button on submit
