@@ -577,6 +577,52 @@ class SantriModel {
         
         return false;
     }
+
+    static async getCandidatesFromPreviousYear(kelasAsal, prevYear) {
+        if (!kelasAsal || !prevYear) return [];
+        const startYear = String(prevYear).includes('/') ? String(prevYear).split('/')[0] : String(prevYear);
+
+        // 1. Ambil dari tabel santri (pendaftar baru tahun ajaran sebelumnya di kelas tersebut)
+        const queryBaru = `
+            SELECT 
+                nama, namaPanggilan, jenisKelamin, pendidikan AS kelasAsal,
+                tempatLahir, tanggalLahir, agama, statusKeluarga, anakKe, dariBersaudara, asalSekolah,
+                email, namaAyah, pekerjaanAyah, teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat
+            FROM santri
+            WHERE pendidikan = ?
+              AND (status_santri IS NULL OR status_santri = 'Aktif')
+              AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))
+            ORDER BY nama ASC
+        `;
+        const [rowsBaru] = await db.execute(queryBaru, [kelasAsal, `%/${startYear}/%`, startYear]);
+
+        // 2. Ambil dari tabel santri_daftar_ulang (pendaftar daftar ulang tahun ajaran sebelumnya yang naik ke kelas tersebut)
+        const queryUlang = `
+            SELECT 
+                nama, namaPanggilan, jenisKelamin, lanjutKe AS kelasAsal,
+                tempatLahir, tanggalLahir, agama, statusKeluarga, anakKe, dariBersaudara, asalSekolah,
+                email, namaAyah, pekerjaanAyah, teleponAyah, namaIbu, pekerjaanIbu, teleponIbu, alamat
+            FROM santri_daftar_ulang
+            WHERE lanjutKe = ?
+              AND (status_santri IS NULL OR status_santri = 'Aktif')
+              AND (nomorPendaftaran LIKE ? OR (nomorPendaftaran IS NULL AND YEAR(timestamp) = ?))
+            ORDER BY nama ASC
+        `;
+        const [rowsUlang] = await db.execute(queryUlang, [kelasAsal, `%/${startYear}/%`, startYear]);
+
+        // Gabungkan dan deduplikasi berdasarkan nama (case-insensitive)
+        const combined = [...rowsBaru, ...rowsUlang];
+        const uniqueMap = new Map();
+        for (const item of combined) {
+            if (!item.nama) continue;
+            const key = item.nama.trim().toLowerCase();
+            if (!uniqueMap.has(key)) {
+                uniqueMap.set(key, item);
+            }
+        }
+
+        return Array.from(uniqueMap.values()).sort((a, b) => a.nama.localeCompare(b.nama, 'id', { sensitivity: 'base' }));
+    }
 }
 
 function getLevenshteinDistance(a, b) {

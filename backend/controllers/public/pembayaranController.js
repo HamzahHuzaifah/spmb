@@ -2,12 +2,13 @@ const SantriModel = require('../../models/SantriModel');
 const TunggakanModel = require('../../models/TunggakanModel');
 
 exports.getFormPembayaran = (req, res) => {
+    const prefilledNoRef = req.query.noRef || '';
     res.render('public/layout', {
         title: 'Cek Info Pembayaran',
         bodyView: 'info-pembayaran',
         result: null,
         error: null,
-        nomorPendaftaran: ''
+        nomorPendaftaran: prefilledNoRef
     });
 };
 

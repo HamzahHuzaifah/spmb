@@ -223,6 +223,8 @@
     function initGlobalSelect2() {
         $('select.form-control, select.form-input').each(function() {
             const $this = $(this);
+            // Skip kandidat-nama-select because it has its own Select2 with tags:true initialization
+            if ($this.hasClass('kandidat-nama-select')) return;
             // Check if already initialized by specific scripts (e.g., AJAX search)
             if (!$this.hasClass('select2-hidden-accessible')) {
                 const optionCount = $this.find('option').length;
@@ -237,6 +239,222 @@
                 }
                 
                 $this.select2(select2Options);
+            }
+        });
+        initDaftarUlangCandidateLookup();
+    }
+
+    function initDaftarUlangCandidateLookup() {
+        const nextLevelMap = {
+            'PAUDQu A': 'PAUDQu B',
+            'PAUDQu B': 'TPQ A',
+            'TPQ A': 'TPQ B',
+            'TPQ B': 'MDT 1',
+            'MDT 1': 'MDT 2',
+            'MDT 2': 'MDT 3',
+            'MDT 3': 'MDT 4'
+        };
+
+        $('.kandidat-nama-select').each(function() {
+            const $nameSelect = $(this);
+            if ($nameSelect.data('kandidat-initialized')) return;
+            $nameSelect.data('kandidat-initialized', true);
+
+            const $form = $nameSelect.closest('form');
+            const $unitSelect = $form.find('select[name="pendidikanSebelumnya"]');
+            const $lanjutSelect = $form.find('select[name="lanjutKe"]');
+            const $modal = $nameSelect.closest('.modal');
+            const $helpEl = $form.find('[id$="nama_help"]');
+
+            let candidatesMap = new Map();
+
+            const initNameSelect2 = (placeholderText) => {
+                if ($nameSelect.hasClass('select2-hidden-accessible')) {
+                    $nameSelect.select2('destroy');
+                }
+                const s2Opts = {
+                    tags: true,
+                    width: '100%',
+                    placeholder: placeholderText || '-- Pilih Nama Santri atau Ketik Manual --',
+                    allowClear: true,
+                    language: {
+                        noResults: function() {
+                            return 'Nama tidak ditemukan di daftar tahun lalu, silakan ketik manual lalu tekan Enter';
+                        }
+                    },
+                    createTag: function(params) {
+                        const term = $.trim(params.term);
+                        if (term === '') return null;
+                        return {
+                            id: term,
+                            text: term + ' (Input Manual)',
+                            isManual: true
+                        };
+                    },
+                    templateSelection: function(data) {
+                        if (!data.id) return data.text;
+                        return data.text.replace(' (Input Manual)', '');
+                    }
+                };
+                if ($modal.length > 0) {
+                    s2Opts.dropdownParent = $modal;
+                }
+                $nameSelect.select2(s2Opts);
+            };
+
+            initNameSelect2('-- Pilih Kelas Sebelumnya Terlebih Dahulu atau Ketik Nama --');
+
+            // Auto-commit typed text on blur (penting untuk pengguna HP yang mengetik nama manual lalu langsung tap field berikutnya tanpa menekan Enter)
+            $(document).on('select2:open', () => {
+                const searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField && !searchField.dataset.blurBound) {
+                    searchField.dataset.blurBound = '1';
+                    searchField.addEventListener('blur', function() {
+                        const typed = (this.value || '').trim();
+                        if (!typed) return;
+                        // Cari apakah yang sedang terbuka adalah kandidat-nama-select
+                        const $openSelect = $('.kandidat-nama-select.select2-hidden-accessible');
+                        $openSelect.each(function() {
+                            const s2Data = $(this).data('select2');
+                            if (s2Data && s2Data.isOpen()) {
+                                const currentVal = $(this).val();
+                                if (!currentVal) {
+                                    if ($(this).find(`option[value="${typed.replace(/"/g, '\\"')}"]`).length === 0) {
+                                        $(this).append(new Option(typed, typed, true, true));
+                                    }
+                                    $(this).val(typed).trigger('change');
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+
+            const fillSantriFields = (santri) => {
+                if (!santri) return;
+                const setInput = (name, val) => {
+                    if (val === undefined || val === null || val === '') return;
+                    const $el = $form.find(`[name="${name}"]`);
+                    if ($el.length === 0) return;
+                    if ($el.attr('type') === 'radio') {
+                        $el.filter(`[value="${val}"]`).prop('checked', true);
+                    } else if ($el.is('select')) {
+                        $el.val(val).trigger('change');
+                    } else if ($el.attr('type') === 'date') {
+                        const dObj = new Date(val);
+                        if (!isNaN(dObj.getTime())) {
+                            const yyyy = dObj.getFullYear();
+                            const mm = String(dObj.getMonth() + 1).padStart(2, '0');
+                            const dd = String(dObj.getDate()).padStart(2, '0');
+                            const dateStr = `${yyyy}-${mm}-${dd}`;
+                            if ($el[0]._flatpickr) {
+                                $el[0]._flatpickr.setDate(dateStr);
+                            } else {
+                                $el.val(dateStr);
+                            }
+                        }
+                    } else {
+                        $el.val(val);
+                    }
+                };
+
+                setInput('namaPanggilan', santri.namaPanggilan);
+                setInput('jenisKelamin', santri.jenisKelamin);
+                setInput('tempatLahir', santri.tempatLahir);
+                setInput('tanggalLahir', santri.tanggalLahir);
+                setInput('agama', santri.agama || 'Islam');
+                setInput('statusKeluarga', santri.statusKeluarga);
+                setInput('anakKe', santri.anakKe);
+                setInput('dariBersaudara', santri.dariBersaudara);
+                setInput('asalSekolah', santri.asalSekolah);
+                setInput('email', santri.email);
+                setInput('namaAyah', santri.namaAyah);
+                setInput('pekerjaanAyah', santri.pekerjaanAyah);
+                setInput('teleponAyah', santri.teleponAyah);
+                setInput('namaIbu', santri.namaIbu);
+                setInput('pekerjaanIbu', santri.pekerjaanIbu);
+                setInput('teleponIbu', santri.teleponIbu);
+                setInput('alamat', santri.alamat);
+            };
+
+            $nameSelect.on('change', function() {
+                const selectedName = $(this).val();
+                if (!selectedName) return;
+                const key = selectedName.trim().toLowerCase();
+                if (candidatesMap.has(key)) {
+                    fillSantriFields(candidatesMap.get(key));
+                    if ($helpEl.length) {
+                        $helpEl.html('<i class="fas fa-check-circle"></i> Data diri & orang tua santri otomatis dilengkapi dari data tahun ajaran sebelumnya. Silakan periksa kembali jika ada perubahan.');
+                    }
+                }
+            });
+
+            const loadCandidatesForClass = async (kelasAsal, preserveSelection = false) => {
+                const currentSelected = preserveSelection ? ($nameSelect.attr('data-selected') || $nameSelect.val()) : '';
+                candidatesMap.clear();
+
+                // Otomatis arahkan Tujuan / Lanjut Ke Tingkat jika tersedia
+                if (kelasAsal && nextLevelMap[kelasAsal] && $lanjutSelect.length) {
+                    const suggestedNext = nextLevelMap[kelasAsal];
+                    if ($lanjutSelect.find(`option[value="${suggestedNext}"]`).length > 0) {
+                        $lanjutSelect.val(suggestedNext).trigger('change');
+                    }
+                }
+
+                if (!kelasAsal) {
+                    $nameSelect.empty().append('<option value="">-- Pilih Kelas Sebelumnya Terlebih Dahulu atau Ketik Nama --</option>');
+                    initNameSelect2('-- Pilih Kelas Sebelumnya Terlebih Dahulu atau Ketik Nama --');
+                    return;
+                }
+
+                if ($helpEl.length) {
+                    $helpEl.html('<i class="fas fa-spinner fa-spin"></i> Memuat daftar nama santri kelas ' + kelasAsal + ' dari tahun ajaran sebelumnya...');
+                }
+
+                try {
+                    const res = await fetch(`/api/public/kandidat-daftar-ulang?kelasAsal=${encodeURIComponent(kelasAsal)}`);
+                    const json = await res.json();
+                    $nameSelect.empty();
+                    $nameSelect.append('<option value=""></option>');
+
+                    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                        json.data.forEach(item => {
+                            if (item.nama) {
+                                candidatesMap.set(item.nama.trim().toLowerCase(), item);
+                                const label = item.namaAyah ? `${item.nama} (Ayah: ${item.namaAyah})` : item.nama;
+                                const opt = new Option(label, item.nama, false, false);
+                                $nameSelect.append(opt);
+                            }
+                        });
+                        initNameSelect2(`-- Pilih Nama Santri ${kelasAsal} (${json.data.length} santri T.A ${json.prevTahunAjaran}) atau Ketik Baru --`);
+                        if ($helpEl.length) {
+                            $helpEl.html(`<i class="fas fa-users"></i> Ditemukan <strong>${json.data.length} santri</strong> dari kelas <strong>${kelasAsal}</strong> pada T.A ${json.prevTahunAjaran}. Pilih nama anak Anda atau ketik manual jika tidak ada di daftar.`);
+                        }
+                    } else {
+                        initNameSelect2(`-- Ketik Nama Lengkap Santri (Belum ada data arsip ${kelasAsal} T.A ${json.prevTahunAjaran || 'sebelumnya'}) --`);
+                        if ($helpEl.length) {
+                            $helpEl.html(`<i class="fas fa-info-circle"></i> Belum ada daftar santri kelas <strong>${kelasAsal}</strong> pada arsip T.A ${json.prevTahunAjaran || 'sebelumnya'}. Silakan ketik nama lengkap santri secara manual lalu tekan Enter.`);
+                        }
+                    }
+
+                    if (currentSelected) {
+                        if ($nameSelect.find(`option[value="${currentSelected.replace(/"/g, '\\"')}"]`).length === 0) {
+                            $nameSelect.append(new Option(currentSelected, currentSelected, true, true));
+                        }
+                        $nameSelect.val(currentSelected).trigger('change');
+                    }
+                } catch (err) {
+                    console.error('Error fetching kandidat daftar ulang:', err);
+                    initNameSelect2('-- Pilih atau Ketik Nama Lengkap Santri --');
+                }
+            };
+
+            $unitSelect.on('change', function() {
+                loadCandidatesForClass($(this).val(), false);
+            });
+
+            if ($unitSelect.val()) {
+                loadCandidatesForClass($unitSelect.val(), true);
             }
         });
     }
@@ -307,10 +525,10 @@
             if (!$yearSelect.length) {
                 $yearSelect = $('<select class="flatpickr-yearDropdown-years"></select>');
                 
-                // Isi tahun dari currentYear - 5 s/d currentYear + 10
+                // Isi tahun dari currentYear - 25 s/d currentYear + 5 agar mencakup seluruh rentang tahun lahir calon santri
                 const currentYear = new Date().getFullYear();
-                const startYear = currentYear - 10;
-                const endYear = currentYear + 10;
+                const startYear = currentYear - 25;
+                const endYear = currentYear + 5;
                 
                 for (let y = startYear; y <= endYear; y++) {
                     $yearSelect.append(`<option value="${y}">${y}</option>`);
@@ -684,6 +902,51 @@
                     }
                 });
             }
+        }
+
+        // --- Script Pendeteksi Admin Online Realtime (Heartbeat Polling) ---
+        if (document.getElementById('onlineUsersWrapper') && document.getElementById('onlineUsersList')) {
+            const avatarColors = ['#e11d48', '#2563eb', '#059669', '#d97706', '#7c3aed', '#db2777', '#0891b2', '#ea580c'];
+            const getHashColor = (str) => {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return avatarColors[Math.abs(hash) % avatarColors.length];
+            };
+            const updateOnlineUsers = (users) => {
+                const listContainer = document.getElementById('onlineUsersList');
+                const wrapper = document.getElementById('onlineUsersWrapper');
+                if (!listContainer || !wrapper) return;
+                listContainer.innerHTML = '';
+                if (users && users.length > 0) {
+                    users.forEach(u => {
+                        const initial = u.nama ? u.nama.charAt(0).toUpperCase() : 'A';
+                        const avatarDiv = document.createElement('div');
+                        avatarDiv.className = 'online-user-avatar';
+                        avatarDiv.style.backgroundColor = getHashColor(u.username || '');
+                        avatarDiv.title = u.nama || u.username;
+                        avatarDiv.textContent = initial;
+                        listContainer.appendChild(avatarDiv);
+                    });
+                    wrapper.style.display = 'flex';
+                } else {
+                    wrapper.style.display = 'none';
+                }
+            };
+            const sendHeartbeat = () => {
+                fetch('/api/admin/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.onlineUsers) updateOnlineUsers(data.onlineUsers);
+                    })
+                    .catch(() => {});
+            };
+            sendHeartbeat();
+            setInterval(sendHeartbeat, 10000);
         }
     });
 

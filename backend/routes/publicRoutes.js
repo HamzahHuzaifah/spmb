@@ -19,6 +19,7 @@ router.post('/daftar', checkRegistrationOpen, pendaftaranLimiter, pendaftaranCon
 // Form Daftar Ulang
 router.get('/daftar-ulang', checkRegistrationOpen, pendaftaranController.getFormDaftarUlang);
 router.post('/daftar-ulang', checkRegistrationOpen, pendaftaranLimiter, pendaftaranController.postFormDaftarUlang);
+router.get('/api/public/kandidat-daftar-ulang', pendaftaranController.apiKandidatDaftarUlang);
 
 // Form Beasiswa
 router.get('/daftar/beasiswa', checkRegistrationOpen, pendaftaranController.getFormBeasiswa);

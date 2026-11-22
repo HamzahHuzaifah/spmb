@@ -6,6 +6,7 @@ const nInput = typeof nameInputName !== 'undefined' ? nameInputName : 'namaSantr
 const gInputType = typeof genderInputType !== 'undefined' ? genderInputType : 'radio';
 const gInputName = typeof genderInputName !== 'undefined' ? genderInputName : 'jenisKelamin';
 const isRead = typeof isReadonly !== 'undefined' ? isReadonly : false;
+const isSelectName = typeof useNameSelect !== 'undefined' ? useNameSelect : false;
 
 const form = typeof formData !== 'undefined' && formData ? formData : {};
 const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field] : fallback);
@@ -14,7 +15,19 @@ const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field
 <% if (lay === 'stacked') { %>
     <div class="<%= cGroup %>">
         <label class="required">Nama Lengkap Santri</label>
-        <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" placeholder="Masukkan nama lengkap" value="<%= getVal(nInput) %>" required>
+        <% if (isSelectName) { %>
+            <select name="<%= nInput %>" id="<%= idPre %>nama" class="form-input kandidat-nama-select" data-selected="<%= getVal(nInput) %>" required>
+                <option value="">-- Pilih Kelas Sebelumnya Terlebih Dahulu atau Ketik Nama --</option>
+                <% if (getVal(nInput)) { %>
+                    <option value="<%= getVal(nInput) %>" selected><%= getVal(nInput) %></option>
+                <% } %>
+            </select>
+            <div id="<%= idPre %>nama_help" class="form-help" style="margin-top: 6px; color: #059669; font-size: 12.5px;">
+                <i class="fas fa-info-circle"></i> Pilih <strong>Unit / Satuan Pendidikan Sebelumnya</strong> di atas untuk memunculkan daftar nama santri tahun ajaran sebelumnya, atau ketik manual jika nama belum tercantum.
+            </div>
+        <% } else { %>
+            <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" placeholder="Masukkan nama lengkap" value="<%= getVal(nInput) %>" required>
+        <% } %>
     </div>
 
     <div class="<%= cGroup %>">
@@ -25,12 +38,14 @@ const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field
     <div class="<%= cGroup %>">
         <label class="required">Jenis Kelamin</label>
         <% if (gInputType === 'radio') { %>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="<%= gInputName %>" value="Laki-laki" <%= getVal(gInputName) === 'Laki-laki' || !getVal(gInputName) ? 'checked' : '' %> required> Laki-laki
+            <div class="radio-group radio-group-inline">
+                <label class="radio-label radio-pill-choice">
+                    <input type="radio" name="<%= gInputName %>" value="Laki-laki" <%= getVal(gInputName) === 'Laki-laki' || !getVal(gInputName) ? 'checked' : '' %> required>
+                    <span>Laki-laki</span>
                 </label>
-                <label class="radio-label">
-                    <input type="radio" name="<%= gInputName %>" value="Perempuan" <%= getVal(gInputName) === 'Perempuan' ? 'checked' : '' %>> Perempuan
+                <label class="radio-label radio-pill-choice">
+                    <input type="radio" name="<%= gInputName %>" value="Perempuan" <%= getVal(gInputName) === 'Perempuan' ? 'checked' : '' %>>
+                    <span>Perempuan</span>
                 </label>
             </div>
         <% } else { %>
@@ -41,12 +56,12 @@ const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field
         <% } %>
     </div>
 
-    <div class="<%= cGroup %>" style="display: flex; gap: 15px;">
-        <div style="flex: 1;">
+    <div class="<%= cGroup %> ttl-split-group">
+        <div class="ttl-split-col">
             <label class="required">Tempat Lahir</label>
             <input type="text" name="tempatLahir" id="<%= idPre %>tempatLahir" class="form-input" placeholder="Kota tempat lahir" value="<%= getVal('tempatLahir') %>" required>
         </div>
-        <div style="flex: 1;">
+        <div class="ttl-split-col">
             <label class="required">Tanggal Lahir</label>
             <input type="date" name="tanggalLahir" id="<%= idPre %>tanggalLahir" class="form-input" value="<%= getVal('tanggalLahir') %>" required>
         </div>
@@ -80,12 +95,12 @@ const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field
 
     <div class="<%= cGroup %>">
         <label class="required">Anak ke (berdasarkan Kartu Keluarga)</label>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span>Anak ke</span>
-            <input type="number" name="anakKe" id="<%= idPre %>anakKe" class="form-input" style="width: 70px;" value="<%= getVal('anakKe') %>" required>
-            <span>dari</span>
-            <input type="number" name="dariBersaudara" id="<%= idPre %>dariBersaudara" class="form-input" style="width: 70px;" value="<%= getVal('dariBersaudara') %>" required>
-            <span>Bersaudara</span>
+        <div class="sibling-inline-row">
+            <span class="sibling-label">Anak ke</span>
+            <input type="number" name="anakKe" id="<%= idPre %>anakKe" class="form-input sibling-number-input" min="1" inputmode="numeric" placeholder="1" value="<%= getVal('anakKe') %>" required>
+            <span class="sibling-label">dari</span>
+            <input type="number" name="dariBersaudara" id="<%= idPre %>dariBersaudara" class="form-input sibling-number-input" min="1" inputmode="numeric" placeholder="2" value="<%= getVal('dariBersaudara') %>" required>
+            <span class="sibling-label">Bersaudara</span>
         </div>
     </div>
 
@@ -100,7 +115,16 @@ const getVal = (field, fallback = '') => (form[field] !== undefined ? form[field
     
         <% if (lay === 'flex-rows') { %><div style="flex: 1;"><% } else { %><div class="<%= cGroup %>"><% } %>
             <label class="required">Nama Lengkap Santri</label>
-            <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" required>
+            <% if (isSelectName) { %>
+                <select name="<%= nInput %>" id="<%= idPre %>nama" class="form-input kandidat-nama-select" required>
+                    <option value="">-- Pilih Kelas Sebelumnya atau Ketik Nama --</option>
+                </select>
+                <div id="<%= idPre %>nama_help" class="form-help" style="margin-top: 4px; color: #059669; font-size: 11.5px;">
+                    Pilih Unit Sebelumnya untuk menampilkan daftar nama, atau ketik manual.
+                </div>
+            <% } else { %>
+                <input type="text" name="<%= nInput %>" id="<%= idPre %>nama" class="form-input" required>
+            <% } %>
         </div>
         
         <% if (lay === 'flex-rows') { %><div style="flex: 1;"><% } else { %><div class="<%= cGroup %>"><% } %>

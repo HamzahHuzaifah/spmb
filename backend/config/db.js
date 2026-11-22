@@ -234,6 +234,20 @@ async function runMigration() {
             );
         }
 
+        // 7. Buat tabel master_jumbotron untuk slider foto background Jumbotron halaman utama
+        await poolPromise.query(`
+            CREATE TABLE IF NOT EXISTS master_jumbotron (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                judul VARCHAR(150) NULL,
+                image_url VARCHAR(255) NOT NULL,
+                urutan INT DEFAULT 1,
+                status ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif',
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+        await poolPromise.query(`INSERT IGNORE INTO system_settings (\`key\`, \`value\`) VALUES ('JUMBOTRON_INTERVAL', '5')`);
+        await poolPromise.query(`INSERT IGNORE INTO system_settings (\`key\`, \`value\`) VALUES ('JUMBOTRON_OVERLAY', '65')`);
+
         // Jalankan cleanup billing ganda/yatim piatu akibat bug lama
         await cleanupOrphanedBilling();
     } catch (err) {

@@ -1,6 +1,38 @@
 const db = require('../../config/db');
+const fs = require('fs');
+const path = require('path');
 const { logActivity } = require('../../utils/logActivity');
 const SystemSettingModel = require('../../models/SystemSetting');
+
+function saveBase64JumbotronImage(dataUrl) {
+    if (!dataUrl || typeof dataUrl !== 'string') return null;
+    const match = dataUrl.match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/i);
+    if (!match) return null;
+    const ext = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const uploadDir = path.join(__dirname, '../../../frontend/public/images/jumbotron');
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    const filename = `jumbotron-${Date.now()}-${Math.floor(Math.random() * 1000)}.${ext}`;
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, buffer);
+    return `/images/jumbotron/${filename}`;
+}
+
+function removeLocalJumbotronImage(imageUrl) {
+    if (!imageUrl || !imageUrl.startsWith('/images/jumbotron/')) return;
+    try {
+        const filePath = path.join(__dirname, '../../../frontend/public', imageUrl);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    } catch (e) {
+        console.error('Gagal menghapus file jumbotron lama:', e.message);
+    }
+}
 
 exports.getMasterData = async (req, res) => {
     try {
@@ -8,6 +40,17 @@ exports.getMasterData = async (req, res) => {
         const [jalur] = await db.execute('SELECT * FROM master_jalur ORDER BY id ASC');
         const [gelombang] = await db.execute('SELECT * FROM master_gelombang ORDER BY id ASC');
         const [tahunAjaran] = await db.execute('SELECT * FROM master_tahun_ajaran ORDER BY tahun_mulai DESC, id DESC');
+
+        let jumbotron = [];
+        try {
+            const [jbRows] = await db.execute('SELECT * FROM master_jumbotron ORDER BY urutan ASC, id DESC');
+            jumbotron = jbRows;
+        } catch (e) {
+            jumbotron = [];
+        }
+
+        const jumbotronInterval = (await SystemSettingModel.getSetting('JUMBOTRON_INTERVAL')) || '5';
+        const jumbotronOverlay = (await SystemSettingModel.getSetting('JUMBOTRON_OVERLAY')) || '65';
 
         const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
         const year = defaultTA.tahun_mulai || new Date().getFullYear();
@@ -27,6 +70,9 @@ exports.getMasterData = async (req, res) => {
             jalur,
             gelombang,
             tahunAjaran,
+            jumbotron,
+            jumbotronInterval,
+            jumbotronOverlay,
             defaultTA,
             bodyView: 'master-data'
         });
@@ -274,5 +320,95 @@ exports.deleteTahunAjaran = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Gagal menghapus tahun ajaran' });
+    }
+};
+
+// --- JUMBOTRON SLIDER ---
+exports.addJumbotron = async (req, res) => {
+    const { nama, urutan, status, image_base64, image_url_manual } = req.body;
+    try {
+        let finalImageUrl = null;
+        if (image_base64 && image_base64.startsWith('data:image/')) {
+            finalImageUrl = saveBase64JumbotronImage(image_base64);
+        } else if (image_url_manual && image_url_manual.trim() !== '') {
+            finalImageUrl = image_url_manual.trim();
+        }
+
+        if (!finalImageUrl) {
+            return res.status(400).json({ success: false, message: 'Harap pilih file foto kegiatan santri untuk diunggah.' });
+        }
+
+        const [result] = await db.execute(
+            'INSERT INTO master_jumbotron (judul, image_url, urutan, status) VALUES (?, ?, ?, ?)',
+            [(nama || 'Kegiatan Santri Madrasah JIC').trim(), finalImageUrl, parseInt(urutan, 10) || 1, status || 'Aktif']
+        );
+        await logActivity(req, 'Tambah Foto Jumbotron', 'master_jumbotron', result.insertId, `Judul: ${nama || '-'}`);
+        res.json({ success: true, message: 'Foto Jumbotron berhasil ditambahkan' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal menambahkan foto jumbotron: ' + err.message });
+    }
+};
+
+exports.editJumbotron = async (req, res) => {
+    const { id } = req.params;
+    const { nama, urutan, status, image_base64, image_url_manual } = req.body;
+    try {
+        const [oldRows] = await db.execute('SELECT * FROM master_jumbotron WHERE id = ?', [id]);
+        if (oldRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Data Jumbotron tidak ditemukan' });
+        }
+
+        let finalImageUrl = oldRows[0].image_url;
+        if (image_base64 && image_base64.startsWith('data:image/')) {
+            const uploadedUrl = saveBase64JumbotronImage(image_base64);
+            if (uploadedUrl) {
+                removeLocalJumbotronImage(oldRows[0].image_url);
+                finalImageUrl = uploadedUrl;
+            }
+        } else if (image_url_manual && image_url_manual.trim() !== '' && image_url_manual.trim() !== oldRows[0].image_url) {
+            finalImageUrl = image_url_manual.trim();
+        }
+
+        await db.execute(
+            'UPDATE master_jumbotron SET judul = ?, image_url = ?, urutan = ?, status = ? WHERE id = ?',
+            [(nama || 'Kegiatan Santri Madrasah JIC').trim(), finalImageUrl, parseInt(urutan, 10) || 1, status || 'Aktif', id]
+        );
+        await logActivity(req, 'Edit Foto Jumbotron', 'master_jumbotron', id, `Judul: ${nama || '-'}`);
+        res.json({ success: true, message: 'Foto Jumbotron berhasil diperbarui' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal memperbarui foto jumbotron: ' + err.message });
+    }
+};
+
+exports.deleteJumbotron = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [oldRows] = await db.execute('SELECT image_url FROM master_jumbotron WHERE id = ?', [id]);
+        if (oldRows.length > 0) {
+            removeLocalJumbotronImage(oldRows[0].image_url);
+        }
+        await db.execute('DELETE FROM master_jumbotron WHERE id = ?', [id]);
+        await logActivity(req, 'Hapus Foto Jumbotron', 'master_jumbotron', id, '');
+        res.json({ success: true, message: 'Foto Jumbotron berhasil dihapus' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal menghapus foto jumbotron' });
+    }
+};
+
+exports.saveJumbotronSettings = async (req, res) => {
+    const { interval, overlay } = req.body;
+    try {
+        const intVal = Math.max(2, Math.min(30, parseInt(interval, 10) || 5));
+        const ovlVal = Math.max(30, Math.min(90, parseInt(overlay, 10) || 65));
+        await SystemSettingModel.setSetting('JUMBOTRON_INTERVAL', String(intVal));
+        await SystemSettingModel.setSetting('JUMBOTRON_OVERLAY', String(ovlVal));
+        await logActivity(req, 'Update Pengaturan Jumbotron', 'system_settings', 0, `Interval: ${intVal}s, Overlay: ${ovlVal}%`);
+        res.json({ success: true, message: 'Pengaturan transisi Jumbotron berhasil disimpan' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal menyimpan pengaturan jumbotron' });
     }
 };

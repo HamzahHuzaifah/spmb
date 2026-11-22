@@ -1,16 +1,10 @@
 <div class="premium-form-card">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
         <h2 style="margin: 0; border: none; padding: 0; color: #d35400;"><i class="fas fa-hand-holding-heart" style="margin-right: 10px;"></i> Form Pendaftaran Santri Baru (Jalur Beasiswa)</h2>
-        <!-- <button type="button" onclick="fillTestingDataPublic('beasiswa')" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; border: none; background: #f59e0b; color: white; cursor: pointer; font-weight: 600;"><i class="fas fa-magic" style="margin-right: 5px;"></i> Isi Data Testing</button> -->
     </div>
     <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan pilih jenis beasiswa dan lengkapi data diri calon santri beserta orang tua dengan benar.</p>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error" style="margin-bottom: 25px; background-color: #fee2e2; border: 1px solid #fca5a5; padding: 15px; border-radius: 8px; color: #b91c1c; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5;">
-            <i class="fas fa-exclamation-circle" style="margin-top: 3px; font-size: 16px; flex-shrink: 0;"></i>
-            <span><%= error %></span>
-        </div>
-    <% } %>
+    <%- include('../partials/public-alert', { error: typeof error !== 'undefined' ? error : null }) %>
 
     <%- include('../partials/terms-card', { type: 'beasiswa' }) %>
 
@@ -19,62 +13,12 @@
         <!-- Pilihan Jalur Beasiswa -->
         <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
             <i class="fas fa-medal" style="margin-right: 10px; color: #d35400;"></i> Jalur Pendaftaran Beasiswa</h3>
-        <div class="form-group" style="margin-bottom: 30px;">
-            <div class="radio-group" style="flex-direction: column; gap: 15px;">
-                <% if (typeof jalurList !== 'undefined' && jalurList.length > 0) {
-                    let hasBeasiswa = false;
-                    jalurList.forEach((jalur, index) => {
-                        if (jalur.nama.toLowerCase().includes('beasiswa')) {
-                            hasBeasiswa = true;
-                %>
-                <label class="radio-label">
-                    <input type="radio" name="jalurBeasiswa" value="<%= jalur.nama %>" required>
-                    <div>
-                        <strong><%= jalur.nama %></strong>
-                        <% if (jalur.syarat_dokumen) { %>
-                            <div class="form-help"><%= jalur.syarat_dokumen %></div>
-                        <% } %>
-                    </div>
-                </label>
-                <%      }
-                    });
-                    if (!hasBeasiswa) { %>
-                        <div style="color: #b91c1c; font-size: 14px;">Belum ada jalur pendaftaran beasiswa yang aktif.</div>
-                <%  }
-                } else { %>
-                <label class="radio-label">
-                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Dhuafa" required>
-                    <div>
-                        <strong>Beasiswa Dhuafa</strong>
-                        <div class="form-help">Potongan biaya khusus bagi kaum dhuafa (wajib melampirkan SKTM).</div>
-                    </div>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Yatim/Piatu">
-                    <div>
-                        <strong>Beasiswa Yatim/Piatu</strong>
-                        <div class="form-help">Potongan biaya khusus anak yatim/piatu (wajib melampirkan Surat
-                            Keterangan/Akta Kematian dan SKTM).</div>
-                    </div>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Pekerja/Komunitas di JIC">
-                    <div>
-                        <strong>Beasiswa Pekerja/Komunitas di JIC</strong>
-                        <div class="form-help">Potongan biaya khusus bagi Keluarga Pegawai/PJLP/Komunitas JIC (wajib melampirkan KTP & KK orang tua serta Kartu Pegawai/PJLP/Komunitas JIC atau surat keterangan dari kantor atau komunitas)</div>
-                    </div>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="jalurBeasiswa" value="Beasiswa Satu Keluarga">
-                    <div>
-                        <strong>Beasiswa Satu Keluarga</strong>
-                        <div class="form-help">Potongan biaya khusus jika mendaftarkan atau menyekolahkan 2 anak kandung
-                            atau lebih dalam satu keluarga. (wajib melampirkan KTP & KK orang tua)</div>
-                    </div>
-                </label>
-                <% } %>
-            </div>
-        </div>
+
+        <%- include('../partials/public-jalur-selector', {
+            mode: 'beasiswa',
+            inputName: 'jalurBeasiswa',
+            jalurList: typeof jalurList !== 'undefined' ? jalurList : []
+        }) %>
 
         <!-- Data Santri -->
         <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
@@ -94,8 +38,7 @@
 
         <%- include('../partials/form-data-santri') %>
 
-        <h3
-            style="margin-top: 35px; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
+        <h3 style="margin-top: 35px; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;">
             <i class="fas fa-users" style="margin-right: 10px; color: #d35400;"></i> B. Data Orang Tua / Wali</h3>
 
         <%- include('../partials/form-orang-tua', { 
@@ -106,24 +49,9 @@
         }) %>
 
         <div style="margin-top: 40px;">
-            <button type="submit" class="btn-submit" style="background-color: #d35400;">Kirim Pendaftaran
-                Beasiswa</button>
+            <button type="submit" class="btn-submit" style="background-color: #d35400;">Kirim Pendaftaran Beasiswa</button>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0 20px 0;">
-        
-        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; text-align: center;">Navigasi Pendaftaran & Menu</div>
-        
-        <div class="public-nav-group">
-            <a href="/daftar" class="public-nav-btn public-nav-btn-primary">
-                <i class="fas fa-user-plus"></i> Jalur Reguler
-            </a>
-            <a href="/daftar-ulang" class="public-nav-btn public-nav-btn-primary">
-                <i class="fas fa-sync-alt"></i> Daftar Ulang (Naik Tingkat)
-            </a>
-            <a href="/" class="public-nav-btn public-nav-btn-full">
-                <i class="fas fa-home"></i> Kembali ke Beranda
-            </a>
-        </div>
+        <%- include('../partials/public-nav-group', { currentForm: 'beasiswa' }) %>
     </form>
 </div>

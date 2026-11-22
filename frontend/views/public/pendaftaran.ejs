@@ -1,16 +1,10 @@
 <div class="premium-form-card">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
         <h2 style="margin: 0; border: none; padding: 0;"><i class="fas fa-user-plus" style="margin-right: 10px; color: var(--primary);"></i> Form Pendaftaran Santri Baru</h2>
-        <!-- <button type="button" onclick="fillTestingDataPublic('baru')" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; border: none; background: #f59e0b; color: white; cursor: pointer; font-weight: 600;"><i class="fas fa-magic" style="margin-right: 5px;"></i> Isi Data Testing</button> -->
     </div>
     <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan lengkapi data diri calon santri dan orang tua dengan benar.</p>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error" style="margin-bottom: 25px; background-color: #fee2e2; border: 1px solid #fca5a5; padding: 15px; border-radius: 8px; color: #b91c1c; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5;">
-            <i class="fas fa-exclamation-circle" style="margin-top: 3px; font-size: 16px; flex-shrink: 0;"></i>
-            <span><%= error %></span>
-        </div>
-    <% } %>
+    <%- include('../partials/public-alert', { error: typeof error !== 'undefined' ? error : null }) %>
 
     <%- include('../partials/terms-card', { type: 'reguler' }) %>
 
@@ -18,40 +12,11 @@
         <!-- Data Santri -->
         <h3 style="margin-bottom: 15px; color: var(--text-main); border-bottom: 1px solid #eee; padding-bottom: 10px;"><i class="fas fa-user-graduate" style="margin-right: 10px; color: var(--primary);"></i> A. Data Calon Santri</h3>
 
-        <!-- Pilihan Jalur Reguler -->
-        <div class="form-group" style="margin-bottom: 25px;">
-            <label class="required">Jalur Pendaftaran</label>
-            <div class="radio-group" style="flex-direction: column; gap: 15px; margin-top: 10px;">
-                <% if (typeof jalurList !== 'undefined' && jalurList.length > 0) {
-                    let hasReguler = false;
-                    jalurList.forEach((jalur, index) => {
-                        if (!jalur.nama.toLowerCase().includes('beasiswa')) {
-                            hasReguler = true;
-                %>
-                <label class="radio-label">
-                    <input type="radio" name="jalurPendaftaran" value="<%= jalur.nama %>" <%= index === 0 ? 'required checked' : '' %>>
-                    <div>
-                        <strong><%= jalur.nama %></strong>
-                        <% if (jalur.syarat_dokumen) { %>
-                            <div class="form-help"><%= jalur.syarat_dokumen %></div>
-                        <% } %>
-                    </div>
-                </label>
-                <%      }
-                    });
-                    if (!hasReguler) { %>
-                        <div style="color: #b91c1c; font-size: 14px;">Belum ada jalur pendaftaran reguler yang aktif.</div>
-                <%  }
-                } else { %>
-                    <label class="radio-label">
-                        <input type="radio" name="jalurPendaftaran" value="Reguler" required checked>
-                        <div>
-                            <strong>Reguler</strong>
-                        </div>
-                    </label>
-                <% } %>
-            </div>
-        </div>
+        <%- include('../partials/public-jalur-selector', {
+            mode: 'reguler',
+            inputName: 'jalurPendaftaran',
+            jalurList: typeof jalurList !== 'undefined' ? jalurList : []
+        }) %>
 
         <div class="form-group">
             <label class="required">Tingkat Pendidikan yang Didaftar</label>
@@ -83,20 +48,6 @@
             <button type="submit" class="btn-submit">Kirim Pendaftaran Reguler</button>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0 20px 0;">
-        
-        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; text-align: center;">Navigasi Pendaftaran & Menu</div>
-        
-        <div class="public-nav-group">
-            <a href="/daftar-ulang" class="public-nav-btn public-nav-btn-primary">
-                <i class="fas fa-sync-alt"></i> Daftar Ulang (Naik Tingkat)
-            </a>
-            <a href="/daftar/beasiswa" class="public-nav-btn public-nav-btn-beasiswa">
-                <i class="fas fa-hand-holding-heart"></i> Jalur Beasiswa
-            </a>
-            <a href="/" class="public-nav-btn public-nav-btn-full">
-                <i class="fas fa-home"></i> Kembali ke Beranda
-            </a>
-        </div>
+        <%- include('../partials/public-nav-group', { currentForm: 'reguler' }) %>
     </form>
 </div>

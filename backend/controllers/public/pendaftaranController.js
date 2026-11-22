@@ -202,6 +202,44 @@ exports.getFormDaftarUlang = async (req, res) => {
     }
 };
 
+exports.apiKandidatDaftarUlang = async (req, res) => {
+    try {
+        const { kelasAsal } = req.query;
+        if (!kelasAsal) {
+            return res.json({ success: true, data: [], prevTahunAjaran: '' });
+        }
+
+        const defaultTA = await SystemSettingModel.getDefaultTahunAjaran();
+        const currentStartYear = parseInt(defaultTA.tahun_mulai, 10) || new Date().getFullYear();
+
+        // Cari tahun ajaran sebelumnya di master_tahun_ajaran jika ada, atau fallback ke currentStartYear - 1
+        let prevYear = currentStartYear - 1;
+        let prevTANama = `${prevYear}/${currentStartYear}`;
+        try {
+            const allTA = await SystemSettingModel.getAllTahunAjaran();
+            const prevTA = allTA
+                .filter(ta => parseInt(ta.tahun_mulai, 10) < currentStartYear)
+                .sort((a, b) => parseInt(b.tahun_mulai, 10) - parseInt(a.tahun_mulai, 10))[0];
+            if (prevTA) {
+                prevYear = prevTA.tahun_mulai;
+                prevTANama = prevTA.nama;
+            }
+        } catch (e) {
+            // fallback ke currentStartYear - 1
+        }
+
+        const candidates = await SantriModel.getCandidatesFromPreviousYear(kelasAsal, prevYear);
+        res.json({
+            success: true,
+            prevTahunAjaran: prevTANama,
+            data: candidates
+        });
+    } catch (err) {
+        console.error('Error apiKandidatDaftarUlang:', err);
+        res.status(500).json({ success: false, message: 'Gagal memuat daftar santri tahun ajaran sebelumnya.' });
+    }
+};
+
 exports.postFormDaftarUlang = async (req, res) => {
     try {
         const {

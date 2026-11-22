@@ -65,8 +65,14 @@ const selectedVal = typeof selectedValue !== 'undefined' ? selectedValue : '';
 // Jika server mengirim data master_jenjang dinamis, kita pakai itu (kecuali untuk admin)
 let finalOptions = [];
 if (typeof jenjangList !== 'undefined' && jenjangList.length > 0) {
-    // Mapping dari jenjangList ke format selectOptions
-    finalOptions = jenjangList.map(j => {
+    // Filter agar sesuai dengan kategori dropdown (misal: unit sebelumnya tanpa MDT 4, lanjut ke tanpa PAUDQu A)
+    const allowedValues = new Set((optionsMap[typeKey] || []).map(o => o.value));
+    const filteredJenjang = (typeKey === 'form_unit_sebelumnya' || typeKey === 'form_lanjut_ke')
+        ? jenjangList.filter(j => allowedValues.size === 0 || allowedValues.has(j.nama) || (typeKey === 'form_unit_sebelumnya' && j.nama !== 'MDT 4') || (typeKey === 'form_lanjut_ke' && j.nama !== 'PAUDQu A'))
+        : jenjangList;
+
+    // Mapping dari filteredJenjang ke format selectOptions
+    finalOptions = filteredJenjang.map(j => {
         let labelText = j.nama;
         let isDisabled = false;
         if (typeof j.sisaKuota !== 'undefined' && !(typeof isDaftarUlang !== 'undefined' && isDaftarUlang)) {

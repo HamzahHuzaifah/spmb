@@ -1,31 +1,23 @@
-<div style="background-color: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-    <% if (type === 'beasiswa') { %>
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">Selamat Datang di Jalur Beasiswa!</h3>
-        <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Assalamualaikum warahmatullahi
-            wabarakatuh,<br><br>Madrasah Jakarta Islamic Centre menyediakan berbagai opsi beasiswa untuk membantu
-            meringankan biaya pendidikan bagi santri yang berhak. Silahkan Anda mengisi formulir pendaftaran berikut
-            untuk memulai pendaftaran di jalur beasiswa yang sesuai.</p>
-    <% } else if (type === 'ulang') { %>
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">Selamat Datang!</h3>
-        <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Assalamualaikum warahmatullahi
-            wabarakatuh,<br><br>Selamat Datang!<br>Terima kasih atas kepercayaan Anda untuk tetap menjadi bagian dari
-            Madrasah Jakarta Islamic Centre. Kami memiliki tujuan untuk menjadi sekolah sekaligus komunitas pembelajaran
-            yang menghasilkan generasi qur'ani yang cerdas, mandiri, kreatif dan berwawasan luas.<br><br>Silahkan Anda
-            mengisi formulir pendaftaran berikut untuk memulai PENDAFTARAN MELANJUTKAN KE JENJANG BERIKUTNYA!</p>
-    <% } else { %>
-        <h3 style="margin-bottom: 15px; color: var(--text-main);">Selamat Datang!</h3>
-        <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Assalamualaikum warahmatullahi
-            wabarakatuh,<br><br>Terima kasih atas minat Anda untuk menjadi bagian dari Madrasah Jakarta Islamic Centre.
-            Kami memiliki tujuan untuk menjadi sekolah sekaligus komunitas pembelajaran yang menghasilkan generasi
-            qur'ani yang cerdas, mandiri, kreatif dan berwawasan luas.<br><br>Silahkan Anda mengisi formulir pendaftaran
-            berikut untuk memulai PENDAFTARAN!</p>
-    <% } %>
+<div class="terms-card-wrapper">
+    <div class="terms-welcome-box">
+        <% if (type === 'beasiswa') { %>
+            <h3><i class="fas fa-hand-holding-heart" style="color: #d97706;"></i> Selamat Datang di Jalur Beasiswa!</h3>
+            <p>Assalamualaikum warahmatullahi wabarakatuh,<br><br>Madrasah Jakarta Islamic Centre menyediakan berbagai opsi beasiswa untuk membantu meringankan biaya pendidikan bagi santri yang berhak. Silakan isi formulir berikut untuk memulai pendaftaran di jalur beasiswa yang sesuai.</p>
+        <% } else if (type === 'ulang') { %>
+            <h3><i class="fas fa-sync-alt" style="color: var(--primary);"></i> Selamat Datang di Daftar Ulang!</h3>
+            <p>Assalamualaikum warahmatullahi wabarakatuh,<br><br>Terima kasih atas kepercayaan Anda untuk tetap menjadi bagian dari Madrasah Jakarta Islamic Centre. Silakan lengkapi formulir berikut untuk memulai pendaftaran melanjutkan ke jenjang berikutnya.</p>
+        <% } else { %>
+            <h3><i class="fas fa-user-plus" style="color: var(--primary);"></i> Selamat Datang!</h3>
+            <p>Assalamualaikum warahmatullahi wabarakatuh,<br><br>Terima kasih atas minat Anda untuk menjadi bagian dari Madrasah Jakarta Islamic Centre. Silakan lengkapi formulir berikut untuk memulai pendaftaran santri baru.</p>
+        <% } %>
+    </div>
 
-    <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text-main);">SYARAT & KETENTUAN PENDAFTARAN<%= type === 'beasiswa' ? ' BEASISWA' : '' %></h4>
-    <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">Harap membaca ketentuan berikut dengan
-        seksama sebelum mengisi<%= type === 'beasiswa' ? '' : ' dan mengirimkan' %> aplikasi pendaftaran Anda.<%= type === 'beasiswa' ? '' : ' Saat Anda mengirimkan aplikasi pendaftaran Anda, Anda berarti telah menyetujui seluruh syarat dan ketentuan berikut.' %></p>
+    <div class="terms-section-head">
+        <h4><i class="fas fa-file-contract"></i> Syarat &amp; Ketentuan Pendaftaran<%= type === 'beasiswa' ? ' Beasiswa' : '' %></h4>
+        <p>Harap membaca ketentuan berikut dengan seksama sebelum mengisi<%= type === 'beasiswa' ? '' : ' dan mengirimkan' %> formulir pendaftaran Anda.</p>
+    </div>
 
-    <div style="max-height: 200px; overflow-y: auto; background: var(--bg-main); padding: 15px; border-radius: 4px; font-size: 13px; line-height: 1.6; border: 1px solid var(--border);">
+    <div class="terms-scroll-box">
         <% if (type === 'beasiswa') { %>
             <p><strong>[ KETENTUAN BEASISWA ]</strong><br>
                 1. Calon santri yang mendaftar melalui jalur beasiswa wajib melampirkan dokumen pendukung asli saat
@@ -64,7 +56,7 @@
 
             <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
 
-            <p><strong>[ C. BIAYA PENDAFTARAN & PROSES PENERIMAAN ]</strong><br>
+            <p><strong>[ C. BIAYA PENDAFTARAN &amp; PROSES PENERIMAAN ]</strong><br>
                 Proses pendaftaran calon santri baru akan dimulai setelah Formulir Pendaftaran diserahkan ke Madrasah
                 Jakarta Islamic Centre melalui formulir ini oleh Panitia SPMB Madrasah Jakarta Islamic Centre.<br><br>
                 Semua biaya yang telah dibayarkan tidak dapat dikembalikan atau ditransfer ke pembayaran lain terkecuali
@@ -76,7 +68,7 @@
                 sesuai.<br><br>
                 Keputusan penerimaan santri adalah kebijakan mutlak pihak Madrasah Jakarta Islamic Centre. Madrasah
                 Jakarta Islamic Centre pada umumnya mempertimbangkan berbagai faktor, antara lain usia anak, kemampuan
-                akademik, dan perilaku anak serta visi & misi orang tua/wali yang sah.<br><br>
+                akademik, dan perilaku anak serta visi &amp; misi orang tua/wali yang sah.<br><br>
                 Santri tidak boleh memulai tahun akademik kecuali biaya pendidikan telah dibayarkan secara
                 penuh.<br><br>
                 Pendaftaran ulang untuk santri yang melanjutkan tidak akan diterima kecuali semua biaya terutang telah
@@ -100,10 +92,8 @@
         <% } %>
     </div>
 
-    <div class="form-group" style="margin-top: 15px;">
-        <label class="radio-label" style="font-weight: 500; color: var(--primary);">
-            <input type="checkbox" name="setujuSK" required> Saya telah membaca dan menyetujui seluruh Syarat &
-            Ketentuan pendaftaran di atas.
-        </label>
-    </div>
+    <label class="terms-agree-label">
+        <input type="checkbox" name="setujuSK" required>
+        <span>Saya telah membaca dan menyetujui seluruh Syarat &amp; Ketentuan pendaftaran di atas.</span>
+    </label>
 </div>

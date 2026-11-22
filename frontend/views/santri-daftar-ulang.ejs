@@ -276,6 +276,7 @@ function formatTimestampIndo(isoStr) {
                         <%- include('partials/select-pendidikan', { 
                             type: 'form_unit_sebelumnya',
                             name: 'pendidikanSebelumnya',
+                            id: 'add_pendidikanSebelumnya',
                             className: 'form-input',
                             required: true,
                             placeholder: '-- Pilih Tingkat --'
@@ -287,6 +288,7 @@ function formatTimestampIndo(isoStr) {
                         <%- include('partials/select-pendidikan', { 
                             type: 'form_lanjut_ke',
                             name: 'lanjutKe',
+                            id: 'add_lanjutKe',
                             className: 'form-input',
                             required: true,
                             placeholder: '-- Pilih Tujuan --'
@@ -294,7 +296,9 @@ function formatTimestampIndo(isoStr) {
                     </div>
 
                     <%- include('partials/form-data-santri', { 
-                        layout: 'flat-grid'
+                        layout: 'flat-grid',
+                        idPrefix: 'add_',
+                        useNameSelect: true
                     }) %>
                 </div>
     

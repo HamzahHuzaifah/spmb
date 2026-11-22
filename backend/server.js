@@ -28,8 +28,8 @@ app.use(morgan(morganFormat, {
     }
 }));
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(cookieParser()); // PENTING: Memungkinkan Express membaca cookie token login
 // PENTING: Global Sanitizer! Semua input dari user (Admin & Public) akan dicuci di sini
 app.use(sanitizeInput);

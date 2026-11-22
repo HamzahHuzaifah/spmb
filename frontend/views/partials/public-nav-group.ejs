@@ -1,0 +1,35 @@
+<%
+/**
+ * Reusable Component: public-nav-group.ejs
+ * Props:
+ * - currentForm: 'reguler' | 'ulang' | 'beasiswa'
+ */
+const activeForm = typeof currentForm !== 'undefined' ? currentForm : 'reguler';
+%>
+<hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0 20px 0;">
+
+<div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; text-align: center;">Navigasi Pendaftaran &amp; Menu</div>
+
+<div class="public-nav-group">
+    <% if (activeForm !== 'reguler') { %>
+        <a href="/daftar" class="public-nav-btn public-nav-btn-primary">
+            <i class="fas fa-user-plus"></i> Jalur Reguler
+        </a>
+    <% } %>
+
+    <% if (activeForm !== 'ulang') { %>
+        <a href="/daftar-ulang" class="public-nav-btn public-nav-btn-primary">
+            <i class="fas fa-sync-alt"></i> Daftar Ulang (Naik Tingkat)
+        </a>
+    <% } %>
+
+    <% if (activeForm !== 'beasiswa') { %>
+        <a href="/daftar/beasiswa" class="public-nav-btn public-nav-btn-beasiswa">
+            <i class="fas fa-hand-holding-heart"></i> Jalur Beasiswa
+        </a>
+    <% } %>
+
+    <a href="/" class="public-nav-btn public-nav-btn-full">
+        <i class="fas fa-home"></i> Kembali ke Beranda
+    </a>
+</div>

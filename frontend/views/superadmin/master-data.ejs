@@ -25,6 +25,9 @@
         <button class="nav-tab" onclick="switchTab('tahun-ajaran')" id="tab-btn-tahun-ajaran" style="padding: 12px 24px; border: none; background: transparent; color: #64748b; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">
             <i class="fas fa-clock" style="margin-right: 8px;"></i> Tahun Ajaran
         </button>
+        <button class="nav-tab" onclick="switchTab('jumbotron')" id="tab-btn-jumbotron" style="padding: 12px 24px; border: none; background: transparent; color: #64748b; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+            <i class="fas fa-images" style="margin-right: 8px;"></i> Jumbotron Beranda
+        </button>
     </div>
 
     <!-- JENJANG -->
@@ -237,6 +240,94 @@
             </div>
         </div>
     </div>
+
+    <!-- JUMBOTRON BERANDA -->
+    <div id="tab-jumbotron" class="tab-content-section" style="display: none;">
+        <!-- Pengaturan Transisi & Overlay Jumbotron -->
+        <div class="table-container" style="border-radius: var(--radius-md); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <h5 style="margin: 0; color: #1e293b; font-weight: 700; font-size: 16px;"><i class="fas fa-sliders-h" style="color: #10b981; margin-right: 8px;"></i> Pengaturan Transisi &amp; Lapisan Warna Jumbotron</h5>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Atur durasi pergantian foto otomatis dan tingkat kegelapan lapisan hijau di belakang tulisan judul halaman utama agar teks tetap terbaca jelas.</p>
+                </div>
+            </div>
+            <form id="jumbotronSettingsForm" style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #475569;">Durasi Transisi Antar Foto (Detik)</label>
+                    <input type="number" id="jb_interval" name="interval" min="2" max="30" value="<%= typeof jumbotronInterval !== 'undefined' ? jumbotronInterval : 5 %>" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #475569;">Ketebalan Overlay Hijau Gelap (30% - 90%)</label>
+                    <input type="number" id="jb_overlay" name="overlay" min="30" max="90" value="<%= typeof jumbotronOverlay !== 'undefined' ? jumbotronOverlay : 65 %>" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="background: #0ea5e9; border: none; border-radius: 8px; padding: 11px 22px; color: white; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.25);">
+                        <i class="fas fa-save"></i> Simpan Pengaturan Transisi
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabel Daftar Foto Jumbotron -->
+        <div class="table-container" style="border-radius: var(--radius-md); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="table-header">
+                <div>
+                    <h5 class="table-title" style="margin: 0; color: #1e293b; font-weight: 700;">Daftar Foto Slide Jumbotron Halaman Utama</h5>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Foto yang berstatus <strong>Aktif</strong> akan ditampilkan secara bergantian (slideshow) sebagai latar belakang Jumbotron di halaman utama pendaftaran.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('jumbotron')" style="background: #10b981; border-radius: 8px; padding: 10px 20px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-plus"></i> Tambah Foto Jumbotron
+                </button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Urutan</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Pratinjau Foto</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Judul / Keterangan Kegiatan</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase;">Status</th>
+                            <th style="padding: 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase; text-align: right;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof jumbotron !== 'undefined' && jumbotron.length > 0) { %>
+                            <% jumbotron.forEach((jb) => { %>
+                            <tr style="transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #475569;">#<%= jb.urutan || 1 %></td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
+                                    <img src="<%= jb.image_url %>" alt="<%= jb.judul %>" style="width: 140px; height: 76px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                                </td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #0f172a;">
+                                    <%= jb.judul || 'Kegiatan Santri Madrasah JIC' %>
+                                    <div style="font-size: 11.5px; color: #94a3b8; font-weight: 400; margin-top: 3px;"><%= jb.image_url %></div>
+                                </td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9;">
+                                    <% if (jb.status === 'Aktif') { %>
+                                        <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Aktif</span>
+                                    <% } else { %>
+                                        <span style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Nonaktif</span>
+                                    <% } %>
+                                </td>
+                                <td style="padding: 16px; border-bottom: 1px solid #f1f5f9; text-align: right;">
+                                    <button data-item="<%= JSON.stringify(jb) %>" onclick="openModal('jumbotron', true, JSON.parse(this.getAttribute('data-item')))" class="btn-edit" style="background: rgba(245, 158, 11, 0.1); color: #d97706; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-right: 5px;"><i class="fas fa-edit"></i> Edit</button>
+                                    <button onclick="deleteData('jumbotron', <%= jb.id %>)" class="btn-delete" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="padding: 28px; text-align: center; color: #64748b;">
+                                    <i class="fas fa-images" style="font-size: 28px; color: #cbd5e1; display: block; margin-bottom: 8px;"></i>
+                                    Belum ada foto Jumbotron yang diunggah. Saat ini halaman utama menggunakan latar belakang hijau zamrud default.
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Form -->
@@ -313,6 +404,24 @@
                     </div>
                     <small style="color: #64748b; font-size: 12px; margin-top: 6px; display: block;">Contoh: Tahun Mulai 2026, Tahun Selesai 2027 menghasilkan Nama "2026/2027".</small>
                 </div>
+
+                <!-- Jumbotron Specific -->
+                <div class="jumbotron-only" style="margin-bottom: 20px; display:none;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Unggah Foto Kegiatan Santri (JPG / PNG / WebP)</label>
+                    <input type="file" id="m_jumbotron_file" accept="image/jpeg,image/png,image/webp" style="width: 100%; padding: 10px; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 13px; background: #f8fafc; cursor: pointer;">
+                    <input type="hidden" id="m_image_base64" name="image_base64">
+                    <div id="m_jumbotron_preview_wrap" style="margin-top: 12px; display: none; text-align: center;">
+                        <img id="m_jumbotron_preview" src="" alt="Preview Jumbotron" style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; margin-bottom: 6px; font-size: 12.5px; font-weight: 600; color: #64748b;">Atau Gunakan URL/Path Gambar (Opsional)</label>
+                        <input type="text" id="m_image_url_manual" name="image_url_manual" placeholder="/images/madrasahjic.webp atau https://..." style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #1e293b;">
+                    </div>
+                    <div style="margin-top: 14px;">
+                        <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #475569;">Urutan Slide</label>
+                        <input type="number" id="m_urutan" name="urutan" min="1" value="1" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #1e293b;">
+                    </div>
+                </div>
                 
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569;">Status</label>
@@ -334,180 +443,5 @@
     </div>
 </div>
 
-<script>
-    // Tab Script
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content-section').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.nav-tab').forEach(el => {
-            el.style.background = 'transparent';
-            el.style.color = '#64748b';
-            el.classList.remove('active-tab');
-        });
-        
-        document.getElementById('tab-' + tabId).style.display = 'block';
-        const activeBtn = document.getElementById('tab-btn-' + tabId);
-        activeBtn.style.background = '#e0f2fe';
-        activeBtn.style.color = '#0ea5e9';
-        activeBtn.classList.add('active-tab');
-    }
-
-    function openModal(type, isEdit = false, data = {}) {
-        const modal = document.getElementById('masterModal');
-        const modalContent = modal.querySelector('div');
-        
-        let titleName = type.charAt(0).toUpperCase() + type.slice(1);
-        document.getElementById('modalTitle').innerText = isEdit ? 'Edit ' + titleName : 'Tambah ' + titleName;
-        document.getElementById('formType').value = type;
-        document.getElementById('dataId').value = data.id || '';
-        document.getElementById('m_nama').value = data.nama || '';
-        document.getElementById('m_status').value = data.status || 'Aktif';
-
-        document.querySelectorAll('.jenjang-only, .gelombang-only, .jalur-only, .tahun-ajaran-only').forEach(el => el.style.display = 'none');
-        document.getElementById('status_help_text').style.display = (type === 'tahun-ajaran') ? 'block' : 'none';
-        
-        if(type === 'jenjang') {
-            document.querySelectorAll('.jenjang-only').forEach(el => el.style.display = 'block');
-            document.getElementById('m_kuota').value = data.kuota || 0;
-        } else if(type === 'gelombang') {
-            document.querySelectorAll('.gelombang-only').forEach(el => el.style.display = 'block');
-            document.getElementById('m_tgl_mulai').value = data.tanggal_mulai ? data.tanggal_mulai.split('T')[0] : '';
-            document.getElementById('m_tgl_selesai').value = data.tanggal_selesai ? data.tanggal_selesai.split('T')[0] : '';
-            document.getElementById('m_buka_baru').checked = data.buka_pendaftaran_baru !== undefined ? data.buka_pendaftaran_baru : true;
-            document.getElementById('m_buka_beasiswa').checked = data.buka_pendaftaran_beasiswa !== undefined ? data.buka_pendaftaran_beasiswa : true;
-            document.getElementById('m_buka_ulang').checked = data.buka_daftar_ulang !== undefined ? data.buka_daftar_ulang : true;
-        } else if(type === 'jalur') {
-            document.querySelectorAll('.jalur-only').forEach(el => el.style.display = 'block');
-            document.getElementById('m_biaya').value = data.biaya || 0;
-            document.getElementById('m_syarat').value = data.syarat_dokumen || '';
-        } else if(type === 'tahun-ajaran') {
-            document.querySelectorAll('.tahun-ajaran-only').forEach(el => el.style.display = 'block');
-            document.getElementById('m_tahun_mulai').value = data.tahun_mulai || new Date().getFullYear();
-            document.getElementById('m_tahun_selesai').value = data.tahun_selesai || (new Date().getFullYear() + 1);
-            if (!isEdit && !data.nama) {
-                document.getElementById('m_nama').value = `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`;
-            }
-        }
-        
-        modal.style.display = 'flex';
-        void modal.offsetWidth; // trigger reflow
-        modal.style.opacity = '1';
-        modalContent.style.transform = 'translateY(0)';
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('masterModal');
-        const modalContent = modal.querySelector('div');
-        
-        modal.style.opacity = '0';
-        modalContent.style.transform = 'translateY(-20px)';
-        
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.getElementById('masterForm').reset();
-        }, 300);
-    }
-
-    document.getElementById('masterForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const type = document.getElementById('formType').value;
-        const id = document.getElementById('dataId').value;
-        const url = `/superadmin/master-data/${type}/${id ? 'edit/'+id : 'add'}`;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(Object.fromEntries(new FormData(this)))
-        }).then(r => r.json()).then(res => {
-            if(res.success) {
-                Swal.fire('Berhasil!', 'Data berhasil disimpan.', 'success').then(() => location.reload());
-            } else {
-                Swal.fire('Gagal!', res.message, 'error');
-            }
-        });
-    });
-
-    function setDefaultTA(id) {
-        Swal.fire({
-            title: 'Jadikan Default Publik?',
-            text: "Form pendaftaran publik akan diarahkan ke tahun ajaran ini.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#10b981',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Ya, Jadikan Default',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/superadmin/master-data/tahun-ajaran/set-default/${id}`, { method: 'POST' })
-                .then(r => r.json()).then(res => {
-                    if(res.success) {
-                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Gagal!', res.message, 'error');
-                    }
-                });
-            }
-        });
-    }
-
-    // Auto-update Nama Tahun Ajaran saat tahun mulai/selesai diubah
-    const tMul = document.getElementById('m_tahun_mulai');
-    const tSel = document.getElementById('m_tahun_selesai');
-    if (tMul && tSel) {
-        tMul.addEventListener('input', function() {
-            if (document.getElementById('formType').value === 'tahun-ajaran') {
-                const y = parseInt(this.value, 10);
-                if (!isNaN(y)) {
-                    tSel.value = y + 1;
-                    document.getElementById('m_nama').value = `${y}/${y + 1}`;
-                }
-            }
-        });
-        tSel.addEventListener('input', function() {
-            if (document.getElementById('formType').value === 'tahun-ajaran') {
-                const y1 = parseInt(tMul.value, 10);
-                const y2 = parseInt(this.value, 10);
-                if (!isNaN(y1) && !isNaN(y2)) {
-                    document.getElementById('m_nama').value = `${y1}/${y2}`;
-                }
-            }
-        });
-    }
-
-    function deleteData(type, id) {
-        Swal.fire({
-            title: 'Hapus Data?',
-            text: "Tindakan ini tidak dapat dibatalkan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/superadmin/master-data/${type}/delete/${id}`, { method: 'POST' })
-                .then(r => r.json()).then(res => {
-                    if(res.success) {
-                        Swal.fire('Terhapus!', 'Data telah dihapus.', 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Gagal!', res.message, 'error');
-                    }
-                });
-            }
-        });
-    }
-    
-    // Add hover effects for buttons
-    document.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('mouseenter', () => { btn.style.background = '#d97706'; btn.style.color = 'white'; });
-        btn.addEventListener('mouseleave', () => { btn.style.background = 'rgba(245, 158, 11, 0.1)'; btn.style.color = '#d97706'; });
-    });
-    
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('mouseenter', () => { btn.style.background = '#ef4444'; btn.style.color = 'white'; });
-        btn.addEventListener('mouseleave', () => { btn.style.background = 'rgba(239, 68, 68, 0.1)'; btn.style.color = '#ef4444'; });
-    });
-</script>
-
+<script src="/js/superadmin-master.js?v=1"></script>
 <%- include('partials/footer') %>

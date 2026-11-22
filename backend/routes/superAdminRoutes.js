@@ -49,6 +49,11 @@ router.post('/master-data/tahun-ajaran/edit/:id', masterDataController.editTahun
 router.post('/master-data/tahun-ajaran/set-default/:id', masterDataController.setDefaultTahunAjaran);
 router.post('/master-data/tahun-ajaran/delete/:id', masterDataController.deleteTahunAjaran);
 
+router.post('/master-data/jumbotron/add', masterDataController.addJumbotron);
+router.post('/master-data/jumbotron/edit/:id', masterDataController.editJumbotron);
+router.post('/master-data/jumbotron/delete/:id', masterDataController.deleteJumbotron);
+router.post('/master-data/jumbotron/settings', masterDataController.saveJumbotronSettings);
+
 // Activity Logs
 router.get('/logs', logController.getLogs);
 
